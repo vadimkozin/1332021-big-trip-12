@@ -1,7 +1,7 @@
 # Личный проект «Большое путешествие» [![Build status][travis-image]][travis-url]
 
 * Студент: [Ulin Salma](https://up.htmlacademy.ru/ecmascript/12/user/1332021).
-* Наставник: `Неизвестно`.
+* Наставник: [Станислав Посиделов](https://htmlacademy.ru/profile/stanispos).
 
 ---
 
