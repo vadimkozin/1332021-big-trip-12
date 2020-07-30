@@ -67,7 +67,6 @@ const createSortTemplate = () =>
   <span class="trip-sort__item  trip-sort__item--offers">Offers</span>
   </form>`;
 
-//
 const createTripDaysTemplate = () => `<ul class="trip-days"></ul>`;
 
 const createTripDaysItemTemplate = () => `<li class="trip-days__item day"></li>`;
@@ -115,7 +114,7 @@ const createTripEventsItemTemplate = () =>
       </button>
     </div>
   </li>`;
-//
+
 
 const createAddFirstEventTemplate = () =>
   `<form class="trip-events__item  event  event--edit" action="#" method="post">
@@ -244,8 +243,8 @@ const render = (container, template, position = Position.BEFORE_END) => {
 };
 
 const siteTripMainElement = document.querySelector(`.trip-main`);
-const siteMenuElement = siteTripMainElement.querySelector(`.trip-main__trip-controls > h2`);
-const siteFilterElement = siteTripMainElement.querySelector(`.trip-main__trip-controls > h2 + h2`);
+const siteMenuElement = siteTripMainElement.querySelector(`.trip-main__trip-controls h2:first-child`);
+const siteFilterElement = siteTripMainElement.querySelector(`.trip-main__trip-controls h2:last-child`);
 const siteTripEventsElement = document.querySelector(`.trip-events`);
 const siteSortElement = siteTripEventsElement.querySelector(`h2`);
 
@@ -257,13 +256,16 @@ render(siteSortElement, createAddFirstEventTemplate(), Position.AFTER_END);
 
 // элементы маршрута
 render(siteTripEventsElement, createTripDaysTemplate());
+
 const tripDaysItemElement = siteTripEventsElement.querySelector(`.trip-days`);
+
 render(tripDaysItemElement, createTripDaysItemTemplate());
 render(tripDaysItemElement, createDayInfoTemplate());
 render(tripDaysItemElement, createTripEventsListTemplate());
 
 // ТЗ: компонент «Точка маршрута» отрисовывается 3 раза;
 const tripListElement = siteTripEventsElement.querySelector(`.trip-events__list`);
+
 for (let i = 0; i < ROUTE_POINT_COUNT; i++) {
   render(tripListElement, createTripEventsItemTemplate());
 }
