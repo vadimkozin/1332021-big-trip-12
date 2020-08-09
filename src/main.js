@@ -9,9 +9,9 @@ import {createTripEventsItemTemplate} from './view/trip-events-item';
 import {createAddFirstEventTemplate} from './view/add-first-event';
 import {createTripAndCostTemplate} from './view/trip-and-cost';
 import {generateRoute} from './mock/route';
-import {getRouteInfo, setOrdinalDaysRoute} from './utils';
+import {getRouteInfo, setOrdinalDaysRoute, getDaysRoute} from './utils';
 
-const ROUTE_POINT_COUNT = 3;
+const ROUTE_POINT_COUNT = 13;
 
 const Position = {
   BEFORE_BEGIN: `beforebegin`,
@@ -31,6 +31,8 @@ const render = (container, template, position = Position.BEFORE_END) => {
 const renderRoute = (points) => {
   const routeInfo = getRouteInfo(points);
   console.log(routeInfo);
+  const days = getDaysRoute(points);
+  console.log(days);
 
   const siteTripMainElement = document.querySelector(`.trip-main`);
   const siteMenuElement = siteTripMainElement.querySelector(`.trip-main__trip-controls h2:first-child`);
@@ -47,10 +49,21 @@ const renderRoute = (points) => {
   // элементы маршрута
   render(siteTripEventsElement, createTripDaysTemplate());
 
-  const tripDaysItemElement = siteTripEventsElement.querySelector(`.trip-days`);
+  const tripDaysElement = siteTripEventsElement.querySelector(`.trip-days`);
 
-  render(tripDaysItemElement, createTripDaysItemTemplate());
-  render(tripDaysItemElement, createDayInfoTemplate());
+  render(tripDaysElement, createTripDaysItemTemplate());
+
+  const tripDaysItemElement = tripDaysElement.querySelector(`.trip-days__item`);
+
+  days.forEach((day) => {
+    const p = points.filter((it) => it.order === day);
+
+    // render(tripDaysItemElement, createDayInfoTemplate(p[0].date1));
+    // render(tripDaysItemElement, createTripEventsListTemplate());
+
+  });
+
+  render(tripDaysItemElement, createDayInfoTemplate(points[0].date1));
   render(tripDaysItemElement, createTripEventsListTemplate());
 
   const tripListElement = siteTripEventsElement.querySelector(`.trip-events__list`);

@@ -149,6 +149,15 @@ const getDuration = (date1, date2, separator = `--`) => {
 // замена в строке
 export const replaceStr = (str, search = `--`, replace = `&nbsp;&mdash;&nbsp;`) => str.split(search).join(replace);
 
+export const getDaysRoute = (points) => {
+  const days = points.reduce((orders, it) => {
+    orders.push(it.order);
+    return orders;
+  }, []);
+
+  return [...new Set(days)];
+};
+
 // возвращает инфо по маршруту
 export const getRouteInfo = (route) => {
   const separator = `--`;
