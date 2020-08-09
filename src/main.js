@@ -8,6 +8,8 @@ import {createTripEventsListTemplate} from './view/trip-events-list';
 import {createTripEventsItemTemplate} from './view/trip-events-item';
 import {createAddFirstEventTemplate} from './view/add-first-event';
 import {createTripAndCostTemplate} from './view/trip-and-cost';
+import {generateRoute} from './mock/route';
+import {getRouteInfo, setOrdinalDaysRoute} from './utils';
 
 const ROUTE_POINT_COUNT = 3;
 
@@ -18,33 +20,45 @@ const Position = {
   AFTER_END: `afterend`,
 };
 
+const route = Array(ROUTE_POINT_COUNT).fill().map(() => generateRoute());
+setOrdinalDaysRoute(route);
+console.log(route.slice());
+
 const render = (container, template, position = Position.BEFORE_END) => {
   container.insertAdjacentHTML(position, template);
 };
 
-const siteTripMainElement = document.querySelector(`.trip-main`);
-const siteMenuElement = siteTripMainElement.querySelector(`.trip-main__trip-controls h2:first-child`);
-const siteFilterElement = siteTripMainElement.querySelector(`.trip-main__trip-controls h2:last-child`);
-const siteTripEventsElement = document.querySelector(`.trip-events`);
-const siteSortElement = siteTripEventsElement.querySelector(`h2`);
+const renderRoute = (points) => {
+  const routeInfo = getRouteInfo(points);
+  console.log(routeInfo);
 
-render(siteTripMainElement, createTripAndCostTemplate(), Position.AFTER_BEGIN);
-render(siteMenuElement, createSiteMenuTemplate(), Position.AFTER_END);
-render(siteFilterElement, createFilterTemplate(), Position.AFTER_END);
-render(siteSortElement, createSortTemplate(), Position.AFTER_END);
-render(siteSortElement, createAddFirstEventTemplate(), Position.AFTER_END);
+  const siteTripMainElement = document.querySelector(`.trip-main`);
+  const siteMenuElement = siteTripMainElement.querySelector(`.trip-main__trip-controls h2:first-child`);
+  const siteFilterElement = siteTripMainElement.querySelector(`.trip-main__trip-controls h2:last-child`);
+  const siteTripEventsElement = document.querySelector(`.trip-events`);
+  const siteSortElement = siteTripEventsElement.querySelector(`h2`);
 
-// элементы маршрута
-render(siteTripEventsElement, createTripDaysTemplate());
+  render(siteTripMainElement, createTripAndCostTemplate(routeInfo), Position.AFTER_BEGIN);
+  render(siteMenuElement, createSiteMenuTemplate(), Position.AFTER_END);
+  render(siteFilterElement, createFilterTemplate(), Position.AFTER_END);
+  render(siteSortElement, createSortTemplate(), Position.AFTER_END);
+  render(siteSortElement, createAddFirstEventTemplate(), Position.AFTER_END);
 
-const tripDaysItemElement = siteTripEventsElement.querySelector(`.trip-days`);
+  // элементы маршрута
+  render(siteTripEventsElement, createTripDaysTemplate());
 
-render(tripDaysItemElement, createTripDaysItemTemplate());
-render(tripDaysItemElement, createDayInfoTemplate());
-render(tripDaysItemElement, createTripEventsListTemplate());
+  const tripDaysItemElement = siteTripEventsElement.querySelector(`.trip-days`);
 
-const tripListElement = siteTripEventsElement.querySelector(`.trip-events__list`);
+  render(tripDaysItemElement, createTripDaysItemTemplate());
+  render(tripDaysItemElement, createDayInfoTemplate());
+  render(tripDaysItemElement, createTripEventsListTemplate());
 
-for (let i = 0; i < ROUTE_POINT_COUNT; i++) {
-  render(tripListElement, createTripEventsItemTemplate());
-}
+  const tripListElement = siteTripEventsElement.querySelector(`.trip-events__list`);
+
+  for (let i = 0; i < ROUTE_POINT_COUNT; i++) {
+    render(tripListElement, createTripEventsItemTemplate());
+  }
+
+};
+
+renderRoute(route);

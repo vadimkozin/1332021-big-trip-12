@@ -130,17 +130,24 @@ export const getRandomPhotos = (url, from = 1, to = 5) => {
 
 };
 
-// возвращает продолжительность маршрута в виде: "18 AUG - 6 OCT" или "MAR 18 - 20"
+// возвращает продолжительность маршрута в виде: "18 AUG--6 OCT" или "MAR 18--20"
 const getDuration = (date1, date2, separator = `--`) => {
 
-  return (date1.getMonth() === date2.getMonth() && date1.getFullYear() === date2.getFullYear())
-    ? `${Atom.MONTHS[date1.getMonth()]} ${date1.getDate()}${separator}${date2.getDate()}`
-    : `${formatDate.dm(date1)}${separator}${formatDate.dm(date2)}`;
+  const inOneMonth = date1.getMonth() === date2.getMonth() && date1.getFullYear() === date2.getFullYear();
+  const inDay = inOneMonth && date1.getDate() === date2.getDate();
+
+  if (inDay) { // 18 AUG
+    return `${formatDate.dm(date1)}`;
+  } else if (inOneMonth) { // AUG 18--20
+    return `${Atom.MONTHS[date1.getMonth()]} ${date1.getDate()}${separator}${date2.getDate()}`;
+  } else { // 18 AUG--6 OCT
+    return `${Atom.MONTHS[date1.getMonth()]} ${date1.getDate()}${separator}${date2.getDate()} ${Atom.MONTHS[date2.getMonth()]}`;
+  }
 
 };
 
 // замена в строке
-export const replaceStr = (str, find = `--`, replace = `&mdash;`) => str.replace(find, replace);
+export const replaceStr = (str, search = `--`, replace = `&nbsp;&mdash;&nbsp;`) => str.split(search).join(replace);
 
 // возвращает инфо по маршруту
 export const getRouteInfo = (route) => {
