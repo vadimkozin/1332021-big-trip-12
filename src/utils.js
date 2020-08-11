@@ -1,4 +1,6 @@
-const Atom = {
+import {namesToActionMap} from './mock/param';
+
+export const Atom = {
   MONTHS: [`Jan`, `Feb`, `Mar`, `Apr`, `May`, `Jun`, `Jul`, `Aug`, `Sep`, `Oct`, `Nov`, `Dec`],
   Time: {
     ADD_MINUTES: `minutes`,
@@ -10,6 +12,7 @@ const Atom = {
     MSEC_PER_HOUR: 60 * 60 * 1000, // миллисекунд в часе
     MSEC_PER_DAY: 60 * 60 * 1000 * 24, // миллисекунд в сутках
   },
+  OFFERS_MAX: 3, // показывать максимально предложений в отчёте
 };
 
 // возвращает случайное число из диапазона
@@ -27,15 +30,13 @@ const addZeros = (n, needLength = 2) => {
   return n;
 };
 
-// форматривание дат: ymd:'2020-08-25', md:'25 AUG', dm:'AUG 25'
-// ymdhm:'2019-03-18T10:30', hm:'10:30'
+// форматривание дат: dm:'AUG 25' md:'25 AUG' hm:'10:30' ymd:'2020-08-25' ymdhm:'2019-03-18T10:30'
 export const formatDate = {
   dm: (date) => `${date.getDate()} ${Atom.MONTHS[date.getMonth()]}`,
   md: (date) => `${Atom.MONTHS[date.getMonth()]} ${date.getDate()}`,
-  hm: (date) => `${addZeros(date.getHours)}:${addZeros(date.getMinutes)}`,
+  hm: (date) => `${addZeros(date.getHours())}:${addZeros(date.getMinutes())}`,
   ymd: (date) => `${date.getFullYear()}-${addZeros(date.getMonth() + 1)}-${addZeros(date.getDate())}`,
   ymdhm: (date) => `${formatDate.ymd(date)}T${formatDate.hm(date)}`,
-  ymdhm_: (date) => `${date.getFullYear()}-${addZeros(date.getMonth() + 1)}-${addZeros(date.getDate())}T${addZeros(date.getHours())}:${addZeros(date.getMinutes)}`,
 };
 
 // возвращает продолжительность маршрута в формате: "23M" or "02H 44M" or "01D 02H 30M"
@@ -146,7 +147,7 @@ const getDuration = (date1, date2, separator = `--`) => {
 
 };
 
-// замена в строке
+// замена в строке (по умолчанию меняет два тире на длинное тире в html)
 export const replaceStr = (str, search = `--`, replace = `&nbsp;&mdash;&nbsp;`) => str.split(search).join(replace);
 
 export const getDaysRoute = (points) => {
@@ -226,4 +227,10 @@ export const setOrdinalDaysRoute = (points) => {
 
     return it;
   });
+};
+
+// возвращает название события в виде: 'Taxi to Amsterdam' || 'Restaurant in Geneva'
+export const getEventTitle = (type, destination) => {
+  const action = namesToActionMap[type];
+  return `${type} ${action} ${destination}`;
 };

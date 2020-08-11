@@ -74,10 +74,8 @@ const renderRoute = (points) => {
       render(tripListElement, createTripEventsItemTemplate(point)); // <li class="trip-events__item">
     });
 
-
   });
 
 };
-
 
 renderRoute(route);
