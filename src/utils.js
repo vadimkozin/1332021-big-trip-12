@@ -93,7 +93,7 @@ export const getTimeAndDuration = (date1 = new Date(), date2 = new Date()) => {
 // добавляя timeShift, одно из: ['minutes', 'hours', 'days']
 export const getNextRandomDate = (lastDate = Date.now(), timeShift = `hours`) => {
   const minutes = getRandomInteger(10, 59);
-  const hours = getRandomInteger(1, 23);
+  const hours = getRandomInteger(1, 10);
   const days = getRandomInteger(1, 3);
   const {Duration: dur} = Atom;
 

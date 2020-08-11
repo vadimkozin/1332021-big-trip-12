@@ -46,9 +46,11 @@ const generateOffers = (type, from = 0, to = 5) => {
 let currentDate = Date.now();
 
 export const generateRoute = () => {
+  const times = [`hours`, `minutes`];
   const type = generatePointType();
   const date1 = getNextRandomDate(currentDate, `hours`);
-  const date2 = getNextRandomDate(date1, `minutes`);
+  const index = getRandomInteger(0, times.length - 1);
+  const date2 = getNextRandomDate(date1, times[index]);
 
   currentDate = date2;
 

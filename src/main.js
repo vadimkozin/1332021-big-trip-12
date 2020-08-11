@@ -13,7 +13,7 @@ import {getRouteInfo, setOrdinalDaysRoute, getDaysRoute} from './utils';
 import {createNoRouteTemplate} from './view/no-route';
 import {Param} from './mock/param';
 
-const ROUTE_POINT_COUNT = 10;
+const ROUTE_POINT_COUNT = 33;
 
 const Position = {
   BEFORE_BEGIN: `beforebegin`,
@@ -30,26 +30,21 @@ const render = (container, template, position = Position.BEFORE_END) => {
 
 const renderRoute = (points) => {
 
-  if (points.length < 2) { // 2 так как 1-я точка по ТЗ зарезервирована под Форму редактирования
+  if (points.length < 2) { // 2 так как 1-я точка по ТЗ зарезервирована для Формы редактирования
     render(document.querySelector(`.trip-events`), createNoRouteTemplate());
     return;
   }
 
-  console.log(points);
   // ТЗ: данные первого по порядку элемента массива -> в Форму редактирования
   const pointFirst = points[0];
 
   // ТЗ: остальные данные в массиве для точек маршрута:
   points = points.slice(1);
-  console.log(points);
 
   setOrdinalDaysRoute(points);
 
   const routeInfo = getRouteInfo(points);
-  console.log(routeInfo);
   const days = getDaysRoute(points);
-  console.log(days);
-
 
   const siteTripMainElement = document.querySelector(`.trip-main`);
   const siteMenuElement = siteTripMainElement.querySelector(`.trip-main__trip-controls h2:first-child`);
@@ -64,7 +59,6 @@ const renderRoute = (points) => {
 
   // форма добавления нового события
   // ТЗ: данные первого по порядку элемента массива -> в Форму редактирования
-  // point, eventsTransfer, eventsActivity
   const names1 = Param.Event.Vehicle.NAMES;
   const names2 = Param.Event.Place.NAMES;
   const cities = Param.DESTINATIONS;
@@ -72,7 +66,7 @@ const renderRoute = (points) => {
   render(siteSortElement, createAddFirstEventTemplate(pointFirst, cities, names1, names2), Position.AFTER_END);
 
   // элементы маршрута
-  render(siteTripEventsElement, createTripDaysTemplate()); // `<ul class="trip-days"></ul>`
+  render(siteTripEventsElement, createTripDaysTemplate());
 
   const tripDaysElement = siteTripEventsElement.querySelector(`.trip-days`);
 
@@ -81,7 +75,7 @@ const renderRoute = (points) => {
     const pointsOfDay = points.filter((it) => it.order === day);
 
     // начинаем очередной день
-    render(tripDaysElement, createTripDaysItemTemplate()); // `<li class="trip-days__item day"></li>`
+    render(tripDaysElement, createTripDaysItemTemplate());
 
     const tripDaysItemElement = tripDaysElement.querySelector(`.trip-days__item:nth-child(${day})`);
 
@@ -89,13 +83,13 @@ const renderRoute = (points) => {
     render(tripDaysItemElement, createDayInfoTemplate(day, pointsOfDay[0].date1));
 
     // контейнер для точек маршрута в текущем дне
-    render(tripDaysItemElement, createTripEventsListTemplate()); // `<ul class="trip-events__list"></ul>`;
+    render(tripDaysItemElement, createTripEventsListTemplate());
 
     const tripListElement = tripDaysItemElement.querySelector(`.trip-events__list`);
 
     // отрисовываем все точки маршрута текущего дня
     pointsOfDay.forEach((point) => {
-      render(tripListElement, createTripEventsItemTemplate(point)); // <li class="trip-events__item">
+      render(tripListElement, createTripEventsItemTemplate(point));
     });
 
   });
