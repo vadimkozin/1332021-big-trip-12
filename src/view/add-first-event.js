@@ -1,4 +1,38 @@
-export const createAddFirstEventTemplate = () =>
+import {formatDate as format, getEventType} from '../utils';
+
+const createEventList = (events, typeEvent) => {
+
+  let html = ``;
+
+  events.forEach((it) => {
+
+    const itLower = it.toLowerCase();
+    const checked = it === typeEvent ? `checked` : ``;
+
+    html += `<div class="event__type-item">
+      <input id="event-type-${itLower}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${itLower}" ${checked}>
+      <label class="event__type-label  event__type-label--${itLower}" for="event-type-${itLower}-1">${it}</label>
+      </div>`;
+  });
+
+  return html;
+
+};
+
+const createCityList = (cities) => {
+
+  let html = ``;
+
+  cities.forEach((it) => {
+    html += `<option value="${it}"></option>`;
+  });
+
+  return html;
+};
+
+const getPlaceholder = (type) => getEventType(type);
+
+export const createAddFirstEventTemplate = (point, cities, eventsTransfer, eventsActivity) =>
   `<form class="trip-events__item  event  event--edit" action="#" method="post">
     <header class="event__header">
       <div class="event__type-wrapper">
@@ -11,7 +45,8 @@ export const createAddFirstEventTemplate = () =>
         <div class="event__type-list">
           <fieldset class="event__type-group">
             <legend class="visually-hidden">Transfer</legend>
-
+            ${createEventList(eventsTransfer, point.type)}
+      <!--
             <div class="event__type-item">
               <input id="event-type-taxi-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="taxi">
               <label class="event__type-label  event__type-label--taxi" for="event-type-taxi-1">Taxi</label>
@@ -46,11 +81,13 @@ export const createAddFirstEventTemplate = () =>
               <input id="event-type-flight-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="flight">
               <label class="event__type-label  event__type-label--flight" for="event-type-flight-1">Flight</label>
             </div>
+      -->
           </fieldset>
 
           <fieldset class="event__type-group">
             <legend class="visually-hidden">Activity</legend>
-
+            ${createEventList(eventsActivity, point.type)}
+      <!--
             <div class="event__type-item">
               <input id="event-type-check-in-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="check-in">
               <label class="event__type-label  event__type-label--check-in" for="event-type-check-in-1">Check-in</label>
@@ -65,20 +102,25 @@ export const createAddFirstEventTemplate = () =>
               <input id="event-type-restaurant-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="restaurant">
               <label class="event__type-label  event__type-label--restaurant" for="event-type-restaurant-1">Restaurant</label>
             </div>
+      -->
           </fieldset>
         </div>
       </div>
 
       <div class="event__field-group  event__field-group--destination">
         <label class="event__label  event__type-output" for="event-destination-1">
-          Bus to
+        <!--  Bus to  -->
+        ${getPlaceholder(point.type)}
         </label>
         <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="" list="destination-list-1">
         <datalist id="destination-list-1">
+          ${createCityList(cities)}
+    <!--
           <option value="Amsterdam"></option>
           <option value="Geneva"></option>
           <option value="Chamonix"></option>
           <option value="Saint Petersburg"></option>
+    -->
         </datalist>
       </div>
 
@@ -86,12 +128,16 @@ export const createAddFirstEventTemplate = () =>
         <label class="visually-hidden" for="event-start-time-1">
           From
         </label>
-        <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="18/03/19 00:00">
+        <!-- <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="18/03/19 00:00"> -->
+        <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${format.dmy(point.date1)}">
+
         &mdash;
         <label class="visually-hidden" for="event-end-time-1">
           To
         </label>
-        <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="18/03/19 00:00">
+        <!-- <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="18/03/19 00:00"> -->
+        <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${format.dmy(point.date2)}">
+
       </div>
 
       <div class="event__field-group  event__field-group--price">
@@ -99,7 +145,7 @@ export const createAddFirstEventTemplate = () =>
           <span class="visually-hidden">Price</span>
           &euro;
         </label>
-        <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="">
+        <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${point.price}">
       </div>
 
       <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>

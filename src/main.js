@@ -10,8 +10,10 @@ import {createAddFirstEventTemplate} from './view/add-first-event';
 import {createTripAndCostTemplate} from './view/trip-and-cost';
 import {generateRoute} from './mock/route';
 import {getRouteInfo, setOrdinalDaysRoute, getDaysRoute} from './utils';
+import {createNoRouteTemplate} from './view/no-route';
+import {Param} from './mock/param';
 
-const ROUTE_POINT_COUNT = 15;
+const ROUTE_POINT_COUNT = 10;
 
 const Position = {
   BEFORE_BEGIN: `beforebegin`,
@@ -21,18 +23,33 @@ const Position = {
 };
 
 const route = Array(ROUTE_POINT_COUNT).fill().map(() => generateRoute());
-setOrdinalDaysRoute(route);
-console.log(route.slice());
 
 const render = (container, template, position = Position.BEFORE_END) => {
   container.insertAdjacentHTML(position, template);
 };
 
 const renderRoute = (points) => {
+
+  if (points.length < 2) { // 2 так как 1-я точка по ТЗ зарезервирована под Форму редактирования
+    render(document.querySelector(`.trip-events`), createNoRouteTemplate());
+    return;
+  }
+
+  console.log(points);
+  // ТЗ: данные первого по порядку элемента массива -> в Форму редактирования
+  const pointFirst = points[0];
+
+  // ТЗ: остальные данные в массиве для точек маршрута:
+  points = points.slice(1);
+  console.log(points);
+
+  setOrdinalDaysRoute(points);
+
   const routeInfo = getRouteInfo(points);
   console.log(routeInfo);
   const days = getDaysRoute(points);
   console.log(days);
+
 
   const siteTripMainElement = document.querySelector(`.trip-main`);
   const siteMenuElement = siteTripMainElement.querySelector(`.trip-main__trip-controls h2:first-child`);
@@ -44,13 +61,20 @@ const renderRoute = (points) => {
   render(siteMenuElement, createSiteMenuTemplate(), Position.AFTER_END);
   render(siteFilterElement, createFilterTemplate(), Position.AFTER_END);
   render(siteSortElement, createSortTemplate(), Position.AFTER_END);
-  render(siteSortElement, createAddFirstEventTemplate(), Position.AFTER_END);
+
+  // форма добавления нового события
+  // ТЗ: данные первого по порядку элемента массива -> в Форму редактирования
+  // point, eventsTransfer, eventsActivity
+  const names1 = Param.Event.Vehicle.NAMES;
+  const names2 = Param.Event.Place.NAMES;
+  const cities = Param.DESTINATIONS;
+
+  render(siteSortElement, createAddFirstEventTemplate(pointFirst, cities, names1, names2), Position.AFTER_END);
 
   // элементы маршрута
   render(siteTripEventsElement, createTripDaysTemplate()); // `<ul class="trip-days"></ul>`
 
   const tripDaysElement = siteTripEventsElement.querySelector(`.trip-days`);
-
 
   days.forEach((day) => {
     // точки за день

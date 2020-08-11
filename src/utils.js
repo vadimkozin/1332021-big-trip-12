@@ -30,12 +30,14 @@ const addZeros = (n, needLength = 2) => {
   return n;
 };
 
-// форматривание дат: dm:'AUG 25' md:'25 AUG' hm:'10:30' ymd:'2020-08-25' ymdhm:'2019-03-18T10:30'
+// форматривание дат: dm:'AUG 25' md:'25 AUG' hm:'10:30' ymd:'2020-08-25'
+// ymdhm:'2019-03-18T10:30' dmy:18/03/19 00:00
 export const formatDate = {
   dm: (date) => `${date.getDate()} ${Atom.MONTHS[date.getMonth()]}`,
   md: (date) => `${Atom.MONTHS[date.getMonth()]} ${date.getDate()}`,
   hm: (date) => `${addZeros(date.getHours())}:${addZeros(date.getMinutes())}`,
   ymd: (date) => `${date.getFullYear()}-${addZeros(date.getMonth() + 1)}-${addZeros(date.getDate())}`,
+  dmy: (date) => `${date.getDate()}/${addZeros(date.getMonth() + 1)}/${String(date.getFullYear()).slice(2)} ${formatDate.hm(date)}`,
   ymdhm: (date) => `${formatDate.ymd(date)}T${formatDate.hm(date)}`,
 };
 
@@ -233,4 +235,10 @@ export const setOrdinalDaysRoute = (points) => {
 export const getEventTitle = (type, destination) => {
   const action = namesToActionMap[type];
   return `${type} ${action} ${destination}`;
+};
+
+// возвращает название события в виде: 'Taxi to' || 'Restaurant in'
+export const getEventType = (type) => {
+  const action = namesToActionMap[type];
+  return `${type} ${action}`;
 };
