@@ -11,7 +11,7 @@ import {createTripAndCostTemplate} from './view/trip-and-cost';
 import {generateRoute} from './mock/route';
 import {getRouteInfo, setOrdinalDaysRoute, getDaysRoute} from './utils';
 
-const ROUTE_POINT_COUNT = 13;
+const ROUTE_POINT_COUNT = 15;
 
 const Position = {
   BEFORE_BEGIN: `beforebegin`,
@@ -47,31 +47,37 @@ const renderRoute = (points) => {
   render(siteSortElement, createAddFirstEventTemplate(), Position.AFTER_END);
 
   // элементы маршрута
-  render(siteTripEventsElement, createTripDaysTemplate());
+  render(siteTripEventsElement, createTripDaysTemplate()); // `<ul class="trip-days"></ul>`
 
   const tripDaysElement = siteTripEventsElement.querySelector(`.trip-days`);
 
-  render(tripDaysElement, createTripDaysItemTemplate());
-
-  const tripDaysItemElement = tripDaysElement.querySelector(`.trip-days__item`);
 
   days.forEach((day) => {
-    const p = points.filter((it) => it.order === day);
+    // точки за день
+    const pointsOfDay = points.filter((it) => it.order === day);
 
-    // render(tripDaysItemElement, createDayInfoTemplate(p[0].date1));
-    // render(tripDaysItemElement, createTripEventsListTemplate());
+    // начинаем очередной день
+    render(tripDaysElement, createTripDaysItemTemplate()); // `<li class="trip-days__item day"></li>`
+
+    const tripDaysItemElement = tripDaysElement.querySelector(`.trip-days__item:nth-child(${day})`);
+
+    // инфо по дню
+    render(tripDaysItemElement, createDayInfoTemplate(day, pointsOfDay[0].date1));
+
+    // контейнер для точек маршрута в текущем дне
+    render(tripDaysItemElement, createTripEventsListTemplate()); // `<ul class="trip-events__list"></ul>`;
+
+    const tripListElement = tripDaysItemElement.querySelector(`.trip-events__list`);
+
+    // отрисовываем все точки маршрута текущего дня
+    pointsOfDay.forEach((point) => {
+      render(tripListElement, createTripEventsItemTemplate(point)); // <li class="trip-events__item">
+    });
+
 
   });
 
-  render(tripDaysItemElement, createDayInfoTemplate(points[0].date1));
-  render(tripDaysItemElement, createTripEventsListTemplate());
-
-  const tripListElement = siteTripEventsElement.querySelector(`.trip-events__list`);
-
-  for (let i = 0; i < ROUTE_POINT_COUNT; i++) {
-    render(tripListElement, createTripEventsItemTemplate());
-  }
-
 };
+
 
 renderRoute(route);
