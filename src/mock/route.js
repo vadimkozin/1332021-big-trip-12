@@ -2,10 +2,9 @@ import {Param} from './param';
 import {getRandomInteger, getRandomSentences, getRandomPhotos, getNextRandomDate} from "../utils";
 
 const generatePointType = () => {
+  const {EVENT: event} = Param;
 
-  const {Event: event} = Param;
-
-  const events = [...event.Place.NAMES, ...event.Vehicle.NAMES];
+  const events = [...event.PLACE.NAMES, ...event.VEHICLE.NAMES];
 
   const index = getRandomInteger(0, events.length - 1);
 
@@ -13,16 +12,15 @@ const generatePointType = () => {
 };
 
 const generateDestination = (destinations) => {
-
   const index = getRandomInteger(0, destinations.length - 1);
 
   return destinations[index];
 };
 
-const offers = (() => {
-  const count = Param.OFFERS_NAME.length;
+const getRandomOffers = () => {
+  const {length} = Param.OFFERS_NAME;
 
-  return Array(count).fill().map(() => {
+  return Array(length).fill().map(() => {
     const index = getRandomInteger(0, Param.OFFERS_NAME.length - 1);
     return {
       type: generatePointType(),
@@ -30,10 +28,11 @@ const offers = (() => {
       price: getRandomInteger(10, 100),
     };
   });
-})();
+};
+
+const offers = getRandomOffers();
 
 const generateOffers = (type, from = 0, to = 5) => {
-
   const array = offers
     .filter((it) => it.type === type)
     .map((it) => ({name: it.name, price: it.price}));
@@ -46,19 +45,18 @@ const generateOffers = (type, from = 0, to = 5) => {
 let currentDate = Date.now();
 
 export const generateRoute = () => {
-  const times = [`hours`, `minutes`];
   const type = generatePointType();
-  const date1 = getNextRandomDate(currentDate, `hours`);
+  const times = [`hours`, `minutes`, `hoursminutes`];
+  const startDate = getNextRandomDate(currentDate, `hours`);
   const index = getRandomInteger(0, times.length - 1);
-  const date2 = getNextRandomDate(date1, times[index]);
+  const endDate = getNextRandomDate(startDate, times[index]);
 
-  currentDate = date2;
+  currentDate = endDate;
 
   return {
     type,
-    date1,
-    date2,
-    adur: date2 - date1,
+    date1: startDate,
+    date2: endDate,
     destination: generateDestination(Param.DESTINATIONS),
     info: {
       description: getRandomSentences(Param.TEXT),

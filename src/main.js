@@ -13,7 +13,10 @@ import {getRouteInfo, setOrdinalDaysRoute, getDaysRoute} from './utils';
 import {createNoRouteTemplate} from './view/no-route';
 import {Param} from './mock/param';
 
-const ROUTE_POINT_COUNT = 33;
+const Config = {
+  ROUTE_POINT_COUNT: 33,
+  POINTS_IN_ROUTE_MIN: 2, // 2 так как 1-я точка по ТЗ зарезервирована для Формы редактирования
+};
 
 const Position = {
   BEFORE_BEGIN: `beforebegin`,
@@ -22,19 +25,15 @@ const Position = {
   AFTER_END: `afterend`,
 };
 
-const route = Array(ROUTE_POINT_COUNT).fill().map(() => generateRoute());
+let points = Array(Config.ROUTE_POINT_COUNT).fill().map(() => generateRoute());
 
 const render = (container, template, position = Position.BEFORE_END) => {
   container.insertAdjacentHTML(position, template);
 };
 
-const renderRoute = (points) => {
-
-  if (points.length < 2) { // 2 так как 1-я точка по ТЗ зарезервирована для Формы редактирования
-    render(document.querySelector(`.trip-events`), createNoRouteTemplate());
-    return;
-  }
-
+if (points.length < Config.POINTS_IN_ROUTE_MIN) {
+  render(document.querySelector(`.trip-events`), createNoRouteTemplate());
+} else {
   // ТЗ: данные первого по порядку элемента массива -> в Форму редактирования
   const pointFirst = points[0];
 
@@ -59,11 +58,9 @@ const renderRoute = (points) => {
 
   // форма добавления нового события
   // ТЗ: данные первого по порядку элемента массива -> в Форму редактирования
-  const names1 = Param.Event.Vehicle.NAMES;
-  const names2 = Param.Event.Place.NAMES;
-  const cities = Param.DESTINATIONS;
+  const {EVENT: {VEHICLE: {NAMES: vehicleNames}, PLACE: {NAMES: placeNames}}, DESTINATIONS: cities} = Param;
 
-  render(siteSortElement, createAddFirstEventTemplate(pointFirst, cities, names1, names2), Position.AFTER_END);
+  render(siteSortElement, createAddFirstEventTemplate(pointFirst, cities, vehicleNames, placeNames), Position.AFTER_END);
 
   // элементы маршрута
   render(siteTripEventsElement, createTripDaysTemplate());
@@ -94,6 +91,4 @@ const renderRoute = (points) => {
 
   });
 
-};
-
-renderRoute(route);
+}

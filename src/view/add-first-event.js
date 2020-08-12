@@ -1,34 +1,21 @@
 import {formatDate as format, getEventType} from '../utils';
 
 const createEventList = (events, typeEvent) => {
+  return events.map((event) => {
 
-  let html = ``;
+    const eventLower = event.toLowerCase();
+    const checked = event === typeEvent ? `checked` : ``;
 
-  events.forEach((it) => {
-
-    const itLower = it.toLowerCase();
-    const checked = it === typeEvent ? `checked` : ``;
-
-    html += `<div class="event__type-item">
-      <input id="event-type-${itLower}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${itLower}" ${checked}>
-      <label class="event__type-label  event__type-label--${itLower}" for="event-type-${itLower}-1">${it}</label>
+    return `<div class="event__type-item">
+      <input id="event-type-${eventLower}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${eventLower}" ${checked}>
+      <label class="event__type-label  event__type-label--${eventLower}" for="event-type-${eventLower}-1">${event}</label>
       </div>`;
-  });
-
-  return html;
+  }).join(``);
 
 };
 
-const createCityList = (cities) => {
-
-  let html = ``;
-
-  cities.forEach((it) => {
-    html += `<option value="${it}"></option>`;
-  });
-
-  return html;
-};
+const createCityList = (cities) =>
+  cities.map((city) => `<option value="${city}"></option>`).join(``);
 
 const getPlaceholder = (type) => getEventType(type);
 

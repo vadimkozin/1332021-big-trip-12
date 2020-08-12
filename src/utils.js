@@ -1,13 +1,14 @@
 import {namesToActionMap} from './mock/param';
 
-export const Atom = {
+export const Param = {
   MONTHS: [`Jan`, `Feb`, `Mar`, `Apr`, `May`, `Jun`, `Jul`, `Aug`, `Sep`, `Oct`, `Nov`, `Dec`],
-  Time: {
+  TIME: {
     ADD_MINUTES: `minutes`,
     ADD_HOURS: `hours`,
-    ADD_DAYS: `days`
+    ADD_DAYS: `days`,
+    ADD_HOURS_AND_MINUTES: `hoursminutes`,
   },
-  Duration: {
+  DURATION: {
     MSEC_PER_MINUTE: 60 * 1000, // миллисекунд в минуте
     MSEC_PER_HOUR: 60 * 60 * 1000, // миллисекунд в часе
     MSEC_PER_DAY: 60 * 60 * 1000 * 24, // миллисекунд в сутках
@@ -15,16 +16,14 @@ export const Atom = {
   OFFERS_MAX: 3, // показывать максимально предложений в отчёте
 };
 
-// возвращает случайное число из диапазона
-export const getRandomInteger = (from = 0, to = 0) => {
-  const range = Number(to) - Number(from) + 1;
-  return from + Math.floor(Math.random() * range);
-};
+// возвращает случайное число из диапазона между min и max (оба включены)
+export const getRandomInteger = (min = 0, max = 0) =>
+  Math.floor(Math.random() * (max - min + 1)) + min;
 
 // добавляет веущие нули: ( '2' => '02')
-const addZeros = (n, needLength = 2) => {
-  n = String(n);
-  while (n.length < needLength) {
+const addZeros = (number, digitsInNumber = 2) => {
+  let n = String(number);
+  while (n.length < digitsInNumber) {
     n = `0` + n;
   }
   return n;
@@ -33,8 +32,8 @@ const addZeros = (n, needLength = 2) => {
 // форматривание дат: dm:'AUG 25' md:'25 AUG' hm:'10:30' ymd:'2020-08-25'
 // ymdhm:'2019-03-18T10:30' dmy:18/03/19 00:00
 export const formatDate = {
-  dm: (date) => `${date.getDate()} ${Atom.MONTHS[date.getMonth()]}`,
-  md: (date) => `${Atom.MONTHS[date.getMonth()]} ${date.getDate()}`,
+  dm: (date) => `${date.getDate()} ${Param.MONTHS[date.getMonth()]}`,
+  md: (date) => `${Param.MONTHS[date.getMonth()]} ${date.getDate()}`,
   hm: (date) => `${addZeros(date.getHours())}:${addZeros(date.getMinutes())}`,
   ymd: (date) => `${date.getFullYear()}-${addZeros(date.getMonth() + 1)}-${addZeros(date.getDate())}`,
   dmy: (date) => `${date.getDate()}/${addZeros(date.getMonth() + 1)}/${String(date.getFullYear()).slice(2)} ${formatDate.hm(date)}`,
@@ -43,14 +42,14 @@ export const formatDate = {
 
 // возвращает продолжительность маршрута в формате: "23M" or "02H 44M" or "01D 02H 30M"
 const getDurationRoute = (milliseconds) => {
-  const {Duration: dur} = Atom;
-  const _hours = milliseconds / dur.MSEC_PER_HOUR;
-  const _days = milliseconds / dur.MSEC_PER_DAY;
+  const {DURATION: dur} = Param;
+  const hoursInRoute = milliseconds / dur.MSEC_PER_HOUR;
+  const daysInRoute = milliseconds / dur.MSEC_PER_DAY;
 
-  if (_hours < 1) { // "23M"
+  if (hoursInRoute < 1) { // "23M"
     return `${addZeros(Math.floor(milliseconds / dur.MSEC_PER_MINUTE))}M`;
 
-  } else if (_days < 1) { // "02H 44M"
+  } else if (daysInRoute < 1) { // "02H 44M"
     const hours = Math.floor(milliseconds / dur.MSEC_PER_HOUR);
     const msec = milliseconds - hours * dur.MSEC_PER_HOUR;
     const minutes = msec / dur.MSEC_PER_MINUTE;
@@ -67,43 +66,42 @@ const getDurationRoute = (milliseconds) => {
 };
 
 // возвращает время маршрута в формате: начало-окончание: '10:30 - 11:00'
-const getTimeRoute = (date1, date2) => {
-  const dt1 = new Date(date1);
-  const dt2 = new Date(date2);
+const getTimeRoute = (startDate, endDate) => {
+  const start = new Date(startDate);
+  const end = new Date(endDate);
 
-  const begin = `${addZeros(dt1.getHours())}:${addZeros(dt1.getMinutes())}`;
-  const end = `${addZeros(dt2.getHours())}:${addZeros(dt2.getMinutes())}`;
+  const from = `${addZeros(start.getHours())}:${addZeros(start.getMinutes())}`;
+  const to = `${addZeros(end.getHours())}:${addZeros(end.getMinutes())}`;
 
-  return `${begin} - ${end}`;
+  return `${from} - ${to}`;
 };
 
 // возвращает разницу date2-date1 в виде объекта {time, duration}
 // например:  {time: '10:30-11:00', duration: '30М'}
-export const getTimeAndDuration = (date1 = new Date(), date2 = new Date()) => {
-  return {
+export const getTimeAndDuration = (date1 = new Date(), date2 = new Date()) => (
+  {
     duration: getDurationRoute(date2 - date1),
     time: getTimeRoute(date1, date2),
-  };
-};
-// const time = getTimeAndDuration(Date.now(), new Date(Date.now() + 49 * 60 * 60 * 1000 + 60*11*1000));
-// console.log(time);
-
+  }
+);
 
 // возвращает случайную дату позднее чем lastDate,
-// добавляя timeShift, одно из: ['minutes', 'hours', 'days']
+// добавляя timeShift, одно из: ['minutes', 'hours', 'days', 'hoursminutes']
 export const getNextRandomDate = (lastDate = Date.now(), timeShift = `hours`) => {
   const minutes = getRandomInteger(10, 59);
   const hours = getRandomInteger(1, 10);
   const days = getRandomInteger(1, 3);
-  const {Duration: dur} = Atom;
+  const {TIME: time, DURATION: dur} = Param;
 
   switch (timeShift) {
-    case Atom.Time.ADD_MINUTES:
+    case time.ADD_MINUTES:
       return new Date(lastDate.valueOf() + minutes * dur.MSEC_PER_MINUTE);
-    case Atom.Time.ADD_HOURS:
+    case time.ADD_HOURS:
       return new Date(lastDate.valueOf() + hours * dur.MSEC_PER_HOUR);
-    case Atom.Time.ADD_DAYS:
+    case time.ADD_DAYS:
       return new Date(lastDate.valueOf() + days * dur.MSEC_PER_DAY);
+    case time.ADD_HOURS_AND_MINUTES:
+      return new Date(lastDate.valueOf() + hours * dur.MSEC_PER_HOUR + minutes * dur.MSEC_PER_MINUTE);
     default:
       return new Date(lastDate.valueOf() + hours * dur.MSEC_PER_HOUR);
   }
@@ -126,25 +124,22 @@ export const getRandomSentences = (text, separator = `.`, from = 1, to = 5) => {
 
 // возвращает массив случайных фото
 export const getRandomPhotos = (url, from = 1, to = 5) => {
-
   const count = getRandomInteger(from, to);
 
   return Array(count).fill().map(() => `${url}${Math.random()}`);
-
 };
 
 // возвращает продолжительность маршрута в виде: "18 AUG--6 OCT" или "MAR 18--20"
-const getDuration = (date1, date2, separator = `--`) => {
+const getDuration = (startDate, endDate, separator = `--`) => {
+  const isOneMonth = startDate.getMonth() === endDate.getMonth() && startDate.getFullYear() === endDate.getFullYear();
+  const isOneDay = isOneMonth && startDate.getDate() === endDate.getDate();
 
-  const inOneMonth = date1.getMonth() === date2.getMonth() && date1.getFullYear() === date2.getFullYear();
-  const inDay = inOneMonth && date1.getDate() === date2.getDate();
-
-  if (inDay) { // 18 AUG
-    return `${formatDate.dm(date1)}`;
-  } else if (inOneMonth) { // AUG 18--20
-    return `${Atom.MONTHS[date1.getMonth()]} ${date1.getDate()}${separator}${date2.getDate()}`;
+  if (isOneDay) { // 18 AUG
+    return `${formatDate.dm(startDate)}`;
+  } else if (isOneMonth) { // AUG 18--20
+    return `${Param.MONTHS[startDate.getMonth()]} ${startDate.getDate()}${separator}${endDate.getDate()}`;
   } else { // 18 AUG--6 OCT
-    return `${Atom.MONTHS[date1.getMonth()]} ${date1.getDate()}${separator}${date2.getDate()} ${Atom.MONTHS[date2.getMonth()]}`;
+    return `${Param.MONTHS[startDate.getMonth()]} ${startDate.getDate()}${separator}${endDate.getDate()} ${Param.MONTHS[endDate.getMonth()]}`;
   }
 
 };
@@ -195,6 +190,8 @@ export const getRouteInfo = (route) => {
 };
 
 // сортировка по: дням, цене и продолжительности
+// Это не перечисления, это то, что автор называет: объектами-неймспейсами (критерий Б16)
+// https://up.htmlacademy.ru/ecmascript/12/criteries#b16
 export const sortRoute = {
   days: (points) => points.sort((a, b) => a.date1 - b.date1),
   price: (points) => points.sort((a, b) => b.price - a.price),
@@ -202,6 +199,8 @@ export const sortRoute = {
 };
 
 // фильтры: всё, запланированно, пройдено
+// Это не перечисления, это то, что автор называет: объектами-неймспейсами (критерий Б16)
+// https://up.htmlacademy.ru/ecmascript/12/criteries#b16
 export const filterRoute = {
   everything: (points) => points,
   future: (points) => points.filter((it) => it.date1.getTime() > Date.now()),
@@ -209,7 +208,7 @@ export const filterRoute = {
 };
 
 // установка порядкового номера дня для каждой точки маршрута
-export const setOrdinalDaysRoute = (points) => {
+export const setOrdinalDaysRoute = ([...points]) => {
   let order = 1;
 
   points.sort((a, b) => a.date1 - b.date1);
