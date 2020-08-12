@@ -208,7 +208,7 @@ export const filterRoute = {
 };
 
 // установка порядкового номера дня для каждой точки маршрута
-export const setOrdinalDaysRoute = ([...points]) => {
+export const setOrdinalDaysRoute = (points) => {
   let order = 1;
 
   points.sort((a, b) => a.date1 - b.date1);

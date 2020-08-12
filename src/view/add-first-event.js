@@ -1,8 +1,7 @@
 import {formatDate as format, getEventType} from '../utils';
 
 const createEventList = (events, typeEvent) => {
-  return events.map((event) => {
-
+  events.map((event) => {
     const eventLower = event.toLowerCase();
     const checked = event === typeEvent ? `checked` : ``;
 

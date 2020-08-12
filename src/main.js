@@ -24,7 +24,7 @@ const Position = {
   BEFORE_END: `beforeend`,
   AFTER_END: `afterend`,
 };
-
+// let а не const потому что на 41-й строке: points = points.slice(1);
 let points = Array(Config.ROUTE_POINT_COUNT).fill().map(() => generateRoute());
 
 const render = (container, template, position = Position.BEFORE_END) => {
@@ -40,7 +40,7 @@ if (points.length < Config.POINTS_IN_ROUTE_MIN) {
   // ТЗ: остальные данные в массиве для точек маршрута:
   points = points.slice(1);
 
-  setOrdinalDaysRoute(points);
+  setOrdinalDaysRoute([...points]);
 
   const routeInfo = getRouteInfo(points);
   const days = getDaysRoute(points);
