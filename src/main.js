@@ -24,8 +24,8 @@ const Position = {
   BEFORE_END: `beforeend`,
   AFTER_END: `afterend`,
 };
-// let а не const потому что на 41-й строке: points = points.slice(1);
-let points = Array(Config.ROUTE_POINT_COUNT).fill().map(() => generateRoute());
+
+const points = Array(Config.ROUTE_POINT_COUNT).fill().map(generateRoute);
 
 const render = (container, template, position = Position.BEFORE_END) => {
   container.insertAdjacentHTML(position, template);
@@ -38,12 +38,12 @@ if (points.length < Config.POINTS_IN_ROUTE_MIN) {
   const pointFirst = points[0];
 
   // ТЗ: остальные данные в массиве для точек маршрута:
-  points = points.slice(1);
+  const pointsRoute = points.slice(1);
 
-  setOrdinalDaysRoute([...points]);
+  setOrdinalDaysRoute([...pointsRoute]);
 
-  const routeInfo = getRouteInfo(points);
-  const days = getDaysRoute(points);
+  const routeInfo = getRouteInfo(pointsRoute);
+  const days = getDaysRoute(pointsRoute);
 
   const siteTripMainElement = document.querySelector(`.trip-main`);
   const siteMenuElement = siteTripMainElement.querySelector(`.trip-main__trip-controls h2:first-child`);
