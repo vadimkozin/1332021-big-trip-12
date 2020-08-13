@@ -1,3 +1,3 @@
 {
-  "extends": "stylelint-config-htmlacademy"
+  "extends": "eslint-config-htmlacademy"
 }
