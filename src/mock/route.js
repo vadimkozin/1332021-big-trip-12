@@ -1,8 +1,11 @@
-import {Param} from './param';
+import {Config} from '../const';
+
+const {MOCK} = Config;
+
 import {getRandomInteger, getRandomSentences, getRandomPhotos, getNextRandomDate} from "../utils";
 
 const generatePointType = () => {
-  const {EVENT: event} = Param;
+  const {EVENT: event} = MOCK;
 
   const events = [...event.PLACE.NAMES, ...event.VEHICLE.NAMES];
 
@@ -18,13 +21,13 @@ const generateDestination = (destinations) => {
 };
 
 const getRandomOffers = () => {
-  const {length} = Param.OFFERS_NAME;
+  const {length} = MOCK.OFFERS_NAME;
 
   return Array(length).fill().map(() => {
-    const index = getRandomInteger(0, Param.OFFERS_NAME.length - 1);
+    const index = getRandomInteger(0, MOCK.OFFERS_NAME.length - 1);
     return {
       type: generatePointType(),
-      name: Param.OFFERS_NAME[index],
+      name: MOCK.OFFERS_NAME[index],
       price: getRandomInteger(10, 100),
     };
   });
@@ -57,10 +60,10 @@ export const generateRoute = () => {
     type,
     date1: startDate,
     date2: endDate,
-    destination: generateDestination(Param.DESTINATIONS),
+    destination: generateDestination(MOCK.DESTINATIONS),
     info: {
-      description: getRandomSentences(Param.TEXT),
-      photos: getRandomPhotos(Param.URL_PHOTO),
+      description: getRandomSentences(MOCK.TEXT),
+      photos: getRandomPhotos(MOCK.URL_PHOTO),
     },
     price: getRandomInteger(50, 400),
     offers: generateOffers(type),

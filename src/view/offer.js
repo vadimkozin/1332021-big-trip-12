@@ -1,4 +1,4 @@
-import {Param} from '../utils';
+import {Config} from '../const';
 
 const getHtmlOffers = (offers, max) => {
   let html = ``;
@@ -18,6 +18,6 @@ const getHtmlOffers = (offers, max) => {
 export const createOfferTemplate = (offers) =>
   `<h4 class="visually-hidden">Offers:</h4>
   <ul class="event__selected-offers">
-    ${getHtmlOffers(offers, Param.OFFERS_MAX)}
+    ${getHtmlOffers(offers, Config.OFFERS_MAX)}
   </ul>`;
 

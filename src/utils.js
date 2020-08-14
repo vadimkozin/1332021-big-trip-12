@@ -1,20 +1,31 @@
-import {namesToActionMap} from './mock/param';
+import {Config} from './const';
 
-export const Param = {
-  MONTHS: [`Jan`, `Feb`, `Mar`, `Apr`, `May`, `Jun`, `Jul`, `Aug`, `Sep`, `Oct`, `Nov`, `Dec`],
-  TIME: {
-    ADD_MINUTES: `minutes`,
-    ADD_HOURS: `hours`,
-    ADD_DAYS: `days`,
-    ADD_HOURS_AND_MINUTES: `hoursminutes`,
-  },
-  DURATION: {
-    MSEC_PER_MINUTE: 60 * 1000, // миллисекунд в минуте
-    MSEC_PER_HOUR: 60 * 60 * 1000, // миллисекунд в часе
-    MSEC_PER_DAY: 60 * 60 * 1000 * 24, // миллисекунд в сутках
-  },
-  OFFERS_MAX: 3, // показывать максимально предложений в отчёте
+const {MONTHS, MOCK, RENDER_POSITION: RenderPosition} = Config;
+
+export const render = (container, element, place = RenderPosition.BEFORE_END) => {
+  switch (place) {
+    case RenderPosition.AFTER_BEGIN:
+      container.prepend(element);
+      break;
+    case RenderPosition.BEFORE_END:
+      container.append(element);
+      break;
+  }
 };
+
+export const renderTemplate = (container, template, place) => {
+  container.insertAdjacentHTML(place, template);
+};
+
+export const createElement = (template) => {
+  const newElement = document.createElement(`div`);
+  newElement.innerHTML = template;
+
+  return newElement.firstChild;
+};
+
+
+// -----------------
 
 // возвращает случайное число из диапазона между min и max (оба включены)
 export const getRandomInteger = (min = 0, max = 0) =>
@@ -32,8 +43,8 @@ const addZeros = (number, digitsInNumber = 2) => {
 // форматривание дат: dm:'AUG 25' md:'25 AUG' hm:'10:30' ymd:'2020-08-25'
 // ymdhm:'2019-03-18T10:30' dmy:18/03/19 00:00
 export const formatDate = {
-  dm: (date) => `${date.getDate()} ${Param.MONTHS[date.getMonth()]}`,
-  md: (date) => `${Param.MONTHS[date.getMonth()]} ${date.getDate()}`,
+  dm: (date) => `${date.getDate()} ${MONTHS[date.getMonth()]}`,
+  md: (date) => `${MONTHS[date.getMonth()]} ${date.getDate()}`,
   hm: (date) => `${addZeros(date.getHours())}:${addZeros(date.getMinutes())}`,
   ymd: (date) => `${date.getFullYear()}-${addZeros(date.getMonth() + 1)}-${addZeros(date.getDate())}`,
   dmy: (date) => `${date.getDate()}/${addZeros(date.getMonth() + 1)}/${String(date.getFullYear()).slice(2)} ${formatDate.hm(date)}`,
@@ -42,7 +53,7 @@ export const formatDate = {
 
 // возвращает продолжительность маршрута в формате: "23M" or "02H 44M" or "01D 02H 30M"
 const getDurationRoute = (milliseconds) => {
-  const {DURATION: dur} = Param;
+  const dur = Config.DURATION;
   const hoursInRoute = milliseconds / dur.MSEC_PER_HOUR;
   const daysInRoute = milliseconds / dur.MSEC_PER_DAY;
 
@@ -91,7 +102,7 @@ export const getNextRandomDate = (lastDate = Date.now(), timeShift = `hours`) =>
   const minutes = getRandomInteger(10, 59);
   const hours = getRandomInteger(1, 10);
   const days = getRandomInteger(1, 3);
-  const {TIME: time, DURATION: dur} = Param;
+  const {TIME: time, DURATION: dur} = Config;
 
   switch (timeShift) {
     case time.ADD_MINUTES:
@@ -137,9 +148,9 @@ const getDuration = (startDate, endDate, separator = `--`) => {
   if (isOneDay) { // 18 AUG
     return `${formatDate.dm(startDate)}`;
   } else if (isOneMonth) { // AUG 18--20
-    return `${Param.MONTHS[startDate.getMonth()]} ${startDate.getDate()}${separator}${endDate.getDate()}`;
+    return `${MONTHS[startDate.getMonth()]} ${startDate.getDate()}${separator}${endDate.getDate()}`;
   } else { // 18 AUG--6 OCT
-    return `${Param.MONTHS[startDate.getMonth()]} ${startDate.getDate()}${separator}${endDate.getDate()} ${Param.MONTHS[endDate.getMonth()]}`;
+    return `${MONTHS[startDate.getMonth()]} ${startDate.getDate()}${separator}${endDate.getDate()} ${MONTHS[endDate.getMonth()]}`;
   }
 
 };
@@ -229,6 +240,21 @@ export const setOrdinalDaysRoute = (points) => {
     return it;
   });
 };
+
+const getMap = (event) => {
+  const {NAMES: names, ACTION: action} = event;
+  const obj = Object.create(null);
+
+  names.forEach((name) => {
+    obj[name] = action;
+  });
+
+  return obj;
+};
+
+const getNamesToActionMap = () => Object.assign({}, getMap(MOCK.EVENT.PLACE), getMap(MOCK.EVENT.VEHICLE));
+
+const namesToActionMap = getNamesToActionMap();
 
 // возвращает название события в виде: 'Taxi to Amsterdam' || 'Restaurant in Geneva'
 export const getEventTitle = (type, destination) => {
