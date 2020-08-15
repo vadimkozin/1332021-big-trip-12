@@ -1,13 +1,13 @@
 import {Config} from './const';
 
-const {MONTHS, MOCK, RENDER_POSITION: RenderPosition} = Config;
+const {MONTHS, MOCK, RENDER_POSITION} = Config;
 
-export const render = (container, element, place = RenderPosition.BEFORE_END) => {
+export const render2 = (container, element, place = RENDER_POSITION.BEFORE_END) => {
   switch (place) {
-    case RenderPosition.AFTER_BEGIN:
+    case RENDER_POSITION.AFTER_BEGIN:
       container.prepend(element);
       break;
-    case RenderPosition.BEFORE_END:
+    case RENDER_POSITION.BEFORE_END:
       container.append(element);
       break;
   }

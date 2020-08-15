@@ -1,3 +1,4 @@
+import {createElement} from "../utils.js";
 import {Config} from '../const';
 
 const getHtmlOffers = (offers, max) => {
@@ -20,4 +21,27 @@ export const createOfferTemplate = (offers) =>
   <ul class="event__selected-offers">
     ${getHtmlOffers(offers, Config.OFFERS_MAX)}
   </ul>`;
+
+export default class SiteMenu {
+  constructor(offers) {
+    this._offers = offers;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createOfferTemplate(this._offers);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+
+}
 

@@ -1,4 +1,4 @@
-import {replaceStr as replace} from '../utils';
+import {createElement, replaceStr as replace} from '../utils';
 
 export const createTripAndCostTemplate = (info) =>
   `<section class="trip-main__trip-info  trip-info">
@@ -16,3 +16,26 @@ export const createTripAndCostTemplate = (info) =>
       Total: &euro;&nbsp;<span class="trip-info__cost-value">${info.total}</span>
     </p>
   </section>`;
+
+export default class TripAndCost {
+  constructor(info) {
+    this._info = info;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createTripAndCostTemplate(this._info);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+
+}

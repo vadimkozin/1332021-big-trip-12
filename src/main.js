@@ -1,6 +1,12 @@
 import {createSiteMenuTemplate} from './view/site-menu';
+import SiteMenuView from './view/site-menu';
+
 import {createFilterTemplate} from './view/filter';
+import FilterView from './view/filter';
+
 import {createSortTemplate} from './view/sort';
+import {SortView} from './view/sort';
+
 import {createTripDaysTemplate} from './view/trip-days';
 import {createTripDaysItemTemplate} from './view/trip-days-item';
 import {createDayInfoTemplate} from './view/day-info';
@@ -47,7 +53,9 @@ if (points.length < Options.POINTS_IN_ROUTE_MIN) {
   const siteSortElement = siteTripEventsElement.querySelector(`h2`);
 
   render(siteTripMainElement, createTripAndCostTemplate(routeInfo), Position.AFTER_BEGIN);
-  render(siteMenuElement, createSiteMenuTemplate(), Position.AFTER_END);
+  // render(siteMenuElement, createSiteMenuTemplate(), Position.AFTER_END);
+  render(siteMenuElement, new SiteMenuView().getTemplate(), Position.AFTER_END);
+
   render(siteFilterElement, createFilterTemplate(), Position.AFTER_END);
   render(siteSortElement, createSortTemplate(), Position.AFTER_END);
 

@@ -1,4 +1,4 @@
-import {getEventTitle, formatDate as format, getTimeAndDuration as duration} from '../utils';
+import {createElement, getEventTitle, formatDate as format, getTimeAndDuration as duration} from '../utils';
 import {createOfferTemplate} from './offer';
 
 export const createTripEventsItemTemplate = (point) =>
@@ -55,3 +55,25 @@ export const createTripEventsItemTemplate = (point) =>
       </button>
     </div>
   </li>`;
+
+export default class SiteMenu {
+  constructor() {
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createTripEventsItemTemplate();
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+
+}

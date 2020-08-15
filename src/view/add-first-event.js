@@ -1,4 +1,4 @@
-import {formatDate as format, getEventType} from '../utils';
+import {createElement, formatDate as format, getEventType} from '../utils';
 
 const createEventList = (events, typeEvent) => {
   events.map((event) => {
@@ -138,3 +138,30 @@ export const createAddFirstEventTemplate = (point, cities, eventsTransfer, event
       <button class="event__reset-btn" type="reset">Cancel</button>
     </header>
   </form>`;
+
+export default class AddFirstEvent {
+  constructor(point, cities, eventsTransfer, eventsActivity) {
+    this._point = point;
+    this._cities = cities;
+    this._eventsTransfer = eventsTransfer;
+    this._eventsActivity = eventsActivity;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createAddFirstEventTemplate(
+        this._point, this._cities, this._eventsTransfer, this._eventsActivity);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+
+}
