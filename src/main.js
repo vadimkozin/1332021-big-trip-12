@@ -16,26 +16,18 @@ import {Config} from './const';
 
 const {POSITION: Position} = Config;
 
-const Options = {
-  ROUTE_POINT_COUNT: 33,
-  POINTS_IN_ROUTE_MIN: 2, // 2 так как 1-я точка по ТЗ зарезервирована для Формы редактирования
-};
+const ROUTE_POINT_COUNT = 10;
 
-const points = Array(Options.ROUTE_POINT_COUNT).fill().map(generateRoute);
+const points = Array(ROUTE_POINT_COUNT).fill().map(generateRoute);
 
-if (points.length < Options.POINTS_IN_ROUTE_MIN) {
+if (!points.length) {
   render(document.querySelector(`.trip-events`), new NoRouteView().getElement());
 } else {
-  // ТЗ: данные первого по порядку элемента массива -> в Форму редактирования
-  const pointFirst = points[0];
 
-  // ТЗ: остальные данные в массиве для точек маршрута:
-  const pointsRoute = points.slice(1);
+  setOrdinalDaysRoute([...points]);
 
-  setOrdinalDaysRoute([...pointsRoute]);
-
-  const routeInfo = getRouteInfo(pointsRoute);
-  const days = getDaysRoute(pointsRoute);
+  const routeInfo = getRouteInfo(points);
+  const days = getDaysRoute(points);
 
   const siteTripMainElement = document.querySelector(`.trip-main`);
   const siteMenuElement = siteTripMainElement.querySelector(`.trip-main__trip-controls h2:first-child`);
@@ -49,9 +41,8 @@ if (points.length < Options.POINTS_IN_ROUTE_MIN) {
   render(siteFilterElement, new FilterView().getElement(), Position.AFTER_END);
 
   // ТЗ: данные первого по порядку элемента массива -> в Форму редактирования
-  const {EVENT: {VEHICLE: {NAMES: vehicleNames}, PLACE: {NAMES: placeNames}}, DESTINATIONS: cities} = Config.MOCK;
-
-  render(siteTripEventsElement, new AddFirstEventView(pointFirst, cities, vehicleNames, placeNames).getElement());
+  // const {EVENT: {VEHICLE: {NAMES: vehicleNames}, PLACE: {NAMES: placeNames}}, DESTINATIONS: cities} = Config.MOCK;
+  // render(siteTripEventsElement, new AddFirstEventView(pointFirst, cities, vehicleNames, placeNames).getElement());
 
   render(siteTripEventsElement, new SortView().getElement());
 
