@@ -1,6 +1,6 @@
 import {createElement, replaceStr as replace} from '../utils';
 
-export const createTripAndCostTemplate = (info) =>
+export const createTripInfoTemplate = (info) =>
   `<section class="trip-main__trip-info  trip-info">
     <div class="trip-info__main">
       <!--<h1 class="trip-info__title">Amsterdam &mdash; Chamonix &mdash; Geneva</h1>-->
@@ -17,14 +17,14 @@ export const createTripAndCostTemplate = (info) =>
     </p>
   </section>`;
 
-export default class TripAndCost {
+export default class TripInfo {
   constructor(info) {
     this._info = info;
     this._element = null;
   }
 
   getTemplate() {
-    return createTripAndCostTemplate(this._info);
+    return createTripInfoTemplate(this._info);
   }
 
   getElement() {

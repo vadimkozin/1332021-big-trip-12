@@ -1,14 +1,20 @@
 import {Config} from './const';
 
-const {MONTHS, MOCK, RENDER_POSITION} = Config;
+const {MONTHS, MOCK, POSITION} = Config;
 
-export const render2 = (container, element, place = RENDER_POSITION.BEFORE_END) => {
+export const render = (container, element, place = POSITION.BEFORE_END) => {
   switch (place) {
-    case RENDER_POSITION.AFTER_BEGIN:
+    case POSITION.BEFORE_BEGIN:
+      container.before(element);
+      break;
+    case POSITION.AFTER_BEGIN:
       container.prepend(element);
       break;
-    case RENDER_POSITION.BEFORE_END:
+    case POSITION.BEFORE_END:
       container.append(element);
+      break;
+    case POSITION.AFTER_END: //
+      container.after(element);
       break;
   }
 };
@@ -23,7 +29,6 @@ export const createElement = (template) => {
 
   return newElement.firstChild;
 };
-
 
 // -----------------
 

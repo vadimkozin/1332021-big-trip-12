@@ -2,7 +2,7 @@ import {createElement} from "../utils.js";
 
 export const createTripDaysItemTemplate = () => `<li class="trip-days__item day"></li>`;
 
-export default class SiteMenu {
+export default class TripDaysItem {
   constructor() {
     this._element = null;
   }

@@ -56,13 +56,14 @@ export const createTripEventsItemTemplate = (point) =>
     </div>
   </li>`;
 
-export default class SiteMenu {
-  constructor() {
+export default class TripEventsItem {
+  constructor(point) {
+    this._point = point;
     this._element = null;
   }
 
   getTemplate() {
-    return createTripEventsItemTemplate();
+    return createTripEventsItemTemplate(this._point);
   }
 
   getElement() {
