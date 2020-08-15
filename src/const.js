@@ -34,4 +34,5 @@ export const Config = {
     },
     URL_PHOTO: `http://picsum.photos/248/152?r=`,
   },
+  ESCAPE_CODE: 27,
 };

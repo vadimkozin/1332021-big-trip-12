@@ -1,6 +1,6 @@
 import {createElement, formatDate as format, getEventType} from '../utils';
 
-const createEventList = (events, typeEvent) => {
+const createEventList = (events, typeEvent) =>
   events.map((event) => {
     const eventLower = event.toLowerCase();
     const checked = event === typeEvent ? `checked` : ``;
@@ -11,14 +11,12 @@ const createEventList = (events, typeEvent) => {
       </div>`;
   }).join(``);
 
-};
-
 const createCityList = (cities) =>
   cities.map((city) => `<option value="${city}"></option>`).join(``);
 
 const getPlaceholder = (type) => getEventType(type);
 
-export const createTripEditFirstTemplate = (point, cities, eventsTransfer, eventsActivity) =>
+const createTripEditFirstTemplate = (point, cities, eventsTransfer, eventsActivity) =>
   `<form class="trip-events__item  event  event--edit" action="#" method="post">
     <header class="event__header">
       <div class="event__type-wrapper">

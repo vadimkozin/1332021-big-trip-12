@@ -30,13 +30,11 @@ export const createElement = (template) => {
   return newElement.firstChild;
 };
 
-// -----------------
-
 // возвращает случайное число из диапазона между min и max (оба включены)
 export const getRandomInteger = (min = 0, max = 0) =>
   Math.floor(Math.random() * (max - min + 1)) + min;
 
-// добавляет веущие нули: ( '2' => '02')
+// добавляет ведущие нули: ( '2' => '02')
 const addZeros = (number, digitsInNumber = 2) => {
   let n = String(number);
   while (n.length < digitsInNumber) {

@@ -11,14 +11,44 @@ import TripInfoView from './view/trip-info';
 import NoRouteView from './view/no-route';
 import {generateRoute} from './mock/route';
 import {getRouteInfo, setOrdinalDaysRoute, getDaysRoute, render} from './utils';
-
 import {Config} from './const';
 
-const {POSITION: Position} = Config;
-
+const {POSITION} = Config;
+const {EVENT: {VEHICLE: {NAMES: vehicleNames}, PLACE: {NAMES: placeNames}}, DESTINATIONS: cities} = Config.MOCK;
 const ROUTE_POINT_COUNT = 10;
 
 const points = Array(ROUTE_POINT_COUNT).fill().map(generateRoute);
+
+const replaceElement = (parentElement, elementFirst, elementSecond) => {
+  parentElement.replaceChild(elementFirst, elementSecond);
+};
+
+const renderPoint = (container, point) => {
+
+  const pointElement = new TripEventsItemView(point).getElement();
+  const pointEditElement = new TripEditFirstView(point, cities, vehicleNames, placeNames).getElement();
+
+  const onEscKeyDown = (evt) => {
+    if (evt.keyCode === Config.ESCAPE_CODE) {
+      evt.preventDefault();
+      replaceElement(container, pointElement, pointEditElement);
+      document.removeEventListener(`keydown`, onEscKeyDown);
+    }
+  };
+
+  pointElement.querySelector(`.event__rollup-btn`).addEventListener(`click`, () => {
+    replaceElement(container, pointEditElement, pointElement);
+    document.addEventListener(`keydown`, onEscKeyDown);
+  });
+
+  pointEditElement.addEventListener(`submit`, (evt) => {
+    evt.preventDefault();
+    replaceElement(container, pointElement, pointEditElement);
+    document.removeEventListener(`keydown`, onEscKeyDown);
+  });
+
+  render(container, pointElement);
+};
 
 if (!points.length) {
   render(document.querySelector(`.trip-events`), new NoRouteView().getElement());
@@ -34,20 +64,13 @@ if (!points.length) {
   const siteFilterElement = siteTripMainElement.querySelector(`.trip-main__trip-controls h2:last-child`);
   const siteTripEventsElement = document.querySelector(`.trip-events`);
 
-  render(siteTripMainElement, new TripInfoView(routeInfo).getElement(), Position.AFTER_BEGIN);
+  render(siteTripMainElement, new TripInfoView(routeInfo).getElement(), POSITION.AFTER_BEGIN);
 
-  render(siteMenuElement, new SiteMenuView().getElement(), Position.AFTER_END);
+  render(siteMenuElement, new SiteMenuView().getElement(), POSITION.AFTER_END);
 
-  render(siteFilterElement, new FilterView().getElement(), Position.AFTER_END);
-
-  // ТЗ: данные первого по порядку элемента массива -> в Форму редактирования
-  // const {EVENT: {VEHICLE: {NAMES: vehicleNames}, PLACE: {NAMES: placeNames}}, DESTINATIONS: cities} = Config.MOCK;
-  // render(siteTripEventsElement, new AddFirstEventView(pointFirst, cities, vehicleNames, placeNames).getElement());
+  render(siteFilterElement, new FilterView().getElement(), POSITION.AFTER_END);
 
   render(siteTripEventsElement, new SortView().getElement());
-
-
-  // форма добавления нового события
 
   // элементы маршрута
   const tripDaysElement = new TripDaysView().getElement();
@@ -67,14 +90,12 @@ if (!points.length) {
 
     // контейнер для точек маршрута в текущем дне
     const tripListElement = new TripEventsListView().getElement();
+
     render(tripDaysItemElement, tripListElement);
 
     // отрисовываем все точки маршрута текущего дня
     pointsOfDay.forEach((point) => {
-      render(tripListElement, new TripEventsItemView(point).getElement());
-
+      renderPoint(tripListElement, point);
     });
-
   });
-
 }

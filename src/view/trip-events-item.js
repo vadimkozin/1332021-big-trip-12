@@ -1,7 +1,7 @@
 import {createElement, getEventTitle, formatDate as format, getTimeAndDuration as duration} from '../utils';
 import {createOfferTemplate} from './offer';
 
-export const createTripEventsItemTemplate = (point) =>
+const createTripEventsItemTemplate = (point) =>
   `<li class="trip-events__item">
     <div class="event">
       <div class="event__type">
