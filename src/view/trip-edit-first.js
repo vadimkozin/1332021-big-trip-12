@@ -18,7 +18,7 @@ const createCityList = (cities) =>
 
 const getPlaceholder = (type) => getEventType(type);
 
-export const createAddFirstEventTemplate = (point, cities, eventsTransfer, eventsActivity) =>
+export const createTripEditFirstTemplate = (point, cities, eventsTransfer, eventsActivity) =>
   `<form class="trip-events__item  event  event--edit" action="#" method="post">
     <header class="event__header">
       <div class="event__type-wrapper">
@@ -139,7 +139,7 @@ export const createAddFirstEventTemplate = (point, cities, eventsTransfer, event
     </header>
   </form>`;
 
-export default class AddFirstEvent {
+export default class TripEditFirst {
   constructor(point, cities, eventsTransfer, eventsActivity) {
     this._point = point;
     this._cities = cities;
@@ -149,7 +149,7 @@ export default class AddFirstEvent {
   }
 
   getTemplate() {
-    return createAddFirstEventTemplate(
+    return createTripEditFirstTemplate(
         this._point, this._cities, this._eventsTransfer, this._eventsActivity);
   }
 
