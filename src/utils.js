@@ -245,7 +245,7 @@ export const setOrdinalDaysRoute = (points) => {
 };
 
 const getMap = (event) =>
-  event.NAMES.reduce((acc, name) => ({...acc, [name]: event.ACTION}), {});
+  event.NAMES.reduce((acc, name) => Object.assign(acc, {[name]: event.ACTION}), {});
 
 const namesToActionMap = Object.assign({}, getMap(MOCK.EVENT.PLACE), getMap(MOCK.EVENT.VEHICLE));
 
