@@ -15,7 +15,7 @@ import {Config} from './const';
 
 const {POSITION} = Config;
 const {EVENT: {VEHICLE: {NAMES: vehicleNames}, PLACE: {NAMES: placeNames}}, DESTINATIONS: cities} = Config.MOCK;
-const ROUTE_POINT_COUNT = 10;
+const ROUTE_POINT_COUNT = 20;
 
 const points = Array(ROUTE_POINT_COUNT).fill().map(generateRoute);
 
