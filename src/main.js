@@ -1,94 +1,101 @@
-import {createSiteMenuTemplate} from './view/site-menu';
-import {createFilterTemplate} from './view/filter';
-import {createSortTemplate} from './view/sort';
-import {createTripDaysTemplate} from './view/trip-days';
-import {createTripDaysItemTemplate} from './view/trip-days-item';
-import {createDayInfoTemplate} from './view/day-info';
-import {createTripEventsListTemplate} from './view/trip-events-list';
-import {createTripEventsItemTemplate} from './view/trip-events-item';
-import {createAddFirstEventTemplate} from './view/add-first-event';
-import {createTripAndCostTemplate} from './view/trip-and-cost';
+import SiteMenuView from './view/site-menu';
+import FilterView from './view/filter';
+import SortView from './view/sort';
+import TripDaysView from './view/trip-days';
+import TripDaysItemView from './view/trip-days-item';
+import DayInfoView from './view/day-info';
+import TripEventsListView from './view/trip-events-list';
+import TripEventsItemView from './view/trip-events-item';
+import TripEditFirstView from './view/trip-edit-first';
+import TripInfoView from './view/trip-info';
+import NoRouteView from './view/no-route';
 import {generateRoute} from './mock/route';
-import {getRouteInfo, setOrdinalDaysRoute, getDaysRoute} from './utils';
-import {createNoRouteTemplate} from './view/no-route';
-import {Param} from './mock/param';
+import {getRouteInfo, setOrdinalDaysRoute, getDaysRoute, render} from './utils';
+import {Config} from './const';
 
-const Config = {
-  ROUTE_POINT_COUNT: 33,
-  POINTS_IN_ROUTE_MIN: 2, // 2 так как 1-я точка по ТЗ зарезервирована для Формы редактирования
+const {POSITION} = Config;
+const {EVENT: {VEHICLE: {NAMES: vehicleNames}, PLACE: {NAMES: placeNames}}, DESTINATIONS: cities} = Config.MOCK;
+const ROUTE_POINT_COUNT = 10;
+
+const points = Array(ROUTE_POINT_COUNT).fill().map(generateRoute);
+
+const replaceElement = (parentElement, elementFirst, elementSecond) => {
+  parentElement.replaceChild(elementFirst, elementSecond);
 };
 
-const Position = {
-  BEFORE_BEGIN: `beforebegin`,
-  AFTER_BEGIN: `afterbegin`,
-  BEFORE_END: `beforeend`,
-  AFTER_END: `afterend`,
+const renderPoint = (container, point) => {
+
+  const pointElement = new TripEventsItemView(point).getElement();
+  const pointEditElement = new TripEditFirstView(point, cities, vehicleNames, placeNames).getElement();
+
+  const onEscKeyDown = (evt) => {
+    if (evt.keyCode === Config.ESCAPE_CODE) {
+      evt.preventDefault();
+      replaceElement(container, pointElement, pointEditElement);
+      document.removeEventListener(`keydown`, onEscKeyDown);
+    }
+  };
+
+  pointElement.querySelector(`.event__rollup-btn`).addEventListener(`click`, () => {
+    replaceElement(container, pointEditElement, pointElement);
+    document.addEventListener(`keydown`, onEscKeyDown);
+  });
+
+  pointEditElement.addEventListener(`submit`, (evt) => {
+    evt.preventDefault();
+    replaceElement(container, pointElement, pointEditElement);
+    document.removeEventListener(`keydown`, onEscKeyDown);
+  });
+
+  render(container, pointElement);
 };
 
-const points = Array(Config.ROUTE_POINT_COUNT).fill().map(generateRoute);
-
-const render = (container, template, position = Position.BEFORE_END) => {
-  container.insertAdjacentHTML(position, template);
-};
-
-if (points.length < Config.POINTS_IN_ROUTE_MIN) {
-  render(document.querySelector(`.trip-events`), createNoRouteTemplate());
+if (!points.length) {
+  render(document.querySelector(`.trip-events`), new NoRouteView().getElement());
 } else {
-  // ТЗ: данные первого по порядку элемента массива -> в Форму редактирования
-  const pointFirst = points[0];
 
-  // ТЗ: остальные данные в массиве для точек маршрута:
-  const pointsRoute = points.slice(1);
+  setOrdinalDaysRoute([...points]);
 
-  setOrdinalDaysRoute([...pointsRoute]);
-
-  const routeInfo = getRouteInfo(pointsRoute);
-  const days = getDaysRoute(pointsRoute);
+  const routeInfo = getRouteInfo(points);
+  const days = getDaysRoute(points);
 
   const siteTripMainElement = document.querySelector(`.trip-main`);
   const siteMenuElement = siteTripMainElement.querySelector(`.trip-main__trip-controls h2:first-child`);
   const siteFilterElement = siteTripMainElement.querySelector(`.trip-main__trip-controls h2:last-child`);
   const siteTripEventsElement = document.querySelector(`.trip-events`);
-  const siteSortElement = siteTripEventsElement.querySelector(`h2`);
 
-  render(siteTripMainElement, createTripAndCostTemplate(routeInfo), Position.AFTER_BEGIN);
-  render(siteMenuElement, createSiteMenuTemplate(), Position.AFTER_END);
-  render(siteFilterElement, createFilterTemplate(), Position.AFTER_END);
-  render(siteSortElement, createSortTemplate(), Position.AFTER_END);
+  render(siteTripMainElement, new TripInfoView(routeInfo).getElement(), POSITION.AFTER_BEGIN);
 
-  // форма добавления нового события
-  // ТЗ: данные первого по порядку элемента массива -> в Форму редактирования
-  const {EVENT: {VEHICLE: {NAMES: vehicleNames}, PLACE: {NAMES: placeNames}}, DESTINATIONS: cities} = Param;
+  render(siteMenuElement, new SiteMenuView().getElement(), POSITION.AFTER_END);
 
-  render(siteSortElement, createAddFirstEventTemplate(pointFirst, cities, vehicleNames, placeNames), Position.AFTER_END);
+  render(siteFilterElement, new FilterView().getElement(), POSITION.AFTER_END);
+
+  render(siteTripEventsElement, new SortView().getElement());
 
   // элементы маршрута
-  render(siteTripEventsElement, createTripDaysTemplate());
-
-  const tripDaysElement = siteTripEventsElement.querySelector(`.trip-days`);
+  const tripDaysElement = new TripDaysView().getElement();
+  render(siteTripEventsElement, tripDaysElement);
 
   days.forEach((day) => {
     // точки за день
-    const pointsOfDay = points.filter((it) => it.order === day);
+    const pointsOfDay = points.filter((point) => point.order === day);
 
     // начинаем очередной день
-    render(tripDaysElement, createTripDaysItemTemplate());
+    render(tripDaysElement, new TripDaysItemView().getElement());
 
     const tripDaysItemElement = tripDaysElement.querySelector(`.trip-days__item:nth-child(${day})`);
 
     // инфо по дню
-    render(tripDaysItemElement, createDayInfoTemplate(day, pointsOfDay[0].date1));
+    render(tripDaysItemElement, new DayInfoView(day, pointsOfDay[0].startDate).getElement());
 
     // контейнер для точек маршрута в текущем дне
-    render(tripDaysItemElement, createTripEventsListTemplate());
+    const tripListElement = new TripEventsListView().getElement();
 
-    const tripListElement = tripDaysItemElement.querySelector(`.trip-events__list`);
+    render(tripDaysItemElement, tripListElement);
 
     // отрисовываем все точки маршрута текущего дня
     pointsOfDay.forEach((point) => {
-      render(tripListElement, createTripEventsItemTemplate(point));
+      renderPoint(tripListElement, point);
     });
-
   });
-
 }

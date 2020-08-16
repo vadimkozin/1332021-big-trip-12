@@ -1,7 +1,7 @@
-import {getEventTitle, formatDate as format, getTimeAndDuration as duration} from '../utils';
+import {createElement, getEventTitle, formatDate as format, getTimeAndDuration as duration} from '../utils';
 import {createOfferTemplate} from './offer';
 
-export const createTripEventsItemTemplate = (point) =>
+const createTripEventsItemTemplate = (point) =>
   `<li class="trip-events__item">
     <div class="event">
       <div class="event__type">
@@ -21,13 +21,13 @@ export const createTripEventsItemTemplate = (point) =>
           <time class="event__end-time" datetime="2019-03-18T11:00">11:00</time>
         -->
 
-          <time class="event__start-time" datetime="${format.ymdhm(point.date1)}">${format.hm(point.date1)}</time>
+          <time class="event__start-time" datetime="${format.ymdhm(point.startDate)}">${format.hm(point.startDate)}</time>
           &mdash;
-          <time class="event__start-time" datetime="${format.ymdhm(point.date2)}">${format.hm(point.date2)}</time>
+          <time class="event__start-time" datetime="${format.ymdhm(point.endDate)}">${format.hm(point.endDate)}</time>
 
         </p>
         <!-- <p class="event__duration">30M</p> -->
-        <p class="event__duration">${duration(point.date1, point.date2).duration}</p>
+        <p class="event__duration">${duration(point.startDate, point.endDate).duration}</p>
 
       </div>
 
@@ -55,3 +55,26 @@ export const createTripEventsItemTemplate = (point) =>
       </button>
     </div>
   </li>`;
+
+export default class TripEventsItem {
+  constructor(point) {
+    this._point = point;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createTripEventsItemTemplate(this._point);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+
+}

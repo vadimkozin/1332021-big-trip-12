@@ -1,26 +1,40 @@
-import {namesToActionMap} from './mock/param';
+import {Config} from './const';
 
-export const Param = {
-  MONTHS: [`Jan`, `Feb`, `Mar`, `Apr`, `May`, `Jun`, `Jul`, `Aug`, `Sep`, `Oct`, `Nov`, `Dec`],
-  TIME: {
-    ADD_MINUTES: `minutes`,
-    ADD_HOURS: `hours`,
-    ADD_DAYS: `days`,
-    ADD_HOURS_AND_MINUTES: `hoursminutes`,
-  },
-  DURATION: {
-    MSEC_PER_MINUTE: 60 * 1000, // миллисекунд в минуте
-    MSEC_PER_HOUR: 60 * 60 * 1000, // миллисекунд в часе
-    MSEC_PER_DAY: 60 * 60 * 1000 * 24, // миллисекунд в сутках
-  },
-  OFFERS_MAX: 3, // показывать максимально предложений в отчёте
+const {MONTHS, MOCK, POSITION} = Config;
+
+export const render = (container, element, place = POSITION.BEFORE_END) => {
+  switch (place) {
+    case POSITION.BEFORE_BEGIN:
+      container.before(element);
+      break;
+    case POSITION.AFTER_BEGIN:
+      container.prepend(element);
+      break;
+    case POSITION.BEFORE_END:
+      container.append(element);
+      break;
+    case POSITION.AFTER_END: //
+      container.after(element);
+      break;
+  }
+};
+
+export const renderTemplate = (container, template, place) => {
+  container.insertAdjacentHTML(place, template);
+};
+
+export const createElement = (template) => {
+  const newElement = document.createElement(`div`);
+  newElement.innerHTML = template;
+
+  return newElement.firstChild;
 };
 
 // возвращает случайное число из диапазона между min и max (оба включены)
 export const getRandomInteger = (min = 0, max = 0) =>
   Math.floor(Math.random() * (max - min + 1)) + min;
 
-// добавляет веущие нули: ( '2' => '02')
+// добавляет ведущие нули: ( '2' => '02')
 const addZeros = (number, digitsInNumber = 2) => {
   let n = String(number);
   while (n.length < digitsInNumber) {
@@ -32,8 +46,8 @@ const addZeros = (number, digitsInNumber = 2) => {
 // форматривание дат: dm:'AUG 25' md:'25 AUG' hm:'10:30' ymd:'2020-08-25'
 // ymdhm:'2019-03-18T10:30' dmy:18/03/19 00:00
 export const formatDate = {
-  dm: (date) => `${date.getDate()} ${Param.MONTHS[date.getMonth()]}`,
-  md: (date) => `${Param.MONTHS[date.getMonth()]} ${date.getDate()}`,
+  dm: (date) => `${date.getDate()} ${MONTHS[date.getMonth()]}`,
+  md: (date) => `${MONTHS[date.getMonth()]} ${date.getDate()}`,
   hm: (date) => `${addZeros(date.getHours())}:${addZeros(date.getMinutes())}`,
   ymd: (date) => `${date.getFullYear()}-${addZeros(date.getMonth() + 1)}-${addZeros(date.getDate())}`,
   dmy: (date) => `${date.getDate()}/${addZeros(date.getMonth() + 1)}/${String(date.getFullYear()).slice(2)} ${formatDate.hm(date)}`,
@@ -42,25 +56,25 @@ export const formatDate = {
 
 // возвращает продолжительность маршрута в формате: "23M" or "02H 44M" or "01D 02H 30M"
 const getDurationRoute = (milliseconds) => {
-  const {DURATION: dur} = Param;
-  const hoursInRoute = milliseconds / dur.MSEC_PER_HOUR;
-  const daysInRoute = milliseconds / dur.MSEC_PER_DAY;
+  const duration = Config.DURATION;
+  const hoursInRoute = milliseconds / duration.MSEC_PER_HOUR;
+  const daysInRoute = milliseconds / duration.MSEC_PER_DAY;
 
   if (hoursInRoute < 1) { // "23M"
-    return `${addZeros(Math.floor(milliseconds / dur.MSEC_PER_MINUTE))}M`;
+    return `${addZeros(Math.floor(milliseconds / duration.MSEC_PER_MINUTE))}M`;
 
   } else if (daysInRoute < 1) { // "02H 44M"
-    const hours = Math.floor(milliseconds / dur.MSEC_PER_HOUR);
-    const msec = milliseconds - hours * dur.MSEC_PER_HOUR;
-    const minutes = msec / dur.MSEC_PER_MINUTE;
+    const hours = Math.floor(milliseconds / duration.MSEC_PER_HOUR);
+    const msec = milliseconds - hours * duration.MSEC_PER_HOUR;
+    const minutes = msec / duration.MSEC_PER_MINUTE;
     return `${addZeros(Math.floor(hours))}H ${addZeros(Math.floor(minutes))}M`;
 
   } else { // "01D 02H 30M"
-    const days = Math.floor(milliseconds / dur.MSEC_PER_DAY);
-    let msec = milliseconds - days * dur.MSEC_PER_DAY;
-    const hours = Math.floor(msec / dur.MSEC_PER_HOUR);
-    msec -= hours * dur.MSEC_PER_HOUR;
-    const minutes = msec / dur.MSEC_PER_MINUTE;
+    const days = Math.floor(milliseconds / duration.MSEC_PER_DAY);
+    let msec = milliseconds - days * duration.MSEC_PER_DAY;
+    const hours = Math.floor(msec / duration.MSEC_PER_HOUR);
+    msec -= hours * duration.MSEC_PER_HOUR;
+    const minutes = msec / duration.MSEC_PER_MINUTE;
     return `${addZeros(Math.floor(days))}D ${addZeros(Math.floor(hours))}H ${addZeros(Math.floor(minutes))}M`;
   }
 };
@@ -91,7 +105,7 @@ export const getNextRandomDate = (lastDate = Date.now(), timeShift = `hours`) =>
   const minutes = getRandomInteger(10, 59);
   const hours = getRandomInteger(1, 10);
   const days = getRandomInteger(1, 3);
-  const {TIME: time, DURATION: dur} = Param;
+  const {TIME: time, DURATION: dur} = Config;
 
   switch (timeShift) {
     case time.ADD_MINUTES:
@@ -137,9 +151,9 @@ const getDuration = (startDate, endDate, separator = `--`) => {
   if (isOneDay) { // 18 AUG
     return `${formatDate.dm(startDate)}`;
   } else if (isOneMonth) { // AUG 18--20
-    return `${Param.MONTHS[startDate.getMonth()]} ${startDate.getDate()}${separator}${endDate.getDate()}`;
+    return `${MONTHS[startDate.getMonth()]} ${startDate.getDate()}${separator}${endDate.getDate()}`;
   } else { // 18 AUG--6 OCT
-    return `${Param.MONTHS[startDate.getMonth()]} ${startDate.getDate()}${separator}${endDate.getDate()} ${Param.MONTHS[endDate.getMonth()]}`;
+    return `${MONTHS[startDate.getMonth()]} ${startDate.getDate()}${separator}${endDate.getDate()} ${MONTHS[endDate.getMonth()]}`;
   }
 
 };
@@ -159,10 +173,10 @@ export const getDaysRoute = (points) => {
 // возвращает инфо по маршруту
 export const getRouteInfo = (route) => {
   const separator = `--`;
-  const points = route.slice().sort((a, b) => a.date1 > b.date1);
-  const begin = formatDate.dm(points[0].date1).toUpperCase();
-  const end = formatDate.dm(points[points.length - 1].date2).toUpperCase();
-  const duration = getDuration(points[0].date1, points[points.length - 1].date2).toUpperCase();
+  const points = route.slice().sort((a, b) => a.startDate > b.startDate);
+  const begin = formatDate.dm(points[0].startDate).toUpperCase();
+  const end = formatDate.dm(points[points.length - 1].endDate).toUpperCase();
+  const duration = getDuration(points[0].startDate, points[points.length - 1].endDate).toUpperCase();
 
   // список городов(пунктов назначения) в хронологическом порядке
   const cities = points.reduce((acc, it) => {
@@ -193,9 +207,9 @@ export const getRouteInfo = (route) => {
 // Это не перечисления, это то, что автор называет: объектами-неймспейсами (критерий Б16)
 // https://up.htmlacademy.ru/ecmascript/12/criteries#b16
 export const sortRoute = {
-  days: (points) => points.sort((a, b) => a.date1 - b.date1),
+  days: (points) => points.sort((a, b) => a.startDate - b.startDate),
   price: (points) => points.sort((a, b) => b.price - a.price),
-  time: (points) => points.sort((a, b) => (b.date2 - b.date1) - (a.date2 - a.date1)),
+  time: (points) => points.sort((a, b) => (b.endDate - b.startDate) - (a.endDate - a.startDate)),
 };
 
 // фильтры: всё, запланированно, пройдено
@@ -203,21 +217,21 @@ export const sortRoute = {
 // https://up.htmlacademy.ru/ecmascript/12/criteries#b16
 export const filterRoute = {
   everything: (points) => points,
-  future: (points) => points.filter((it) => it.date1.getTime() > Date.now()),
-  past: (points) => points.filter((it) => it.date2.getTime() < Date.now()),
+  future: (points) => points.filter((it) => it.startDate.getTime() > Date.now()),
+  past: (points) => points.filter((it) => it.endDate.getTime() < Date.now()),
 };
 
 // установка порядкового номера дня для каждой точки маршрута
 export const setOrdinalDaysRoute = (points) => {
   let order = 1;
 
-  points.sort((a, b) => a.date1 - b.date1);
+  points.sort((a, b) => a.startDate - b.startDate);
 
-  let currentDay = formatDate.ymd(points[0].date1);
+  let currentDay = formatDate.ymd(points[0].startDate);
 
   return points.map((it) => {
 
-    const day = formatDate.ymd(it.date1);
+    const day = formatDate.ymd(it.startDate);
 
     if (day === currentDay) {
       it.order = order;
@@ -229,6 +243,11 @@ export const setOrdinalDaysRoute = (points) => {
     return it;
   });
 };
+
+const getMap = (event) =>
+  event.NAMES.reduce((acc, name) => Object.assign(acc, {[name]: event.ACTION}), {});
+
+const namesToActionMap = Object.assign({}, getMap(MOCK.EVENT.PLACE), getMap(MOCK.EVENT.VEHICLE));
 
 // возвращает название события в виде: 'Taxi to Amsterdam' || 'Restaurant in Geneva'
 export const getEventTitle = (type, destination) => {

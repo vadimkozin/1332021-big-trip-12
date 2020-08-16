@@ -1,6 +1,6 @@
-import {formatDate as format, getEventType} from '../utils';
+import {createElement, formatDate as format, getEventType} from '../utils';
 
-const createEventList = (events, typeEvent) => {
+const createEventList = (events, typeEvent) =>
   events.map((event) => {
     const eventLower = event.toLowerCase();
     const checked = event === typeEvent ? `checked` : ``;
@@ -11,14 +11,12 @@ const createEventList = (events, typeEvent) => {
       </div>`;
   }).join(``);
 
-};
-
 const createCityList = (cities) =>
   cities.map((city) => `<option value="${city}"></option>`).join(``);
 
 const getPlaceholder = (type) => getEventType(type);
 
-export const createAddFirstEventTemplate = (point, cities, eventsTransfer, eventsActivity) =>
+const createTripEditFirstTemplate = (point, cities, eventsTransfer, eventsActivity) =>
   `<form class="trip-events__item  event  event--edit" action="#" method="post">
     <header class="event__header">
       <div class="event__type-wrapper">
@@ -115,14 +113,14 @@ export const createAddFirstEventTemplate = (point, cities, eventsTransfer, event
           From
         </label>
         <!-- <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="18/03/19 00:00"> -->
-        <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${format.dmy(point.date1)}">
+        <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${format.dmy(point.startDate)}">
 
         &mdash;
         <label class="visually-hidden" for="event-end-time-1">
           To
         </label>
         <!-- <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="18/03/19 00:00"> -->
-        <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${format.dmy(point.date2)}">
+        <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${format.dmy(point.endDate)}">
 
       </div>
 
@@ -138,3 +136,30 @@ export const createAddFirstEventTemplate = (point, cities, eventsTransfer, event
       <button class="event__reset-btn" type="reset">Cancel</button>
     </header>
   </form>`;
+
+export default class TripEditFirst {
+  constructor(point, cities, eventsTransfer, eventsActivity) {
+    this._point = point;
+    this._cities = cities;
+    this._eventsTransfer = eventsTransfer;
+    this._eventsActivity = eventsActivity;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createTripEditFirstTemplate(
+        this._point, this._cities, this._eventsTransfer, this._eventsActivity);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+
+}
