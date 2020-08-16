@@ -56,25 +56,25 @@ export const formatDate = {
 
 // возвращает продолжительность маршрута в формате: "23M" or "02H 44M" or "01D 02H 30M"
 const getDurationRoute = (milliseconds) => {
-  const dur = Config.DURATION;
-  const hoursInRoute = milliseconds / dur.MSEC_PER_HOUR;
-  const daysInRoute = milliseconds / dur.MSEC_PER_DAY;
+  const duration = Config.DURATION;
+  const hoursInRoute = milliseconds / duration.MSEC_PER_HOUR;
+  const daysInRoute = milliseconds / duration.MSEC_PER_DAY;
 
   if (hoursInRoute < 1) { // "23M"
-    return `${addZeros(Math.floor(milliseconds / dur.MSEC_PER_MINUTE))}M`;
+    return `${addZeros(Math.floor(milliseconds / duration.MSEC_PER_MINUTE))}M`;
 
   } else if (daysInRoute < 1) { // "02H 44M"
-    const hours = Math.floor(milliseconds / dur.MSEC_PER_HOUR);
-    const msec = milliseconds - hours * dur.MSEC_PER_HOUR;
-    const minutes = msec / dur.MSEC_PER_MINUTE;
+    const hours = Math.floor(milliseconds / duration.MSEC_PER_HOUR);
+    const msec = milliseconds - hours * duration.MSEC_PER_HOUR;
+    const minutes = msec / duration.MSEC_PER_MINUTE;
     return `${addZeros(Math.floor(hours))}H ${addZeros(Math.floor(minutes))}M`;
 
   } else { // "01D 02H 30M"
-    const days = Math.floor(milliseconds / dur.MSEC_PER_DAY);
-    let msec = milliseconds - days * dur.MSEC_PER_DAY;
-    const hours = Math.floor(msec / dur.MSEC_PER_HOUR);
-    msec -= hours * dur.MSEC_PER_HOUR;
-    const minutes = msec / dur.MSEC_PER_MINUTE;
+    const days = Math.floor(milliseconds / duration.MSEC_PER_DAY);
+    let msec = milliseconds - days * duration.MSEC_PER_DAY;
+    const hours = Math.floor(msec / duration.MSEC_PER_HOUR);
+    msec -= hours * duration.MSEC_PER_HOUR;
+    const minutes = msec / duration.MSEC_PER_MINUTE;
     return `${addZeros(Math.floor(days))}D ${addZeros(Math.floor(hours))}H ${addZeros(Math.floor(minutes))}M`;
   }
 };
@@ -173,10 +173,10 @@ export const getDaysRoute = (points) => {
 // возвращает инфо по маршруту
 export const getRouteInfo = (route) => {
   const separator = `--`;
-  const points = route.slice().sort((a, b) => a.date1 > b.date1);
-  const begin = formatDate.dm(points[0].date1).toUpperCase();
-  const end = formatDate.dm(points[points.length - 1].date2).toUpperCase();
-  const duration = getDuration(points[0].date1, points[points.length - 1].date2).toUpperCase();
+  const points = route.slice().sort((a, b) => a.startDate > b.startDate);
+  const begin = formatDate.dm(points[0].startDate).toUpperCase();
+  const end = formatDate.dm(points[points.length - 1].endDate).toUpperCase();
+  const duration = getDuration(points[0].startDate, points[points.length - 1].endDate).toUpperCase();
 
   // список городов(пунктов назначения) в хронологическом порядке
   const cities = points.reduce((acc, it) => {
@@ -207,9 +207,9 @@ export const getRouteInfo = (route) => {
 // Это не перечисления, это то, что автор называет: объектами-неймспейсами (критерий Б16)
 // https://up.htmlacademy.ru/ecmascript/12/criteries#b16
 export const sortRoute = {
-  days: (points) => points.sort((a, b) => a.date1 - b.date1),
+  days: (points) => points.sort((a, b) => a.startDate - b.startDate),
   price: (points) => points.sort((a, b) => b.price - a.price),
-  time: (points) => points.sort((a, b) => (b.date2 - b.date1) - (a.date2 - a.date1)),
+  time: (points) => points.sort((a, b) => (b.endDate - b.startDate) - (a.endDate - a.startDate)),
 };
 
 // фильтры: всё, запланированно, пройдено
@@ -217,21 +217,21 @@ export const sortRoute = {
 // https://up.htmlacademy.ru/ecmascript/12/criteries#b16
 export const filterRoute = {
   everything: (points) => points,
-  future: (points) => points.filter((it) => it.date1.getTime() > Date.now()),
-  past: (points) => points.filter((it) => it.date2.getTime() < Date.now()),
+  future: (points) => points.filter((it) => it.startDate.getTime() > Date.now()),
+  past: (points) => points.filter((it) => it.endDate.getTime() < Date.now()),
 };
 
 // установка порядкового номера дня для каждой точки маршрута
 export const setOrdinalDaysRoute = (points) => {
   let order = 1;
 
-  points.sort((a, b) => a.date1 - b.date1);
+  points.sort((a, b) => a.startDate - b.startDate);
 
-  let currentDay = formatDate.ymd(points[0].date1);
+  let currentDay = formatDate.ymd(points[0].startDate);
 
   return points.map((it) => {
 
-    const day = formatDate.ymd(it.date1);
+    const day = formatDate.ymd(it.startDate);
 
     if (day === currentDay) {
       it.order = order;
@@ -244,20 +244,10 @@ export const setOrdinalDaysRoute = (points) => {
   });
 };
 
-const getMap = (event) => {
-  const {NAMES: names, ACTION: action} = event;
-  const obj = Object.create(null);
+const getMap = (event) =>
+  event.NAMES.reduce((acc, name) => ({...acc, [name]: event.ACTION}), {});
 
-  names.forEach((name) => {
-    obj[name] = action;
-  });
-
-  return obj;
-};
-
-const getNamesToActionMap = () => Object.assign({}, getMap(MOCK.EVENT.PLACE), getMap(MOCK.EVENT.VEHICLE));
-
-const namesToActionMap = getNamesToActionMap();
+const namesToActionMap = Object.assign({}, getMap(MOCK.EVENT.PLACE), getMap(MOCK.EVENT.VEHICLE));
 
 // возвращает название события в виде: 'Taxi to Amsterdam' || 'Restaurant in Geneva'
 export const getEventTitle = (type, destination) => {

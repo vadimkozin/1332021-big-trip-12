@@ -58,8 +58,8 @@ export const generateRoute = () => {
 
   return {
     type,
-    date1: startDate,
-    date2: endDate,
+    startDate,
+    endDate,
     destination: generateDestination(MOCK.DESTINATIONS),
     info: {
       description: getRandomSentences(MOCK.TEXT),

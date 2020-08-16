@@ -86,7 +86,7 @@ if (!points.length) {
     const tripDaysItemElement = tripDaysElement.querySelector(`.trip-days__item:nth-child(${day})`);
 
     // инфо по дню
-    render(tripDaysItemElement, new DayInfoView(day, pointsOfDay[0].date1).getElement());
+    render(tripDaysItemElement, new DayInfoView(day, pointsOfDay[0].startDate).getElement());
 
     // контейнер для точек маршрута в текущем дне
     const tripListElement = new TripEventsListView().getElement();

@@ -21,13 +21,13 @@ const createTripEventsItemTemplate = (point) =>
           <time class="event__end-time" datetime="2019-03-18T11:00">11:00</time>
         -->
 
-          <time class="event__start-time" datetime="${format.ymdhm(point.date1)}">${format.hm(point.date1)}</time>
+          <time class="event__start-time" datetime="${format.ymdhm(point.startDate)}">${format.hm(point.startDate)}</time>
           &mdash;
-          <time class="event__start-time" datetime="${format.ymdhm(point.date2)}">${format.hm(point.date2)}</time>
+          <time class="event__start-time" datetime="${format.ymdhm(point.endDate)}">${format.hm(point.endDate)}</time>
 
         </p>
         <!-- <p class="event__duration">30M</p> -->
-        <p class="event__duration">${duration(point.date1, point.date2).duration}</p>
+        <p class="event__duration">${duration(point.startDate, point.endDate).duration}</p>
 
       </div>
 
