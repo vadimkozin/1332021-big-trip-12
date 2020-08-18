@@ -142,14 +142,26 @@ const createTripEditFirstTemplate = (point, cities, eventsTransfer, eventsActivi
 export default class TripEditFirst extends AbstractView {
   constructor(point, cities, eventsTransfer, eventsActivity) {
     super();
+
     this._point = point;
     this._cities = cities;
     this._eventsTransfer = eventsTransfer;
     this._eventsActivity = eventsActivity;
+    this._formSubmitHandler = this._formSubmitHandler.bind(this);
   }
 
   getTemplate() {
     return createTripEditFirstTemplate(
         this._point, this._cities, this._eventsTransfer, this._eventsActivity);
+  }
+
+  _formSubmitHandler(evt) {
+    evt.preventDefault();
+    this._callback.submit();
+  }
+
+  setFormSubmitHandler(callback) {
+    this._callback.submit = callback;
+    this.getElement().addEventListener(`submit`, this._formSubmitHandler);
   }
 }

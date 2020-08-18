@@ -35,6 +35,7 @@ export const OFFERS_MAX = 3; // показывать максимально пр
 export const ESCAPE_CODE = 27;
 
 // ===
+/*
 export const Config = {
   MONTHS: [`Jan`, `Feb`, `Mar`, `Apr`, `May`, `Jun`, `Jul`, `Aug`, `Sep`, `Oct`, `Nov`, `Dec`],
   TIME: {
@@ -73,3 +74,4 @@ export const Config = {
   },
   ESCAPE_CODE: 27,
 };
+*/

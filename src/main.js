@@ -10,46 +10,39 @@ import TripEditFirstView from './view/trip-edit-first';
 import TripInfoView from './view/trip-info';
 import NoRouteView from './view/no-route';
 import {generateRoute} from './mock/route';
-import {render} from './utils/render';
+import {render, replace, RenderPosition} from './utils/render';
 import {getRouteInfo, setOrdinalDaysRoute, getDaysRoute} from './utils/route';
+import {Mock, ESCAPE_CODE} from './const';
 
-import {Config} from './const';
-
-const {POSITION} = Config;
-const {EVENT: {VEHICLE: {NAMES: vehicleNames}, PLACE: {NAMES: placeNames}}, DESTINATIONS: cities} = Config.MOCK;
+const {EVENT: {VEHICLE: {NAMES: vehicleNames}, PLACE: {NAMES: placeNames}}, DESTINATIONS: cities} = Mock;
 const ROUTE_POINT_COUNT = 20;
 
 const points = Array(ROUTE_POINT_COUNT).fill().map(generateRoute);
 
-const replaceElement = (parentElement, elementFirst, elementSecond) => {
-  parentElement.replaceChild(elementFirst, elementSecond);
-};
-
 const renderPoint = (container, point) => {
 
-  const pointElement = new TripEventsItemView(point).getElement();
-  const pointEditElement = new TripEditFirstView(point, cities, vehicleNames, placeNames).getElement();
+  const pointComponent = new TripEventsItemView(point);
+  const pointEditComponent = new TripEditFirstView(point, cities, vehicleNames, placeNames);
 
   const onEscKeyDown = (evt) => {
-    if (evt.keyCode === Config.ESCAPE_CODE) {
+    if (evt.keyCode === ESCAPE_CODE) {
       evt.preventDefault();
-      replaceElement(container, pointElement, pointEditElement);
+      replace(pointComponent, pointEditComponent);
       document.removeEventListener(`keydown`, onEscKeyDown);
     }
   };
 
-  pointElement.querySelector(`.event__rollup-btn`).addEventListener(`click`, () => {
-    replaceElement(container, pointEditElement, pointElement);
+  pointComponent.setEditClickHandler(() => {
+    replace(pointEditComponent, pointComponent);
     document.addEventListener(`keydown`, onEscKeyDown);
   });
 
-  pointEditElement.addEventListener(`submit`, (evt) => {
-    evt.preventDefault();
-    replaceElement(container, pointElement, pointEditElement);
+  pointEditComponent.setFormSubmitHandler(() => {
+    replace(pointComponent, pointEditComponent);
     document.removeEventListener(`keydown`, onEscKeyDown);
   });
 
-  render(container, pointElement);
+  render(container, pointComponent);
 };
 
 if (!points.length) {
@@ -66,13 +59,13 @@ if (!points.length) {
   const siteFilterElement = siteTripMainElement.querySelector(`.trip-main__trip-controls h2:last-child`);
   const siteTripEventsElement = document.querySelector(`.trip-events`);
 
-  render(siteTripMainElement, new TripInfoView(routeInfo).getElement(), POSITION.AFTER_BEGIN);
+  render(siteTripMainElement, new TripInfoView(routeInfo), RenderPosition.AFTER_BEGIN);
 
-  render(siteMenuElement, new SiteMenuView().getElement(), POSITION.AFTER_END);
+  render(siteMenuElement, new SiteMenuView(), RenderPosition.AFTER_END);
 
-  render(siteFilterElement, new FilterView().getElement(), POSITION.AFTER_END);
+  render(siteFilterElement, new FilterView(), RenderPosition.AFTER_END);
 
-  render(siteTripEventsElement, new SortView().getElement());
+  render(siteTripEventsElement, new SortView());
 
   // элементы маршрута
   const tripDaysElement = new TripDaysView().getElement();
@@ -83,15 +76,15 @@ if (!points.length) {
     const pointsOfDay = points.filter((point) => point.order === day);
 
     // начинаем очередной день
-    render(tripDaysElement, new TripDaysItemView().getElement());
+    render(tripDaysElement, new TripDaysItemView());
 
     const tripDaysItemElement = tripDaysElement.querySelector(`.trip-days__item:nth-child(${day})`);
 
     // инфо по дню
-    render(tripDaysItemElement, new DayInfoView(day, pointsOfDay[0].startDate).getElement());
+    render(tripDaysItemElement, new DayInfoView(day, pointsOfDay[0].startDate));
 
     // контейнер для точек маршрута в текущем дне
-    const tripListElement = new TripEventsListView().getElement();
+    const tripListElement = new TripEventsListView();
 
     render(tripDaysItemElement, tripListElement);
 
