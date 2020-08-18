@@ -1,4 +1,5 @@
-import {createElement, formatDate as format} from '../utils';
+import {createElement} from '../utils/render';
+import {formatDate as format} from '../utils/common';
 
 const createDayInfoTemplate = (dayInOrder, date) =>
   `<div class="day__info">

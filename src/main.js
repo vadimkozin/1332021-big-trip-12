@@ -10,7 +10,9 @@ import TripEditFirstView from './view/trip-edit-first';
 import TripInfoView from './view/trip-info';
 import NoRouteView from './view/no-route';
 import {generateRoute} from './mock/route';
-import {getRouteInfo, setOrdinalDaysRoute, getDaysRoute, render} from './utils';
+import {render} from './utils/render';
+import {getRouteInfo, setOrdinalDaysRoute, getDaysRoute} from './utils/route';
+
 import {Config} from './const';
 
 const {POSITION} = Config;

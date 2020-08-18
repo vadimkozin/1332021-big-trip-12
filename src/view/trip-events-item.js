@@ -1,4 +1,7 @@
-import {createElement, getEventTitle, formatDate as format, getTimeAndDuration as duration} from '../utils';
+import {createElement} from '../utils/render';
+import {getEventTitle, getTimeAndDuration as duration} from '../utils/route';
+import {formatDate as format} from '../utils/common';
+
 import {createOfferTemplate} from './offer';
 
 const createTripEventsItemTemplate = (point) =>

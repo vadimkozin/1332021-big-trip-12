@@ -1,4 +1,6 @@
-import {createElement, formatDate as format, getEventType} from '../utils';
+import {createElement} from '../utils/render';
+import {formatDate as format} from '../utils/common';
+import {getEventType} from '../utils/route';
 
 const createEventList = (events, typeEvent) =>
   events.map((event) => {

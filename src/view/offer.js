@@ -1,5 +1,5 @@
-import {createElement} from "../utils.js";
-import {Config} from '../const';
+import {createElement} from "../utils/render";
+import {OFFERS_MAX} from '../const';
 
 const getHtmlOffers = (offers, max) =>
   offers
@@ -15,7 +15,7 @@ const getHtmlOffers = (offers, max) =>
 export const createOfferTemplate = (offers) =>
   `<h4 class="visually-hidden">Offers:</h4>
   <ul class="event__selected-offers">
-    ${getHtmlOffers(offers, Config.OFFERS_MAX)}
+    ${getHtmlOffers(offers, OFFERS_MAX)}
   </ul>`;
 
 export default class SiteMenu {

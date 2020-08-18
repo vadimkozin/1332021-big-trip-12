@@ -1,4 +1,5 @@
-import {createElement, replaceStr as replace} from '../utils';
+import {createElement} from '../utils/render';
+import {replaceStr as replace} from '../utils/common';
 
 const createTripInfoTemplate = (info) =>
   `<section class="trip-main__trip-info  trip-info">

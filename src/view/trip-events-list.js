@@ -1,4 +1,4 @@
-import {createElement} from "../utils.js";
+import {createElement} from "../utils/render";
 
 const createTripEventsListTemplate = () => `<ul class="trip-events__list"></ul>`;
 
