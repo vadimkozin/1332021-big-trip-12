@@ -1,4 +1,4 @@
-import {createElement} from "../utils/render";
+import AbstractView from './abstract';
 import {OFFERS_MAX} from '../const';
 
 const getHtmlOffers = (offers, max) =>
@@ -18,26 +18,14 @@ export const createOfferTemplate = (offers) =>
     ${getHtmlOffers(offers, OFFERS_MAX)}
   </ul>`;
 
-export default class SiteMenu {
+export default class SiteMenu extends AbstractView {
   constructor(offers) {
+    super();
     this._offers = offers;
-    this._element = null;
   }
 
   getTemplate() {
     return createOfferTemplate(this._offers);
   }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
-  }
-
 }
 

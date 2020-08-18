@@ -1,4 +1,4 @@
-import {createElement} from '../utils/render';
+import AbstractView from './abstract';
 import {getEventTitle, getTimeAndDuration as duration} from '../utils/route';
 import {formatDate as format} from '../utils/common';
 
@@ -59,25 +59,13 @@ const createTripEventsItemTemplate = (point) =>
     </div>
   </li>`;
 
-export default class TripEventsItem {
+export default class TripEventsItem extends AbstractView {
   constructor(point) {
+    super();
     this._point = point;
-    this._element = null;
   }
 
   getTemplate() {
     return createTripEventsItemTemplate(this._point);
   }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
-  }
-
 }

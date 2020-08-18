@@ -1,4 +1,4 @@
-import {createElement} from '../utils/render';
+import AbstractView from './abstract';
 import {formatDate as format} from '../utils/common';
 import {getEventType} from '../utils/route';
 
@@ -139,29 +139,17 @@ const createTripEditFirstTemplate = (point, cities, eventsTransfer, eventsActivi
     </header>
   </form>`;
 
-export default class TripEditFirst {
+export default class TripEditFirst extends AbstractView {
   constructor(point, cities, eventsTransfer, eventsActivity) {
+    super();
     this._point = point;
     this._cities = cities;
     this._eventsTransfer = eventsTransfer;
     this._eventsActivity = eventsActivity;
-    this._element = null;
   }
 
   getTemplate() {
     return createTripEditFirstTemplate(
         this._point, this._cities, this._eventsTransfer, this._eventsActivity);
   }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
-  }
-
 }
