@@ -1,6 +1,14 @@
 import {MONTHS, Mock, Duration} from '../const';
 import {addZeros, formatDate} from './common';
 
+const ROUTE_INFO_BLANK = {
+  nameRoute: ``,
+  begin: null,
+  end: null,
+  duration: ``,
+  total: 0
+};
+
 export const getDaysRoute = (points) => {
   const days = points.reduce((orders, it) => {
     orders.push(it.order);
@@ -70,9 +78,13 @@ const getDuration = (startDate, endDate, separator = `--`) => {
 };
 
 // возвращает инфо по маршруту
-export const getRouteInfo = (route) => {
+export const getRouteInfo = (routePoints) => {
+  if (!routePoints.length) {
+    return ROUTE_INFO_BLANK;
+  }
+
   const separator = `--`;
-  const points = route.slice().sort((a, b) => a.startDate > b.startDate);
+  const points = routePoints.slice().sort((a, b) => a.startDate > b.startDate);
   const begin = formatDate.dm(points[0].startDate).toUpperCase();
   const end = formatDate.dm(points[points.length - 1].endDate).toUpperCase();
   const duration = getDuration(points[0].startDate, points[points.length - 1].endDate).toUpperCase();
@@ -102,14 +114,9 @@ export const getRouteInfo = (route) => {
   };
 };
 
-// сортировка по: дням, цене и продолжительности
-// Это не перечисления, это то, что автор называет: объектами-неймспейсами (критерий Б16)
-// https://up.htmlacademy.ru/ecmascript/12/criteries#b16
-export const sortRoute = {
-  days: (points) => points.sort((a, b) => a.startDate - b.startDate),
-  price: (points) => points.sort((a, b) => b.price - a.price),
-  time: (points) => points.sort((a, b) => (b.endDate - b.startDate) - (a.endDate - a.startDate)),
-};
+export const sortPrice = (a, b) => b.price - a.price;
+export const sortTime = (a, b) => (b.endDate - b.startDate) - (a.endDate - a.startDate);
+export const sortDays = (a, b) => a.startDate - b.startDate;
 
 // фильтры: всё, запланированно, пройдено
 // Это не перечисления, это то, что автор называет: объектами-неймспейсами (критерий Б16)

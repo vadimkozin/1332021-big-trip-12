@@ -33,7 +33,39 @@ const createSortTemplate = () =>
   </form>`;
 
 export default class Sort extends AbstractView {
+  constructor() {
+    super();
+    this._sortTypeChangeHandler = this._sortTypeChangeHandler.bind(this);
+  }
+
   getTemplate() {
     return createSortTemplate();
   }
+
+  _sortTypeChangeHandler(evt) {
+    if (evt.target.type !== `radio`) {
+      return;
+    }
+
+    evt.preventDefault();
+    this._callback.sortTypeChange(evt.target.value);
+  }
+
+  setSortTypeChangeHandler(callback) {
+    this._callback.sortTypeChange = callback;
+    this.getElement().addEventListener(`change`, this._sortTypeChangeHandler);
+  }
 }
+
+
+/**
+const onChangeSort = (evt) => {
+  if (!evt.target.name === `radio`) {
+    return;
+  }
+  console.log(evt.target.value);
+};
+// form class="trip-events__trip-sort
+const handlerSort = document.querySelector(`.trip-events__trip-sort`).addEventListener(`change`, onChangeSort);
+
+ */
