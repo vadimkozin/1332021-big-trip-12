@@ -1,26 +1,10 @@
-import {createElement} from "../utils.js";
+import AbstractView from './abstract';
 
 const createNoRouteTemplate = () =>
-  `<h1 style="text-align:center;">Click New Event to create your first point</h1>`;
+  `<p class="trip-events__msg">Click New Event to create your first point</p>`;
 
-export default class NoRoute {
-  constructor() {
-    this._element = null;
-  }
-
+export default class NoRoute extends AbstractView {
   getTemplate() {
     return createNoRouteTemplate();
   }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
-  }
-
 }

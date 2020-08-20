@@ -1,4 +1,6 @@
-import {createElement, formatDate as format, getEventType} from '../utils';
+import AbstractView from './abstract';
+import {formatDate as format} from '../utils/common';
+import {getEventType} from '../utils/route';
 
 const createEventList = (events, typeEvent) =>
   events.map((event) => {
@@ -137,13 +139,15 @@ const createTripEditFirstTemplate = (point, cities, eventsTransfer, eventsActivi
     </header>
   </form>`;
 
-export default class TripEditFirst {
+export default class TripEditFirst extends AbstractView {
   constructor(point, cities, eventsTransfer, eventsActivity) {
+    super();
+
     this._point = point;
     this._cities = cities;
     this._eventsTransfer = eventsTransfer;
     this._eventsActivity = eventsActivity;
-    this._element = null;
+    this._formSubmitHandler = this._formSubmitHandler.bind(this);
   }
 
   getTemplate() {
@@ -151,15 +155,13 @@ export default class TripEditFirst {
         this._point, this._cities, this._eventsTransfer, this._eventsActivity);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-    return this._element;
+  _formSubmitHandler(evt) {
+    evt.preventDefault();
+    this._callback.submit();
   }
 
-  removeElement() {
-    this._element = null;
+  setFormSubmitHandler(callback) {
+    this._callback.submit = callback;
+    this.getElement().addEventListener(`submit`, this._formSubmitHandler);
   }
-
 }
