@@ -6,7 +6,7 @@ import {render, RenderPosition} from './utils/render';
 import {getRouteInfo} from './utils/route';
 import TripPresenter from './presenter/trip';
 
-const ROUTE_POINT_COUNT = 19;
+const ROUTE_POINT_COUNT = 21;
 
 const points = Array(ROUTE_POINT_COUNT).fill().map(generateRoute);
 const routeInfo = getRouteInfo(points);
