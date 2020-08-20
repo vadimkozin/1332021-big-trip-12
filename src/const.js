@@ -39,3 +39,7 @@ export const SortType = {
   TIME: `sort-time`,
   PRICE: `sort-price`,
 };
+
+export const SEPARATOR = `--`;
+
+export const INFO_ROUTE_CITIES_MAX = 3; // максимально городов в информации о маршруте

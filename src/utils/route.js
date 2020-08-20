@@ -1,5 +1,5 @@
-import {MONTHS, Mock, Duration} from '../const';
-import {addZeros, formatDate} from './common';
+import {MONTHS, Mock, Duration, SEPARATOR, INFO_ROUTE_CITIES_MAX} from '../const';
+import {addZeros, formatDate, getValuesByKey} from './common';
 
 const ROUTE_INFO_BLANK = {
   nameRoute: ``,
@@ -9,14 +9,9 @@ const ROUTE_INFO_BLANK = {
   total: 0
 };
 
-export const getDaysRoute = (points) => {
-  const days = points.reduce((orders, it) => {
-    orders.push(it.order);
-    return orders;
-  }, []);
-
-  return [...new Set(days)];
-};
+// возвращает уникальные дни маршрута: [1,2,..]
+export const getDaysRoute = (points) =>
+  [...new Set(getValuesByKey({key: `order`, arrayObj: points}))];
 
 // возвращает продолжительность маршрута в формате: "23M" or "02H 44M" or "01D 02H 30M"
 const getDurationRoute = (milliseconds) => {
@@ -53,17 +48,17 @@ const getTimeRoute = (startDate, endDate) => {
   return `${from} - ${to}`;
 };
 
-// возвращает разницу date2-date1 в виде объекта {time, duration}
+// возвращает разницу dateEnd-dateStart в виде объекта {time, duration}
 // например:  {time: '10:30-11:00', duration: '30М'}
-export const getTimeAndDuration = (date1 = new Date(), date2 = new Date()) => (
+export const getTimeAndDuration = (dateStart = new Date(), dateEnd = new Date()) => (
   {
-    duration: getDurationRoute(date2 - date1),
-    time: getTimeRoute(date1, date2),
+    duration: getDurationRoute(dateEnd - dateStart),
+    time: getTimeRoute(dateStart, dateEnd),
   }
 );
 
 // возвращает продолжительность маршрута в виде: "18 AUG--6 OCT" или "MAR 18--20"
-const getDuration = (startDate, endDate, separator = `--`) => {
+const getDuration = (startDate, endDate, separator = SEPARATOR) => {
   const isOneMonth = startDate.getMonth() === endDate.getMonth() && startDate.getFullYear() === endDate.getFullYear();
   const isOneDay = isOneMonth && startDate.getDate() === endDate.getDate();
 
@@ -83,30 +78,22 @@ export const getRouteInfo = (routePoints) => {
     return ROUTE_INFO_BLANK;
   }
 
-  const separator = `--`;
   const points = routePoints.slice().sort((a, b) => a.startDate > b.startDate);
   const begin = formatDate.dm(points[0].startDate).toUpperCase();
   const end = formatDate.dm(points[points.length - 1].endDate).toUpperCase();
   const duration = getDuration(points[0].startDate, points[points.length - 1].endDate).toUpperCase();
 
   // список городов(пунктов назначения) в хронологическом порядке
-  const cities = points.reduce((acc, it) => {
-    acc.push(`${it.destination}`);
-    return acc;
-  }, []);
-
-  let nameRoute = ``;
-
-  nameRoute = cities.length <= 3
-    ? cities.join(separator)
-    : `${cities[0]}${separator}...${separator}${cities[cities.length - 1]}`;
+  const cities = getValuesByKey({key: `destination`, arrayObj: points});
 
   const total = points.reduce((sum, it) =>
     sum + it.price + it.offers.reduce((sumOffer, offer) => sumOffer + offer.price, 0)
   , 0);
 
   return {
-    nameRoute,
+    nameRoute: cities.length <= INFO_ROUTE_CITIES_MAX
+      ? cities.join(SEPARATOR)
+      : `${cities[0]}${SEPARATOR}...${SEPARATOR}${cities[cities.length - 1]}`,
     begin,
     end,
     duration,
@@ -127,16 +114,13 @@ export const filterRoute = {
   past: (points) => points.filter((it) => it.endDate.getTime() < Date.now()),
 };
 
-// установка порядкового номера дня для каждой точки маршрута
+// установка порядкового номера дня для каждой точки маршрута (мутация)
 export const setOrdinalDaysRoute = (points) => {
-  let order = 1;
-
   points.sort((a, b) => a.startDate - b.startDate);
 
   let currentDay = formatDate.ymd(points[0].startDate);
 
-  return points.map((it) => {
-
+  points.reduce((order, it) => {
     const day = formatDate.ymd(it.startDate);
 
     if (day === currentDay) {
@@ -145,9 +129,9 @@ export const setOrdinalDaysRoute = (points) => {
       it.order = ++order;
       currentDay = day;
     }
+    return order;
 
-    return it;
-  });
+  }, 1);
 };
 
 const getMap = (event) =>
@@ -156,13 +140,15 @@ const getMap = (event) =>
 const namesToActionMap = Object.assign({}, getMap(Mock.EVENT.PLACE), getMap(Mock.EVENT.VEHICLE));
 
 // возвращает название события в виде: 'Taxi to Amsterdam' || 'Restaurant in Geneva'
-export const getEventTitle = (type, destination) => {
-  const action = namesToActionMap[type];
-  return `${type} ${action} ${destination}`;
-};
+export const getEventTitle = (type, destination) => getEventInfo(type, destination);
 
 // возвращает название события в виде: 'Taxi to' || 'Restaurant in'
-export const getEventType = (type) => {
+export const getEventType = (type) => getEventInfo(type);
+
+const getEventInfo = (type, destination) => {
   const action = namesToActionMap[type];
-  return `${type} ${action}`;
+  return destination
+    ? `${type} ${action} ${destination}`
+    : `${type} ${action}`;
 };
+

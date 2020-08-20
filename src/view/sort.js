@@ -56,16 +56,3 @@ export default class Sort extends AbstractView {
     this.getElement().addEventListener(`change`, this._sortTypeChangeHandler);
   }
 }
-
-
-/**
-const onChangeSort = (evt) => {
-  if (!evt.target.name === `radio`) {
-    return;
-  }
-  console.log(evt.target.value);
-};
-// form class="trip-events__trip-sort
-const handlerSort = document.querySelector(`.trip-events__trip-sort`).addEventListener(`change`, onChangeSort);
-
- */

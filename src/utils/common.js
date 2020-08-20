@@ -69,3 +69,11 @@ export const getNextRandomDate = (lastDate = Date.now(), timeShift = `hours`) =>
       return new Date(lastDate.valueOf() + hours * Duration.MSEC_PER_HOUR);
   }
 };
+
+// возвращает значения из массива объектов по ключуы
+export const getValuesByKey = ({key, arrayObj} = {}) => {
+  return arrayObj.reduce((array, it) => {
+    array.push(it[key]);
+    return array;
+  }, []);
+};

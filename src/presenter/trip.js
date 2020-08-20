@@ -8,7 +8,7 @@ import TripEditFirstView from '../view/trip-edit-first';
 import NoRouteView from '../view/no-route';
 import {SortType, Mock, ESCAPE_CODE} from '../const';
 import {render, replace} from '../utils/render';
-import {setOrdinalDaysRoute, getDaysRoute, sortPrice, sortTime, sortDays} from '../utils/route';
+import {setOrdinalDaysRoute, getDaysRoute, sortPrice, sortTime} from '../utils/route';
 
 const {EVENT: {VEHICLE: {NAMES: vehicleNames}, PLACE: {NAMES: placeNames}}, DESTINATIONS: cities} = Mock;
 
@@ -28,8 +28,9 @@ export default class Trip {
 
   init(points) {
     this._points = points.slice();
+    this._defaultPoints = points.slice();
 
-    this._setHandlerOnSort();
+    this._setHandlerSort();
     this._renderTrip();
   }
 
@@ -134,7 +135,7 @@ export default class Trip {
         this._points.sort(sortPrice);
         break;
       default:
-        this._points.sort(sortDays);
+        this._points = this._defaultPoints.slice();
         break;
     }
 
@@ -151,9 +152,10 @@ export default class Trip {
     this._renderTripList(sortType);
   }
 
-  _setHandlerOnSort() {
+  _setHandlerSort() {
     this._sortComponent.setSortTypeChangeHandler(this._handleSortTypeChange);
   }
+
   _clearTripList() {
     this._tripDaysComponent.getElement().innerHTML = ``;
     this._tripDaysItemComponent.getElement().innerHTML = ``;
