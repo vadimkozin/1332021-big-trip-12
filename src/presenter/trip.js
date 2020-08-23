@@ -3,14 +3,11 @@ import TripDaysView from '../view/trip-days';
 import TripDaysItemView from '../view/trip-days-item';
 import DayInfoView from '../view/day-info';
 import TripEventsListView from '../view/trip-events-list';
-import TripEventsItemView from '../view/trip-events-item';
-import TripEditFirstView from '../view/trip-edit-first';
 import NoRouteView from '../view/no-route';
-import {SortType, Mock, ESCAPE_CODE} from '../const';
-import {render, replace} from '../utils/render';
+import PointPresenter from './point';
+import {SortType} from '../const';
+import {render} from '../utils/render';
 import {setOrdinalDaysRoute, getDaysRoute, sortPrice, sortTime} from '../utils/route';
-
-const {EVENT: {VEHICLE: {NAMES: vehicleNames}, PLACE: {NAMES: placeNames}}, DESTINATIONS: cities} = Mock;
 
 export default class Trip {
   constructor(tripConatainer) {
@@ -61,7 +58,8 @@ export default class Trip {
 
     // точки маршрута
     this._points.forEach((point) => {
-      this._renderPoint(this._tripEventsListComponent, point);
+      // this._renderPoint(this._tripEventsListComponent, point);
+      this._renderPoint2(this._tripEventsListComponent, point);
     });
   }
 
@@ -92,34 +90,40 @@ export default class Trip {
 
       // точки маршрута за день
       pointsOfDay.forEach((point) => {
-        this._renderPoint(tripListElement, point);
+        // this._renderPoint(tripListElement, point);
+        this._renderPoint2(tripListElement, point);
+
       });
     });
   }
 
-  _renderPoint(container, point) {
-    const pointComponent = new TripEventsItemView(point);
-    const pointEditComponent = new TripEditFirstView(point, cities, vehicleNames, placeNames);
+  // _renderPoint(container, point) {
+  //   const pointComponent = new TripEventsItemView(point);
+  //   const pointEditComponent = new TripEditFirstView(point, cities, vehicleNames, placeNames);
 
-    const onEscKeyDown = (evt) => {
-      if (evt.keyCode === ESCAPE_CODE) {
-        evt.preventDefault();
-        replace(pointComponent, pointEditComponent);
-        document.removeEventListener(`keydown`, onEscKeyDown);
-      }
-    };
+  //   const onEscKeyDown = (evt) => {
+  //     if (evt.keyCode === ESCAPE_CODE) {
+  //       evt.preventDefault();
+  //       replace(pointComponent, pointEditComponent);
+  //       document.removeEventListener(`keydown`, onEscKeyDown);
+  //     }
+  //   };
 
-    pointComponent.setEditClickHandler(() => {
-      replace(pointEditComponent, pointComponent);
-      document.addEventListener(`keydown`, onEscKeyDown);
-    });
+  //   pointComponent.setEditClickHandler(() => {
+  //     replace(pointEditComponent, pointComponent);
+  //     document.addEventListener(`keydown`, onEscKeyDown);
+  //   });
 
-    pointEditComponent.setFormSubmitHandler(() => {
-      replace(pointComponent, pointEditComponent);
-      document.removeEventListener(`keydown`, onEscKeyDown);
-    });
+  //   pointEditComponent.setFormSubmitHandler(() => {
+  //     replace(pointComponent, pointEditComponent);
+  //     document.removeEventListener(`keydown`, onEscKeyDown);
+  //   });
 
-    render(container, pointComponent);
+  //   render(container, pointComponent);
+  // }
+
+  _renderPoint2(container, point) {
+    new PointPresenter(container).init(point);
   }
 
   _renderNoTrip() {
