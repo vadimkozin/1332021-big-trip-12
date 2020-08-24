@@ -1,6 +1,9 @@
 import {Mock} from '../const';
 import {getRandomInteger, getRandomSentences, getRandomPhotos, getNextRandomDate} from "../utils/common";
 
+let countId = 1;
+
+const generateId = () => countId++;
 
 const generatePointType = () => {
   const {EVENT: event} = Mock;
@@ -43,6 +46,8 @@ const generateOffers = (type, from = 0, to = 5) => {
   return array.slice(0, count);
 };
 
+export const getOffersByType = (type) => offers.filter((offer) => offer.type === type);
+
 let currentDate = Date.now();
 
 export const generateRoute = () => {
@@ -55,6 +60,7 @@ export const generateRoute = () => {
   currentDate = endDate;
 
   return {
+    id: generateId(),
     type,
     startDate,
     endDate,
