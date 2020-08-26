@@ -1,9 +1,6 @@
+import uniqueId from 'lodash.uniqueid';
 import {Mock} from '../const';
 import {getRandomInteger, getRandomSentences, getRandomPhotos, getNextRandomDate} from "../utils/common";
-
-let countId = 1;
-
-const generateId = () => countId++;
 
 const generatePointType = () => {
   const {EVENT: event} = Mock;
@@ -78,7 +75,7 @@ export const generateRoute = () => {
   currentDate = endDate;
 
   return {
-    id: generateId(),
+    id: uniqueId(),
     type,
     startDate,
     endDate,

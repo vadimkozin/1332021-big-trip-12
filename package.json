@@ -19,5 +19,7 @@
   "engines": {
     "node": "10"
   },
-  "dependencies": {}
+  "dependencies": {
+    "lodash.uniqueid": "4.0.1"
+  }
 }
