@@ -75,7 +75,6 @@ const createSectionOffers = (point) => {
 
 
 const createSectionDestination = (point) => {
-
   const description = point._description ? point._description : point.description;
   const photos = point._photos ? point._photos : point.photos;
   const isPhotos = Boolean(photos.length);
@@ -197,18 +196,9 @@ export default class TripEdit extends SmartView {
     this._eventsTransfer = eventsTransfer;
     this._eventsActivity = eventsActivity;
 
-    this._formSubmitHandler = this._formSubmitHandler.bind(this);
-    this._favoriteClickHander = this._favoriteClickHander.bind(this);
-
-    this._typeHandler = this._typeHandler.bind(this);
-    this._destinationHandler = this._destinationHandler.bind(this);
-    this._priceHandler = this._priceHandler.bind(this);
-    this._startDateHandler = this._startDateHandler.bind(this);
-    this._endDateHandler = this._endDateHandler.bind(this);
-    this._offerHandler = this._offerHandler.bind(this);
-
     this._storeOffers = new StoreItems(`name`, `price`).init(point.offers);
 
+    this._setHandlers();
     this._setInnerHandlers();
   }
 
@@ -226,24 +216,113 @@ export default class TripEdit extends SmartView {
     this.setFormSubmitHandler(this._callback.formSubmit);
   }
 
+  _setHandlers() {
+    this._handlers = {};
+
+    this._handlers.formSubmit = (evt) => {
+      evt.preventDefault();
+      this._callback.formSubmit(TripEdit.parseDataToPoint(this._data));
+    };
+
+    this._handlers.favoriteClick = (evt) => {
+      evt.preventDefault();
+      this._callback.favoriteClick();
+    };
+
+    this._handlers.type = (evt) => {
+      evt.preventDefault();
+
+      if (evt.target.nodeName !== `LABEL`) {
+        return;
+      }
+
+      this._storeOffers.destroy();
+      this.updateData({[Smart.OFFERS]: {}});
+      this.updateData({[Smart.EVENT_TYPE]: evt.target.textContent});
+    };
+
+    this._handlers.destination = (evt) => {
+      evt.preventDefault();
+
+      if (evt.target.nodeName !== `INPUT`) {
+        return;
+      }
+
+      const destination = evt.target.value;
+      const description = getDestinationByName(destination).description;
+      const photos = getDestinationByName(destination).photos;
+      this.updateData({[Smart.DESCRIPTION]: description});
+      this.updateData({[Smart.PHOTOS]: photos});
+      this.updateData({[Smart.DESTINATION]: destination});
+    };
+
+    this._handlers.price = (evt) => {
+      evt.preventDefault();
+      this.updateData({[Smart.PRICE]: evt.target.value}, true);
+    };
+
+    this._handlers.startDate = (evt) => {
+      evt.preventDefault();
+      const date = getDateFrom(evt.target.value);
+      this.updateData({[Smart.START_DATE]: date}, true);
+    };
+
+    this._handlers.endDate = (evt) => {
+      evt.preventDefault();
+      const date = getDateFrom(evt.target.value);
+      this.updateData({[Smart.END_DATE]: date}, true);
+    };
+
+    this._handlers.offer = (evt) => {
+      evt.preventDefault();
+
+      let parent = null;
+
+      if (evt.target.nodeName === `SPAN`) {
+        parent = evt.target.parentElement;
+      }
+
+      if (evt.target.nodeName === `LABEL`) {
+        parent = evt.target;
+      }
+
+      if (parent) {
+        const name = parent.children[0].innerText;
+        const price = parent.children[1].innerText;
+
+        this._storeOffers.add(name, Number(price));
+        this.updateData({[Smart.OFFERS]: this._storeOffers.getItems()});
+      }
+    };
+
+    this._handlers.formSubmit = this._handlers.formSubmit.bind(this);
+    this._handlers.favoriteClick = this._handlers.favoriteClick.bind(this);
+    this._handlers.type = this._handlers.type.bind(this);
+    this._handlers.destination = this._handlers.destination.bind(this);
+    this._handlers.price = this._handlers.price.bind(this);
+    this._handlers.startDate = this._handlers.startDate.bind(this);
+    this._handlers.endDate = this._handlers.endDate.bind(this);
+    this._handlers.offer = this._handlers.offer.bind(this);
+  }
+
   _setInnerHandlers() {
     this.getElement().querySelector(`.event__type-list`)
-        .addEventListener(`click`, this._typeHandler);
+        .addEventListener(`click`, this._handlers.type);
 
     this.getElement().querySelector(`.event__input.event__input--destination`)
-        .addEventListener(`change`, this._destinationHandler);
+        .addEventListener(`change`, this._handlers.destination);
 
     this.getElement().querySelector(`.event__input.event__input--price`)
-        .addEventListener(`input`, this._priceHandler);
+        .addEventListener(`input`, this._handlers.price);
 
     this.getElement().querySelector(`input[name="event-start-time"]`)
-        .addEventListener(`input`, this._startDateHandler);
+        .addEventListener(`input`, this._handlers.startDate);
 
     this.getElement().querySelector(`input[name="event-end-time"]`)
-        .addEventListener(`input`, this._endDateHandler);
+        .addEventListener(`input`, this._handlers._endDate);
 
     this.getElement().querySelector(`.event__available-offers`)
-        .addEventListener(`click`, this._offerHandler);
+        .addEventListener(`click`, this._handlers.offer);
 
   }
 
@@ -326,15 +405,14 @@ export default class TripEdit extends SmartView {
 
   setFormSubmitHandler(callback) {
     this._callback.formSubmit = callback;
-    this.getElement().addEventListener(`submit`, this._formSubmitHandler);
+    this.getElement().addEventListener(`submit`, this._handlers.formSubmit);
   }
 
   setFavoriteClickHander(callback) {
     this._callback.favoriteClick = callback;
     this.getElement()
       .querySelector(`.event__favorite-checkbox`)
-      .addEventListener(`change`, this._favoriteClickHander);
-
+      .addEventListener(`change`, this._handlers.favorite);
   }
 
   static parsePointToData(point) {

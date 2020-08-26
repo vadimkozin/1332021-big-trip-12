@@ -26,7 +26,6 @@ export default class Trip {
     this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
     this._handleTripChange = this._handleTripChange.bind(this);
     this._handleModeChange = this._handleModeChange.bind(this);
-
   }
 
   init(points) {

@@ -22,42 +22,60 @@ export default class Point {
     this._handleFavoriteClick = this._handleFavoriteClick.bind(this);
     this._handleFormSubmit = this._handleFormSubmit.bind(this);
     this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
-
   }
 
   init(point) {
     this._point = point;
 
-    const prevPointComponent = this._pointComponent;
-    const prevPointEditComponent = this._pointEditComponent;
+    this._initSavePrev();
 
     this._pointComponent = new TripEventsItemView(point);
     this._pointEditComponent = new TripEditView(point, cities, vehicleNames, placeNames);
 
-    this._pointComponent.setEditClickHandler(this._handleEditClick);
-    this._pointEditComponent.setFormSubmitHandler(this._handleFormSubmit);
-    this._pointEditComponent.setFavoriteClickHander(this._handleFavoriteClick);
+    this._initSetHandlers();
 
-    if (prevPointComponent === null || prevPointEditComponent === null) {
+    if (this._initIsFirstCall()) {
       render(this._pointContainer, this._pointComponent);
       return;
     }
 
+    this._initReplaceComponent();
+    this._initRemovePrev();
+  }
+
+  _initSavePrev() {
+    this._prevPointComponent = this._pointComponent;
+    this._prevPointEditComponent = this._pointEditComponent;
+  }
+
+  _initSetHandlers() {
+    this._pointComponent.setEditClickHandler(this._handleEditClick);
+    this._pointEditComponent.setFormSubmitHandler(this._handleFormSubmit);
+    this._pointEditComponent.setFavoriteClickHander(this._handleFavoriteClick);
+  }
+
+  _initIsFirstCall() {
+    return (this._prevPointComponent === null || this._prevPointEditComponent === null);
+  }
+
+  _initReplaceComponent() {
     if (this._mode === Mode.DEFAULT) {
-      replace(this._pointComponent, prevPointComponent);
+      replace(this._pointComponent, this._prevPointComponent);
     }
 
     if (this._mode === Mode.EDITTING) {
-      replace(this._pointEditComponent, prevPointEditComponent);
+      replace(this._pointEditComponent, this._prevPointEditComponent);
     }
+  }
 
-    remove(prevPointComponent);
-    remove(prevPointEditComponent);
-
+  _initRemovePrev() {
+    remove(this._prevPointComponent);
+    remove(this._prevPointEditComponent);
+    this._prevPointComponent = null;
+    this._prevPointEditComponent = null;
   }
 
   resetView() {
-
     if (this._mode !== Mode.DEFAULT) {
       this._pointEditComponent.reset(this._point);
       this._replaceFormToView();

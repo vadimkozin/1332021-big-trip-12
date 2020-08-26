@@ -89,19 +89,4 @@ export const generateRoute = () => {
     offers: generateOffers(type),
     isFavorite: Boolean(getRandomInteger(0, 1)),
   };
-  // return {
-  //   id: generateId(),
-  //   type,
-  //   startDate,
-  //   endDate,
-  //   destination: generateDestination(Mock.DESTINATIONS),
-  //   info: {
-  //     description: getRandomSentences(Mock.TEXT),
-  //     photos: getRandomPhotos(Mock.URL_PHOTO),
-  //   },
-  //   price: getRandomInteger(50, 400),
-  //   offers: generateOffers(type),
-  //   isFavorite: Boolean(getRandomInteger(0, 1)),
-  // };
-
 };
