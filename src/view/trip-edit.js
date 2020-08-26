@@ -1,16 +1,19 @@
-// import AbstractView from './abstract';
 import SmartView from './smart';
-import {formatDate as format} from '../utils/common';
+import {formatDate as format, getDateFrom, StoreItems} from '../utils/common';
 import {getEventType} from '../utils/route';
-import {getOffersByType} from '../mock/route';
+import {getOffersByType, getDestinationByName} from '../mock/route';
 
 const Smart = {
   EVENT_TYPE: `_type`,
   DESTINATION: `_destination`,
   START_DATE: `_startDate`,
   END_DATE: `_endDate`,
-  PRICE: `_price`
+  PRICE: `_price`,
+  OFFERS: `_offers`,
+  DESCRIPTION: `_description`,
+  PHOTOS: `_photos`,
 };
+
 
 const createEventList = (events, typeEvent) =>
   events.map((event) => {
@@ -23,30 +26,30 @@ const createEventList = (events, typeEvent) =>
       </div>`;
   }).join(``);
 
+
 const createCityList = (cities) =>
   cities.map((city) => `<option value="${city}"></option>`).join(``);
 
-// const getPlaceholder = (type) => getEventType(type);
 const getPlaceholder = (point) => point._type ? getEventType(point._type) : getEventType(point.type);
+
 const getDestination = (point) => point._destination ? point._destination : point.destination;
+
 const getPrice = (point) => point._price ? point._price : point.price;
 
 
 const createSectionOffers = (point) => {
 
-  if (!point.offers.length) {
-    return ``;
-  }
+  const allOffersByType = point._type ? getOffersByType(point._type) : getOffersByType(point.type);
 
-  const offers = getOffersByType(point.type);
+  const pointOffers = Array.isArray(point.offers) ? point.offers.slice() : [];
 
-  if (!offers.length) {
-    return ``;
-  }
+  const offers = Array.isArray(point._offers)
+    ? point._offers.slice()
+    : pointOffers;
 
-  const offerList = offers.map((offer) => {
+  const offerList = allOffersByType.map((offer) => {
     const nameLower = offer.name.toLowerCase();
-    const checked = point.offers.find((offerSelected) => offerSelected.name === offer.name) ? `checked` : ``;
+    const checked = offers.find((offerChecked) => offerChecked.name === offer.name) ? `checked` : ``;
 
     return `
       <div class="event__offer-selector">
@@ -59,16 +62,53 @@ const createSectionOffers = (point) => {
       </div>`;
   }).join(``);
 
+  const title = offerList
+    ? ` <h3 class="event__section-title  event__section-title--offers">Offers</h3>`
+    : ``;
+
   return `
     <section class="event__section  event__section--offers">
-      <h3 class="event__section-title  event__section-title--offers">Offers</h3>
+     ${title}
       <div class="event__available-offers">${offerList}</div>
     </section>`;
 };
 
+
+const createSectionDestination = (point) => {
+
+  const description = point._description ? point._description : point.description;
+  const photos = point._photos ? point._photos : point.photos;
+  const isPhotos = Boolean(photos.length);
+
+  if (!(description && isPhotos)) {
+    return ``;
+  }
+
+  let photosContainer = ``;
+
+  if (isPhotos) {
+    const photoList = photos.map((photo) =>
+      `<img class="event__photo" src="${photo}" alt="Event photo"></img>`).join(``);
+
+    photosContainer =
+      `<div class="event__photos-container">
+        <div class="event__photos-tape">
+        ${photoList}
+        </div>
+      </div>`;
+  }
+
+  return `
+    <section class="event__section  event__section--destination">
+      <h3 class="event__section-title  event__section-title--destination">Destination</h3>
+      <p class="event__destination-description">${description}</p>
+      ${photosContainer}
+    </section>`;
+};
+
+
 const createTripEditTemplate = (point, cities, eventsTransfer, eventsActivity) => {
   const favoriteChecked = point.isFavorite ? `checked` : ``;
-  console.log(`template:::`, point);
 
   return `<form class="event  event--edit" action="#" method="post">
   <header class="event__header">
@@ -94,17 +134,11 @@ const createTripEditTemplate = (point, cities, eventsTransfer, eventsActivity) =
 
     <div class="event__field-group  event__field-group--destination">
       <label class="event__label  event__type-output" for="event-destination-1">
-        <!-- Flight to -->
         ${getPlaceholder(point)}
       </label>
       <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${getDestination(point)}" list="destination-list-1">
       <datalist id="destination-list-1">
         ${createCityList(cities)}
-        <!--
-        <option value="Amsterdam"></option>
-        <option value="Geneva"></option>
-        <option value="Chamonix"></option>
-        -->
       </datalist>
     </div>
 
@@ -112,14 +146,12 @@ const createTripEditTemplate = (point, cities, eventsTransfer, eventsActivity) =
       <label class="visually-hidden" for="event-start-time-1">
         From
       </label>
-      <!-- <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="18/03/19 12:25"> -->
       <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${format.dmy(point.startDate)}">
 
       &mdash;
       <label class="visually-hidden" for="event-end-time-1">
         To
       </label>
-      <!-- <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="18/03/19 13:35"> -->
       <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${format.dmy(point.endDate)}">
 
     </div>
@@ -150,67 +182,16 @@ const createTripEditTemplate = (point, cities, eventsTransfer, eventsActivity) =
 
   <section class="event__details">
     ${createSectionOffers(point)}
-  <!--
-    <section class="event__section  event__section--offers">
-      <h3 class="event__section-title  event__section-title--offers">Offers</h3>
-
-      <div class="event__available-offers">
-        <div class="event__offer-selector">
-          <input class="event__offer-checkbox  visually-hidden" id="event-offer-luggage-1" type="checkbox" name="event-offer-luggage" checked>
-          <label class="event__offer-label" for="event-offer-luggage-1">
-            <span class="event__offer-title">Add luggage</span>
-            &plus;
-            &euro;&nbsp;<span class="event__offer-price">30</span>
-          </label>
-        </div>
-
-        <div class="event__offer-selector">
-          <input class="event__offer-checkbox  visually-hidden" id="event-offer-comfort-1" type="checkbox" name="event-offer-comfort" checked>
-          <label class="event__offer-label" for="event-offer-comfort-1">
-            <span class="event__offer-title">Switch to comfort class</span>
-            &plus;
-            &euro;&nbsp;<span class="event__offer-price">100</span>
-          </label>
-        </div>
-
-        <div class="event__offer-selector">
-          <input class="event__offer-checkbox  visually-hidden" id="event-offer-meal-1" type="checkbox" name="event-offer-meal">
-          <label class="event__offer-label" for="event-offer-meal-1">
-            <span class="event__offer-title">Add meal</span>
-            &plus;
-            &euro;&nbsp;<span class="event__offer-price">15</span>
-          </label>
-        </div>
-
-        <div class="event__offer-selector">
-          <input class="event__offer-checkbox  visually-hidden" id="event-offer-seats-1" type="checkbox" name="event-offer-seats">
-          <label class="event__offer-label" for="event-offer-seats-1">
-            <span class="event__offer-title">Choose seats</span>
-            &plus;
-            &euro;&nbsp;<span class="event__offer-price">5</span>
-          </label>
-        </div>
-
-        <div class="event__offer-selector">
-          <input class="event__offer-checkbox  visually-hidden" id="event-offer-train-1" type="checkbox" name="event-offer-train">
-          <label class="event__offer-label" for="event-offer-train-1">
-            <span class="event__offer-title">Travel by train</span>
-            &plus;
-            &euro;&nbsp;<span class="event__offer-price">40</span>
-          </label>
-        </div>
-      </div>
-    </section>
-    -->
+    ${createSectionDestination(point)}
   </section>
 </form>`;
 };
+
 
 export default class TripEdit extends SmartView {
   constructor(point, cities, eventsTransfer, eventsActivity) {
     super();
 
-    // this._point = point;
     this._data = TripEdit.parsePointToData(point);
     this._cities = cities;
     this._eventsTransfer = eventsTransfer;
@@ -222,7 +203,11 @@ export default class TripEdit extends SmartView {
     this._typeHandler = this._typeHandler.bind(this);
     this._destinationHandler = this._destinationHandler.bind(this);
     this._priceHandler = this._priceHandler.bind(this);
+    this._startDateHandler = this._startDateHandler.bind(this);
+    this._endDateHandler = this._endDateHandler.bind(this);
+    this._offerHandler = this._offerHandler.bind(this);
 
+    this._storeOffers = new StoreItems(`name`, `price`).init(point.offers);
 
     this._setInnerHandlers();
   }
@@ -237,7 +222,6 @@ export default class TripEdit extends SmartView {
   }
 
   restoreHandlers() {
-    console.log(`trip-edit.restoreHandlers():`);
     this._setInnerHandlers();
     this.setFormSubmitHandler(this._callback.formSubmit);
   }
@@ -250,7 +234,16 @@ export default class TripEdit extends SmartView {
         .addEventListener(`change`, this._destinationHandler);
 
     this.getElement().querySelector(`.event__input.event__input--price`)
-        .addEventListener(`change`, this._priceHandler);
+        .addEventListener(`input`, this._priceHandler);
+
+    this.getElement().querySelector(`input[name="event-start-time"]`)
+        .addEventListener(`input`, this._startDateHandler);
+
+    this.getElement().querySelector(`input[name="event-end-time"]`)
+        .addEventListener(`input`, this._endDateHandler);
+
+    this.getElement().querySelector(`.event__available-offers`)
+        .addEventListener(`click`, this._offerHandler);
 
   }
 
@@ -260,7 +253,9 @@ export default class TripEdit extends SmartView {
     if (evt.target.nodeName !== `LABEL`) {
       return;
     }
-    console.log(evt.target.textContent);
+
+    this._storeOffers.destroy();
+    this.updateData({[Smart.OFFERS]: {}});
     this.updateData({[Smart.EVENT_TYPE]: evt.target.textContent});
   }
 
@@ -271,28 +266,60 @@ export default class TripEdit extends SmartView {
       return;
     }
 
-    console.log(evt.target.value);
-    this.updateData({[Smart.DESTINATION]: evt.target.value});
+    const destination = evt.target.value;
+    const description = getDestinationByName(destination).description;
+    const photos = getDestinationByName(destination).photos;
+
+    this.updateData({[Smart.DESCRIPTION]: description});
+    this.updateData({[Smart.PHOTOS]: photos});
+    this.updateData({[Smart.DESTINATION]: destination});
   }
 
   _priceHandler(evt) {
     evt.preventDefault();
-    console.log(evt.target);
-    console.log(evt.target.value);
-    this.updateData({[Smart.PRICE]: evt.target.value});
+    this.updateData({[Smart.PRICE]: evt.target.value}, true);
+  }
+
+  _startDateHandler(evt) {
+    evt.preventDefault();
+    const date = getDateFrom(evt.target.value);
+    this.updateData({[Smart.START_DATE]: date}, true);
+  }
+
+  _endDateHandler(evt) {
+    evt.preventDefault();
+    const date = getDateFrom(evt.target.value);
+    this.updateData({[Smart.END_DATE]: date}, true);
+  }
+
+  _offerHandler(evt) {
+    evt.preventDefault();
+
+    let parent = null;
+
+    if (evt.target.nodeName === `SPAN`) {
+      parent = evt.target.parentElement;
+    }
+
+    if (evt.target.nodeName === `LABEL`) {
+      parent = evt.target;
+    }
+
+    if (parent) {
+      const name = parent.children[0].innerText;
+      const price = parent.children[1].innerText;
+
+      this._storeOffers.add(name, Number(price));
+      this.updateData({[Smart.OFFERS]: this._storeOffers.getItems()});
+    }
   }
 
   _formSubmitHandler(evt) {
     evt.preventDefault();
-
-    // this._callback.formSubmit(TripEdit.parseDataToPoint(this._data));
-    const tmp = TripEdit.parseDataToPoint(this._data);
-    console.log(`tmp:`, tmp);
-    this._callback.formSubmit(tmp);
+    this._callback.formSubmit(TripEdit.parseDataToPoint(this._data));
   }
 
   _favoriteClickHander(evt) {
-    console.log(`trip-edit._favoriteClickHander:`, evt);
     evt.preventDefault();
     this._callback.favoriteClick();
   }
@@ -326,14 +353,12 @@ export default class TripEdit extends SmartView {
 
     Object
       .values(Smart)
-      .find((property) => data[property])
+      .filter((property) => data[property])
       .forEach((property) => {
         const prop = property.slice(1);
         data[prop] = data[property];
         delete data[property];
       });
-
-    console.log(`saved:`, data);
 
     return data;
   }

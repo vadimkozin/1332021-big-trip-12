@@ -24,6 +24,20 @@ export const formatDate = {
   ymdhm: (date) => `${formatDate.ymd(date)}T${formatDate.hm(date)}`,
 };
 
+// возвращает дату (Date) из строки в формате: 25/09/20 14:23
+export const getDateFrom = (value) => {
+  const test = /^\d{1,2}\/\d{1,2}\/\d{2}\s+\d{2}:\d{2}$/.test(value);
+
+  if (!test) {
+    return null;
+  }
+
+  const [dayMonthYear, time] = value.split(/\s+/);
+  const [day, month, year] = dayMonthYear.split(`/`);
+
+  return new Date(Date.parse(`${month}/${day}/${year} ${time}`));
+};
+
 // замена в строке (по умолчанию меняет два тире на длинное тире в html)
 export const replaceStr = (str, search = `--`, replace = `&nbsp;&mdash;&nbsp;`) => str.split(search).join(replace);
 
@@ -78,7 +92,7 @@ export const getValuesByKey = ({key, arrayObj} = {}) => {
   }, []);
 };
 
-// обновдяет элемент в списке
+// обновляет элемент в списке
 export const updateItem = (items, update) => {
   const index = items.findIndex((item) => item.id === update.id);
 
@@ -92,3 +106,44 @@ export const updateItem = (items, update) => {
     ...items.slice(index + 1)
   ];
 };
+
+// хранилище уникальных пар: key->value, !при повторном добавлении key удаляется из хранилища
+export class StoreItems {
+  constructor(keyName = `key`, valueName = `value`) {
+    this._store = {};
+    this._keyName = keyName;
+    this._valueName = valueName;
+  }
+
+  add(key, value) {
+    if (this._store[key]) {
+      delete this._store[key];
+    } else {
+      this._store[key] = value;
+    }
+
+    return this;
+  }
+
+  init(items) {
+    if (Array.isArray(items)) {
+      items.forEach((item) => {
+        const values = Object.values(item);
+        this.add(values[0], values[1]);
+      });
+    }
+
+    return this;
+  }
+
+  destroy() {
+    this._store = {};
+    return this;
+  }
+
+  getItems() {
+    return Object
+      .entries(this._store)
+      .map(([key, value]) => ({[this._keyName]: key, [this._valueName]: value}));
+  }
+}

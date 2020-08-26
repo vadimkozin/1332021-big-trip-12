@@ -43,8 +43,6 @@ export default class Point {
       return;
     }
 
-    console.log(`point.init(point):`, point);
-
     if (this._mode === Mode.DEFAULT) {
       replace(this._pointComponent, prevPointComponent);
     }
@@ -59,7 +57,9 @@ export default class Point {
   }
 
   resetView() {
+
     if (this._mode !== Mode.DEFAULT) {
+      this._pointEditComponent.reset(this._point);
       this._replaceFormToView();
     }
   }
@@ -80,16 +80,17 @@ export default class Point {
   _escKeyDownHandler(evt) {
     if (evt.keyCode === ESCAPE_CODE) {
       evt.preventDefault();
+      this._pointEditComponent.reset(this._point);
       this._replaceFormToView();
     }
   }
 
-  _handleFormSubmit() {
+  _handleFormSubmit(point) {
+    this._changeData(point);
     this._replaceFormToView();
   }
 
   _handleFavoriteClick() {
-    console.log(`point._handleFavoriteClick:`, this._point);
     this._changeData(
         Object.assign(
             {},

@@ -147,7 +147,6 @@ export default class Trip {
   }
 
   _handleTripChange(updatedPoint) {
-    console.log(`trip._handleTripChange(updatedPoint):`, updatedPoint);
     this._points = updateItem(this._points, updatedPoint);
     this._defaultPoints = updateItem(this._defaultPoints, updatedPoint);
     this._pointPresenter[updatedPoint.id].init(updatedPoint);

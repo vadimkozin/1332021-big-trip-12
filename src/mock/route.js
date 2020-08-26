@@ -21,17 +21,34 @@ const generateDestination = (destinations) => {
   return destinations[index];
 };
 
+const getRandomDestinations = () => {
+  const {length} = Mock.DESTINATIONS;
+  let index = 0;
+
+  return Array(length).fill().map(() =>
+    ({
+      name: Mock.DESTINATIONS[index++],
+      photos: getRandomPhotos(Mock.URL_PHOTO),
+      description: getRandomSentences(Mock.TEXT),
+    })
+  );
+};
+
+const destinations = getRandomDestinations();
+
+export const getDestinationByName = (name) => destinations.find((dest) => dest.name === name);
+
 const getRandomOffers = () => {
   const {length} = Mock.OFFERS_NAME;
+  let index = 0;
 
-  return Array(length).fill().map(() => {
-    const index = getRandomInteger(0, Mock.OFFERS_NAME.length - 1);
-    return {
+  return Array(length).fill().map(() =>
+    ({
       type: generatePointType(),
-      name: Mock.OFFERS_NAME[index],
+      name: Mock.OFFERS_NAME[index++],
       price: getRandomInteger(10, 100),
-    };
-  });
+    })
+  );
 };
 
 const offers = getRandomOffers();
@@ -56,6 +73,7 @@ export const generateRoute = () => {
   const startDate = getNextRandomDate(currentDate, `hours`);
   const index = getRandomInteger(0, times.length - 1);
   const endDate = getNextRandomDate(startDate, times[index]);
+  const destination = generateDestination(Mock.DESTINATIONS);
 
   currentDate = endDate;
 
@@ -64,13 +82,26 @@ export const generateRoute = () => {
     type,
     startDate,
     endDate,
-    destination: generateDestination(Mock.DESTINATIONS),
-    info: {
-      description: getRandomSentences(Mock.TEXT),
-      photos: getRandomPhotos(Mock.URL_PHOTO),
-    },
+    destination,
+    description: getDestinationByName(destination).description,
+    photos: getDestinationByName(destination).photos,
     price: getRandomInteger(50, 400),
     offers: generateOffers(type),
     isFavorite: Boolean(getRandomInteger(0, 1)),
   };
+  // return {
+  //   id: generateId(),
+  //   type,
+  //   startDate,
+  //   endDate,
+  //   destination: generateDestination(Mock.DESTINATIONS),
+  //   info: {
+  //     description: getRandomSentences(Mock.TEXT),
+  //     photos: getRandomPhotos(Mock.URL_PHOTO),
+  //   },
+  //   price: getRandomInteger(50, 400),
+  //   offers: generateOffers(type),
+  //   isFavorite: Boolean(getRandomInteger(0, 1)),
+  // };
+
 };
