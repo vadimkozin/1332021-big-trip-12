@@ -1,6 +1,6 @@
+import uniqueId from 'lodash.uniqueid';
 import {Mock} from '../const';
 import {getRandomInteger, getRandomSentences, getRandomPhotos, getNextRandomDate} from "../utils/common";
-
 
 const generatePointType = () => {
   const {EVENT: event} = Mock;
@@ -18,20 +18,23 @@ const generateDestination = (destinations) => {
   return destinations[index];
 };
 
-const getRandomOffers = () => {
-  const {length} = Mock.OFFERS_NAME;
+const destinations = Mock.DESTINATIONS.map((destination) =>
+  ({
+    name: destination,
+    photos: getRandomPhotos(Mock.URL_PHOTO),
+    description: getRandomSentences(Mock.TEXT),
+  })
+);
 
-  return Array(length).fill().map(() => {
-    const index = getRandomInteger(0, Mock.OFFERS_NAME.length - 1);
-    return {
-      type: generatePointType(),
-      name: Mock.OFFERS_NAME[index],
-      price: getRandomInteger(10, 100),
-    };
-  });
-};
+export const getDestinationByName = (name) => destinations.find((dest) => dest.name === name);
 
-const offers = getRandomOffers();
+const offers = Mock.OFFERS_NAME.map((name) =>
+  ({
+    name,
+    type: generatePointType(),
+    price: getRandomInteger(10, 100),
+  })
+);
 
 const generateOffers = (type, from = 0, to = 5) => {
   const array = offers
@@ -43,6 +46,8 @@ const generateOffers = (type, from = 0, to = 5) => {
   return array.slice(0, count);
 };
 
+export const getOffersByType = (type) => offers.filter((offer) => offer.type === type);
+
 let currentDate = Date.now();
 
 export const generateRoute = () => {
@@ -51,18 +56,18 @@ export const generateRoute = () => {
   const startDate = getNextRandomDate(currentDate, `hours`);
   const index = getRandomInteger(0, times.length - 1);
   const endDate = getNextRandomDate(startDate, times[index]);
+  const destination = generateDestination(Mock.DESTINATIONS);
 
   currentDate = endDate;
 
   return {
+    id: uniqueId(),
     type,
     startDate,
     endDate,
-    destination: generateDestination(Mock.DESTINATIONS),
-    info: {
-      description: getRandomSentences(Mock.TEXT),
-      photos: getRandomPhotos(Mock.URL_PHOTO),
-    },
+    destination,
+    description: getDestinationByName(destination).description,
+    photos: getDestinationByName(destination).photos,
     price: getRandomInteger(50, 400),
     offers: generateOffers(type),
     isFavorite: Boolean(getRandomInteger(0, 1)),

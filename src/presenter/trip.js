@@ -3,19 +3,19 @@ import TripDaysView from '../view/trip-days';
 import TripDaysItemView from '../view/trip-days-item';
 import DayInfoView from '../view/day-info';
 import TripEventsListView from '../view/trip-events-list';
-import TripEventsItemView from '../view/trip-events-item';
-import TripEditFirstView from '../view/trip-edit-first';
 import NoRouteView from '../view/no-route';
-import {SortType, Mock, ESCAPE_CODE} from '../const';
-import {render, replace} from '../utils/render';
+import PointPresenter from './point';
+import {updateItem} from '../utils/common';
+import {SortType} from '../const';
+import {render} from '../utils/render';
 import {setOrdinalDaysRoute, getDaysRoute, sortPrice, sortTime} from '../utils/route';
-
-const {EVENT: {VEHICLE: {NAMES: vehicleNames}, PLACE: {NAMES: placeNames}}, DESTINATIONS: cities} = Mock;
 
 export default class Trip {
   constructor(tripConatainer) {
     this._tripContainer = tripConatainer;
     this._currentSortType = SortType.DEFAULT;
+    this._pointPresenter = {};
+
     this._sortComponent = new SortView();
     this._tripDaysComponent = new TripDaysView();
     this._tripDaysItemComponent = new TripDaysItemView();
@@ -24,6 +24,8 @@ export default class Trip {
     this._dayWithoutInfoComponent = new DayInfoView({isDayWithoutInfo: true});
 
     this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
+    this._handleTripChange = this._handleTripChange.bind(this);
+    this._handleModeChange = this._handleModeChange.bind(this);
   }
 
   init(points) {
@@ -98,28 +100,9 @@ export default class Trip {
   }
 
   _renderPoint(container, point) {
-    const pointComponent = new TripEventsItemView(point);
-    const pointEditComponent = new TripEditFirstView(point, cities, vehicleNames, placeNames);
-
-    const onEscKeyDown = (evt) => {
-      if (evt.keyCode === ESCAPE_CODE) {
-        evt.preventDefault();
-        replace(pointComponent, pointEditComponent);
-        document.removeEventListener(`keydown`, onEscKeyDown);
-      }
-    };
-
-    pointComponent.setEditClickHandler(() => {
-      replace(pointEditComponent, pointComponent);
-      document.addEventListener(`keydown`, onEscKeyDown);
-    });
-
-    pointEditComponent.setFormSubmitHandler(() => {
-      replace(pointComponent, pointEditComponent);
-      document.removeEventListener(`keydown`, onEscKeyDown);
-    });
-
-    render(container, pointComponent);
+    const pointPresenter = new PointPresenter(container, this._handleTripChange, this._handleModeChange);
+    pointPresenter.init(point);
+    this._pointPresenter[point.id] = pointPresenter;
   }
 
   _renderNoTrip() {
@@ -161,4 +144,17 @@ export default class Trip {
     this._tripDaysItemComponent.getElement().innerHTML = ``;
     this._tripEventsListComponent.getElement().innerHTML = ``;
   }
+
+  _handleTripChange(updatedPoint) {
+    this._points = updateItem(this._points, updatedPoint);
+    this._defaultPoints = updateItem(this._defaultPoints, updatedPoint);
+    this._pointPresenter[updatedPoint.id].init(updatedPoint);
+  }
+
+  _handleModeChange() {
+    Object
+      .values(this._pointPresenter)
+      .forEach((presenter) => presenter.resetView());
+  }
+
 }
