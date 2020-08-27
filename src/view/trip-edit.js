@@ -215,6 +215,7 @@ export default class TripEdit extends SmartView {
   restoreHandlers() {
     this._setInnerHandlers();
     this.setFormSubmitHandler(this._callback.formSubmit);
+    this.setFavoriteClickHander(this._callback.favoriteClick);
   }
 
   _setHandlers() {
