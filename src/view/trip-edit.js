@@ -1,5 +1,6 @@
 import SmartView from './smart';
-import {formatDate as format, getDateFrom, StoreItems} from '../utils/common';
+import {formatDate as format, getDateFrom} from '../utils/common';
+import StoreItems from '../utils/common';
 import {getEventType} from '../utils/route';
 import {getOffersByType, getDestinationByName} from '../mock/route';
 
@@ -160,7 +161,7 @@ const createTripEditTemplate = (point, cities, eventsTransfer, eventsActivity) =
         <span class="visually-hidden">Price</span>
         &euro;
       </label>
-      <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${getPrice(point)}">
+      <input class="event__input  event__input--price" id="event-price-1" type="number" name="event-price" value="${getPrice(point)}">
     </div>
 
     <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
@@ -224,7 +225,7 @@ export default class TripEdit extends SmartView {
       this._callback.formSubmit(TripEdit.parseDataToPoint(this._data));
     };
 
-    this._handlers.favoriteClick = (evt) => {
+    this._handlers.favorite = (evt) => {
       evt.preventDefault();
       this._callback.favoriteClick();
     };
@@ -258,7 +259,7 @@ export default class TripEdit extends SmartView {
 
     this._handlers.price = (evt) => {
       evt.preventDefault();
-      this.updateData({[Smart.PRICE]: evt.target.value}, true);
+      this.updateData({[Smart.PRICE]: parseInt(evt.target.value, 10)}, true);
     };
 
     this._handlers.startDate = (evt) => {
@@ -296,7 +297,7 @@ export default class TripEdit extends SmartView {
     };
 
     this._handlers.formSubmit = this._handlers.formSubmit.bind(this);
-    this._handlers.favoriteClick = this._handlers.favoriteClick.bind(this);
+    this._handlers.favorite = this._handlers.favorite.bind(this);
     this._handlers.type = this._handlers.type.bind(this);
     this._handlers.destination = this._handlers.destination.bind(this);
     this._handlers.price = this._handlers.price.bind(this);
@@ -319,88 +320,11 @@ export default class TripEdit extends SmartView {
         .addEventListener(`input`, this._handlers.startDate);
 
     this.getElement().querySelector(`input[name="event-end-time"]`)
-        .addEventListener(`input`, this._handlers._endDate);
+        .addEventListener(`input`, this._handlers.endDate);
 
     this.getElement().querySelector(`.event__available-offers`)
         .addEventListener(`click`, this._handlers.offer);
 
-  }
-
-  _typeHandler(evt) {
-    evt.preventDefault();
-
-    if (evt.target.nodeName !== `LABEL`) {
-      return;
-    }
-
-    this._storeOffers.destroy();
-    this.updateData({[Smart.OFFERS]: {}});
-    this.updateData({[Smart.EVENT_TYPE]: evt.target.textContent});
-  }
-
-  _destinationHandler(evt) {
-    evt.preventDefault();
-
-    if (evt.target.nodeName !== `INPUT`) {
-      return;
-    }
-
-    const destination = evt.target.value;
-    const description = getDestinationByName(destination).description;
-    const photos = getDestinationByName(destination).photos;
-
-    this.updateData({[Smart.DESCRIPTION]: description});
-    this.updateData({[Smart.PHOTOS]: photos});
-    this.updateData({[Smart.DESTINATION]: destination});
-  }
-
-  _priceHandler(evt) {
-    evt.preventDefault();
-    this.updateData({[Smart.PRICE]: evt.target.value}, true);
-  }
-
-  _startDateHandler(evt) {
-    evt.preventDefault();
-    const date = getDateFrom(evt.target.value);
-    this.updateData({[Smart.START_DATE]: date}, true);
-  }
-
-  _endDateHandler(evt) {
-    evt.preventDefault();
-    const date = getDateFrom(evt.target.value);
-    this.updateData({[Smart.END_DATE]: date}, true);
-  }
-
-  _offerHandler(evt) {
-    evt.preventDefault();
-
-    let parent = null;
-
-    if (evt.target.nodeName === `SPAN`) {
-      parent = evt.target.parentElement;
-    }
-
-    if (evt.target.nodeName === `LABEL`) {
-      parent = evt.target;
-    }
-
-    if (parent) {
-      const name = parent.children[0].innerText;
-      const price = parent.children[1].innerText;
-
-      this._storeOffers.add(name, Number(price));
-      this.updateData({[Smart.OFFERS]: this._storeOffers.getItems()});
-    }
-  }
-
-  _formSubmitHandler(evt) {
-    evt.preventDefault();
-    this._callback.formSubmit(TripEdit.parseDataToPoint(this._data));
-  }
-
-  _favoriteClickHander(evt) {
-    evt.preventDefault();
-    this._callback.favoriteClick();
   }
 
   setFormSubmitHandler(callback) {

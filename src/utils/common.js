@@ -26,9 +26,9 @@ export const formatDate = {
 
 // возвращает дату (Date) из строки в формате: 25/09/20 14:23
 export const getDateFrom = (value) => {
-  const test = /^\d{1,2}\/\d{1,2}\/\d{2}\s+\d{2}:\d{2}$/.test(value);
+  const isNormalFormatDate = /^\d{1,2}\/\d{1,2}\/\d{2}\s+\d{2}:\d{2}$/.test(value);
 
-  if (!test) {
+  if (!isNormalFormatDate) {
     return null;
   }
 
@@ -108,7 +108,7 @@ export const updateItem = (items, update) => {
 };
 
 // хранилище уникальных пар: key->value, !при повторном добавлении key удаляется из хранилища
-export class StoreItems {
+export default class StoreItems {
   constructor(keyName = `key`, valueName = `value`) {
     this._store = {};
     this._keyName = keyName;

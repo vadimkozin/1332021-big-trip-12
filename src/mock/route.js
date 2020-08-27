@@ -18,37 +18,23 @@ const generateDestination = (destinations) => {
   return destinations[index];
 };
 
-const getRandomDestinations = () => {
-  const {length} = Mock.DESTINATIONS;
-  let index = 0;
-
-  return Array(length).fill().map(() =>
-    ({
-      name: Mock.DESTINATIONS[index++],
-      photos: getRandomPhotos(Mock.URL_PHOTO),
-      description: getRandomSentences(Mock.TEXT),
-    })
-  );
-};
-
-const destinations = getRandomDestinations();
+const destinations = Mock.DESTINATIONS.map((destination) =>
+  ({
+    name: destination,
+    photos: getRandomPhotos(Mock.URL_PHOTO),
+    description: getRandomSentences(Mock.TEXT),
+  })
+);
 
 export const getDestinationByName = (name) => destinations.find((dest) => dest.name === name);
 
-const getRandomOffers = () => {
-  const {length} = Mock.OFFERS_NAME;
-  let index = 0;
-
-  return Array(length).fill().map(() =>
-    ({
-      type: generatePointType(),
-      name: Mock.OFFERS_NAME[index++],
-      price: getRandomInteger(10, 100),
-    })
-  );
-};
-
-const offers = getRandomOffers();
+const offers = Mock.OFFERS_NAME.map((name) =>
+  ({
+    name,
+    type: generatePointType(),
+    price: getRandomInteger(10, 100),
+  })
+);
 
 const generateOffers = (type, from = 0, to = 5) => {
   const array = offers

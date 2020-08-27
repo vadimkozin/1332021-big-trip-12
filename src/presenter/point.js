@@ -44,8 +44,10 @@ export default class Point {
   }
 
   _initSavePrev() {
-    this._prevPointComponent = this._pointComponent;
-    this._prevPointEditComponent = this._pointEditComponent;
+    this._prev = {
+      pointComponent: this._pointComponent,
+      pointEditComponent: this._pointEditComponent,
+    };
   }
 
   _initSetHandlers() {
@@ -55,24 +57,24 @@ export default class Point {
   }
 
   _initIsFirstCall() {
-    return (this._prevPointComponent === null || this._prevPointEditComponent === null);
+    return !Object.values(this._prev).every(Boolean);
   }
 
   _initReplaceComponent() {
     if (this._mode === Mode.DEFAULT) {
-      replace(this._pointComponent, this._prevPointComponent);
+      replace(this._pointComponent, this._prev.pointComponent);
     }
 
     if (this._mode === Mode.EDITTING) {
-      replace(this._pointEditComponent, this._prevPointEditComponent);
+      replace(this._pointEditComponent, this._prev.pointEditComponent);
     }
   }
 
   _initRemovePrev() {
-    remove(this._prevPointComponent);
-    remove(this._prevPointEditComponent);
-    this._prevPointComponent = null;
-    this._prevPointEditComponent = null;
+    Object.keys(this._prev).forEach((component) => {
+      remove(this._prev[component]);
+      this._prev[component] = null;
+    });
   }
 
   resetView() {
