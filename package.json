@@ -10,8 +10,11 @@
     "start": "webpack-dev-server --open"
   },
   "devDependencies": {
+    "css-loader": "4.2.2",
     "eslint": "7.5.0",
     "eslint-config-htmlacademy": "0.5.2",
+    "moment-locales-webpack-plugin": "1.2.0",
+    "style-loader": "1.2.1",
     "webpack": "4.44.1",
     "webpack-cli": "3.3.12",
     "webpack-dev-server": "3.11.0"
@@ -20,6 +23,8 @@
     "node": "10"
   },
   "dependencies": {
-    "lodash.uniqueid": "4.0.1"
+    "flatpickr": "4.6.6",
+    "lodash.uniqueid": "4.0.1",
+    "moment": "2.27.0"
   }
 }
