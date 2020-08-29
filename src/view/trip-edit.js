@@ -214,9 +214,10 @@ export default class TripEdit extends SmartView {
 
     this._storeOffers = new StoreItems(`name`, `price`).init(point.offers);
 
-    this._datepicker = {};
-    this._datepicker.start = null;
-    this._datepicker.end = null;
+    this._datepicker = {
+      start: null,
+      end: null
+    };
 
     this._setHandlers();
     this._setInnerHandlers();
@@ -311,11 +312,6 @@ export default class TripEdit extends SmartView {
       this.updateData({[Smart.PRICE]: parseInt(evt.target.value, 10)}, true);
     };
 
-    // this._handlers.startDate = (evt) => {
-    //   evt.preventDefault();
-    //   const date = getDateFrom(evt.target.value);
-    //   this.updateData({[Smart.START_DATE]: date}, true);
-    // };
     this._handlers.startDate = (selectedDates) => {
 
       const startDate = selectedDates[0];
@@ -331,12 +327,6 @@ export default class TripEdit extends SmartView {
       this._datepicker.end.set(`minDate`, startDate);
 
     };
-
-    // this._handlers.endDate = (evt) => {
-    //   evt.preventDefault();
-    //   const date = getDateFrom(evt.target.value);
-    //   this.updateData({[Smart.END_DATE]: date}, true);
-    // };
 
     this._handlers.endDate = (selectedDates) => {
       this.updateData({[Smart.END_DATE]: selectedDates[0]}, true);
@@ -383,12 +373,6 @@ export default class TripEdit extends SmartView {
 
     this.getElement().querySelector(`.event__input.event__input--price`)
         .addEventListener(`input`, this._handlers.price);
-
-    // this.getElement().querySelector(`input[name="event-start-time"]`)
-    //     .addEventListener(`input`, this._handlers.startDate);
-
-    // this.getElement().querySelector(`input[name="event-end-time"]`)
-    //     .addEventListener(`input`, this._handlers.endDate);
 
     this.getElement().querySelector(`.event__available-offers`)
         .addEventListener(`click`, this._handlers.offer);
