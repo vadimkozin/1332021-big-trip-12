@@ -28,6 +28,8 @@ export const Duration = {
   MSEC_PER_MINUTE: 60 * 1000, // миллисекунд в минуте
   MSEC_PER_HOUR: 60 * 60 * 1000, // миллисекунд в часе
   MSEC_PER_DAY: 60 * 60 * 1000 * 24, // миллисекунд в сутках
+  MINUTES_PER_HOUR: 60, // минут в часе
+  HOURS_PER_DAY: 24, // часов в дне
 };
 
 export const OFFERS_MAX = 3; // показывать максимально предложений в отчёте

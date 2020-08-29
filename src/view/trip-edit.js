@@ -1,8 +1,13 @@
+import flatpicker from 'flatpickr';
 import SmartView from './smart';
-import {formatDate as format, getDateFrom} from '../utils/common';
+import {formatDate as format} from '../utils/common';
 import StoreItems from '../utils/common';
 import {getEventType} from '../utils/route';
 import {getOffersByType, getDestinationByName} from '../mock/route';
+
+import '../../node_modules/flatpickr/dist/flatpickr.min.css';
+import '../../node_modules/flatpickr/dist/themes/material_blue.css';
+import '../../public/css/add.css';
 
 const Smart = {
   EVENT_TYPE: `_type`,
@@ -15,6 +20,16 @@ const Smart = {
   PHOTOS: `_photos`,
 };
 
+const configDatepicker = {
+  "dateFormat": `d/m/Y H:i`,
+  "time_24hr": true,
+  "enableTime": true,
+};
+
+const getDatepicker = ({element, config = configDatepicker, defaultDate = null, onChange = function () {}} = {}) => {
+  return flatpicker(element,
+      Object.assign({}, config, {defaultDate, onChange}));
+};
 
 const createEventList = (events, typeEvent) =>
   events.map((event) => {
@@ -199,8 +214,14 @@ export default class TripEdit extends SmartView {
 
     this._storeOffers = new StoreItems(`name`, `price`).init(point.offers);
 
+    this._datepicker = {
+      start: null,
+      end: null
+    };
+
     this._setHandlers();
     this._setInnerHandlers();
+    this._setDatepicker();
   }
 
   reset(point) {
@@ -216,6 +237,34 @@ export default class TripEdit extends SmartView {
     this._setInnerHandlers();
     this.setFormSubmitHandler(this._callback.formSubmit);
     this.setFavoriteClickHander(this._callback.favoriteClick);
+    this._setDatepicker();
+  }
+
+  _setDatepicker() {
+    Object.values(this._datepicker).forEach((datepicker) => {
+      if (datepicker) {
+        datepicker.destroy();
+        datepicker = null;
+      }
+    });
+
+    this._initializeDatePicker();
+  }
+
+  _initializeDatePicker() {
+    this._datepicker.start = getDatepicker({
+      element: this.getElement().querySelector(`input[name="event-start-time"]`),
+      defaultDate: this._data.startDate,
+      onChange: this._handlers.startDate,
+    });
+
+    this._datepicker.end = getDatepicker({
+      element: this.getElement().querySelector(`input[name="event-end-time"]`),
+      defaultDate: this._data.endDate,
+      onChange: this._handlers.endDate,
+    });
+
+    this._datepicker.end.set(`minDate`, this._data.startDate);
   }
 
   _setHandlers() {
@@ -263,16 +312,24 @@ export default class TripEdit extends SmartView {
       this.updateData({[Smart.PRICE]: parseInt(evt.target.value, 10)}, true);
     };
 
-    this._handlers.startDate = (evt) => {
-      evt.preventDefault();
-      const date = getDateFrom(evt.target.value);
-      this.updateData({[Smart.START_DATE]: date}, true);
+    this._handlers.startDate = (selectedDates) => {
+
+      const startDate = selectedDates[0];
+      this.updateData({[Smart.START_DATE]: startDate}, true);
+
+      const endDate = this._datepicker.end.selectedDates[0];
+
+      if (endDate < startDate) {
+        this._datepicker.end.setDate(startDate);
+        this.updateData({[Smart.END_DATE]: startDate}, true);
+      }
+
+      this._datepicker.end.set(`minDate`, startDate);
+
     };
 
-    this._handlers.endDate = (evt) => {
-      evt.preventDefault();
-      const date = getDateFrom(evt.target.value);
-      this.updateData({[Smart.END_DATE]: date}, true);
+    this._handlers.endDate = (selectedDates) => {
+      this.updateData({[Smart.END_DATE]: selectedDates[0]}, true);
     };
 
     this._handlers.offer = (evt) => {
@@ -316,12 +373,6 @@ export default class TripEdit extends SmartView {
 
     this.getElement().querySelector(`.event__input.event__input--price`)
         .addEventListener(`input`, this._handlers.price);
-
-    this.getElement().querySelector(`input[name="event-start-time"]`)
-        .addEventListener(`input`, this._handlers.startDate);
-
-    this.getElement().querySelector(`input[name="event-end-time"]`)
-        .addEventListener(`input`, this._handlers.endDate);
 
     this.getElement().querySelector(`.event__available-offers`)
         .addEventListener(`click`, this._handlers.offer);
