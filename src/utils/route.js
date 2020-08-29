@@ -1,3 +1,4 @@
+import moment from 'moment';
 import {MONTHS, Mock, Duration, SEPARATOR, INFO_ROUTE_CITIES_MAX} from '../const';
 import {addZeros, formatDate, getValuesByKey} from './common';
 
@@ -14,27 +15,20 @@ export const getDaysRoute = (points) =>
   [...new Set(getValuesByKey({key: `order`, arrayObj: points}))];
 
 // возвращает продолжительность маршрута в формате: "23M" or "02H 44M" or "01D 02H 30M"
-const getDurationRoute = (milliseconds) => {
-  const hoursInRoute = milliseconds / Duration.MSEC_PER_HOUR;
-  const daysInRoute = milliseconds / Duration.MSEC_PER_DAY;
+export const getDurationRoute = (milliseconds) => {
+  const duration = moment.duration(milliseconds);
 
-  if (hoursInRoute < 1) { // "23M"
-    return `${addZeros(Math.floor(milliseconds / Duration.MSEC_PER_MINUTE))}M`;
+  const days = addZeros(Math.floor(duration.asDays()));
+  const hours = addZeros(duration.hours());
+  const minutes = addZeros(duration.minutes());
 
-  } else if (daysInRoute < 1) { // "02H 44M"
-    const hours = Math.floor(milliseconds / Duration.MSEC_PER_HOUR);
-    const msec = milliseconds - hours * Duration.MSEC_PER_HOUR;
-    const minutes = msec / Duration.MSEC_PER_MINUTE;
-    return `${addZeros(Math.floor(hours))}H ${addZeros(Math.floor(minutes))}M`;
-
-  } else { // "01D 02H 30M"
-    const days = Math.floor(milliseconds / Duration.MSEC_PER_DAY);
-    let msec = milliseconds - days * Duration.MSEC_PER_DAY;
-    const hours = Math.floor(msec / Duration.MSEC_PER_HOUR);
-    msec -= hours * Duration.MSEC_PER_HOUR;
-    const minutes = msec / Duration.MSEC_PER_MINUTE;
-    return `${addZeros(Math.floor(days))}D ${addZeros(Math.floor(hours))}H ${addZeros(Math.floor(minutes))}M`;
+  if (duration.asMinutes() < Duration.MINUTES_PER_HOUR) {
+    return `${minutes}M`;
+  } else if (duration.asHours() < Duration.HOURS_PER_DAY) {
+    return `${hours}H ${minutes}M`;
   }
+
+  return `${days}D ${hours}H ${minutes}M`;
 };
 
 // возвращает время маршрута в формате: начало-окончание: '10:30 - 11:00'

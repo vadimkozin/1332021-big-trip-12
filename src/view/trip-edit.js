@@ -1,6 +1,6 @@
 import flatpicker from 'flatpickr';
 import SmartView from './smart';
-import {formatDate as format, getDateFrom} from '../utils/common';
+import {formatDate as format} from '../utils/common';
 import StoreItems from '../utils/common';
 import {getEventType} from '../utils/route';
 import {getOffersByType, getDestinationByName} from '../mock/route';
@@ -21,11 +21,9 @@ const Smart = {
 };
 
 const configDatepicker = {
-  dateFormat: `d/m/Y H:i`,
-  time_24hr: true,
-  enableTime: true,
-  defaultDate: null, // this._data.startDate,
-  onChange: null, // this._handlers.startDate
+  "dateFormat": `d/m/Y H:i`,
+  "time_24hr": true,
+  "enableTime": true,
 };
 
 const getDatepicker = ({element, config = configDatepicker, defaultDate = null, onChange = function () {}} = {}) => {
