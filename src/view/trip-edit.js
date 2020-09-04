@@ -288,8 +288,11 @@ export default class TripEdit extends SmartView {
       }
 
       this._storeOffers.destroy();
-      this.updateData({[Smart.OFFERS]: {}});
-      this.updateData({[Smart.EVENT_TYPE]: evt.target.textContent});
+
+      this.updateData({
+        [Smart.OFFERS]: [],
+        [Smart.EVENT_TYPE]: evt.target.textContent,
+      });
     };
 
     this._handlers.destination = (evt) => {
@@ -300,11 +303,12 @@ export default class TripEdit extends SmartView {
       }
 
       const destination = evt.target.value;
-      const description = getDestinationByName(destination).description;
-      const photos = getDestinationByName(destination).photos;
-      this.updateData({[Smart.DESCRIPTION]: description});
-      this.updateData({[Smart.PHOTOS]: photos});
-      this.updateData({[Smart.DESTINATION]: destination});
+
+      this.updateData({
+        [Smart.DESCRIPTION]: getDestinationByName(destination).description,
+        [Smart.PHOTOS]: getDestinationByName(destination).photos,
+        [Smart.DESTINATION]: destination
+      });
     };
 
     this._handlers.price = (evt) => {
