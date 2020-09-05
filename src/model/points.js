@@ -1,9 +1,9 @@
 import Observer from "../utils/observer.js";
 
 export default class Points extends Observer {
-  constructor() {
+  constructor(points) {
     super();
-    this._points = [];
+    this._points = points.slice();
   }
 
   set points(points) {
@@ -28,6 +28,8 @@ export default class Points extends Observer {
     ];
 
     this._notify(updateType, update);
+
+    return this;
   }
 
   add(updateType, update) {
@@ -37,6 +39,8 @@ export default class Points extends Observer {
     ];
 
     this._notify(updateType, update);
+
+    return this;
   }
 
   delete(updateType, update) {
@@ -52,5 +56,7 @@ export default class Points extends Observer {
     ];
 
     this._notify(updateType);
+
+    return this;
   }
 }

@@ -28,7 +28,7 @@ const destinations = Mock.DESTINATIONS.map((destination) =>
 
 export const getDestinationByName = (name) => destinations.find((dest) => dest.name === name);
 
-const offers = Mock.OFFERS_NAME.map((name) =>
+export const offers = Mock.OFFERS_NAME.map((name) =>
   ({
     name,
     type: generatePointType(),

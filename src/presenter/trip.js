@@ -5,13 +5,13 @@ import DayInfoView from '../view/day-info';
 import TripEventsListView from '../view/trip-events-list';
 import NoRouteView from '../view/no-route';
 import PointPresenter from './point';
-import {updateItem} from '../utils/common';
 import {SortType} from '../const';
 import {render} from '../utils/render';
-import {setOrdinalDaysRoute, getDaysRoute, sortPrice, sortTime} from '../utils/route';
+import {setOrdinalDaysRoute, getDaysRoute, sortPrice, sortTime, sortDays} from '../utils/route';
 
 export default class Trip {
-  constructor(tripConatainer) {
+  constructor(tripConatainer, pointsModel) {
+    this._pointsModel = pointsModel;
     this._tripContainer = tripConatainer;
     this._currentSortType = SortType.DEFAULT;
     this._pointPresenter = {};
@@ -28,9 +28,8 @@ export default class Trip {
     this._handleModeChange = this._handleModeChange.bind(this);
   }
 
-  init(points) {
-    this._points = points.slice();
-    this._defaultPoints = points.slice();
+  init() {
+    this._points = this._pointsModel.points.slice();
 
     this._setHandlerSort();
     this._renderTrip();
@@ -118,7 +117,7 @@ export default class Trip {
         this._points.sort(sortPrice);
         break;
       default:
-        this._points = this._defaultPoints.slice();
+        this._points.sort(sortDays);
         break;
     }
 
@@ -146,8 +145,7 @@ export default class Trip {
   }
 
   _handleTripChange(updatedPoint) {
-    this._points = updateItem(this._points, updatedPoint);
-    this._defaultPoints = updateItem(this._defaultPoints, updatedPoint);
+    this._points = this._pointsModel.update(`!`, updatedPoint).points;
     this._pointPresenter[updatedPoint.id].init(updatedPoint);
   }
 
