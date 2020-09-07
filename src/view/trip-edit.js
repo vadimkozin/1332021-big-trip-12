@@ -52,6 +52,13 @@ const getDestination = (point) => point._destination ? point._destination : poin
 
 const getPrice = (point) => point._price ? point._price : point.price;
 
+const getStartDate = (point) => point._startDate ? point._startDate : point.startDate;
+
+const getEndDate = (point) => point._endDate ? point._endDate : point.endDate;
+
+const getStartDateFormat = (point) => format.dmy(getStartDate(point));
+
+const getEndDateFormat = (point) => format.dmy(getEndDate(point));
 
 const createSectionOffers = (point) => {
 
@@ -123,6 +130,12 @@ const createSectionDestination = (point) => {
 
 
 const createTripEditTemplate = (point, cities, eventsTransfer, eventsActivity) => {
+  console.log(`trip-edit:`, point);
+  console.log(`price:`, getPrice(point));
+  console.log(`startDate:`, getStartDateFormat(point));
+  console.log(`endDate:`, getEndDateFormat(point));
+  console.log(`destination:`, getDestination(point));
+
   const favoriteChecked = point.isFavorite ? `checked` : ``;
 
   return `<form class="event  event--edit" action="#" method="post">
@@ -161,13 +174,13 @@ const createTripEditTemplate = (point, cities, eventsTransfer, eventsActivity) =
       <label class="visually-hidden" for="event-start-time-1">
         From
       </label>
-      <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${format.dmy(point.startDate)}">
+      <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${getStartDateFormat(point)}">
 
       &mdash;
       <label class="visually-hidden" for="event-end-time-1">
         To
       </label>
-      <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${format.dmy(point.endDate)}">
+      <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${getEndDateFormat(point)}">
 
     </div>
 
@@ -254,13 +267,13 @@ export default class TripEdit extends SmartView {
   _initializeDatePicker() {
     this._datepicker.start = getDatepicker({
       element: this.getElement().querySelector(`input[name="event-start-time"]`),
-      defaultDate: this._data.startDate,
+      defaultDate: getStartDate(this._data),
       onChange: this._handlers.startDate,
     });
 
     this._datepicker.end = getDatepicker({
       element: this.getElement().querySelector(`input[name="event-end-time"]`),
-      defaultDate: this._data.endDate,
+      defaultDate: getEndDate(this._data),
       onChange: this._handlers.endDate,
     });
 
@@ -329,7 +342,6 @@ export default class TripEdit extends SmartView {
       }
 
       this._datepicker.end.set(`minDate`, startDate);
-
     };
 
     this._handlers.endDate = (selectedDates) => {
