@@ -33,5 +33,4 @@ render(siteMenuElement, new SiteMenuView(), RenderPosition.AFTER_END);
 
 render(siteFilterElement, new FilterView(), RenderPosition.AFTER_END);
 
-// new TripPresenter(siteTripEventsElement, pointsModel).init(points);
 new TripPresenter(siteTripEventsElement, models).init();

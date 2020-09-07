@@ -2,6 +2,7 @@ import TripEventsItemView from '../view/trip-events-item';
 import TripEditView from '../view/trip-edit';
 import {render, replace, remove} from '../utils/render';
 import {Mock, ESCAPE_CODE} from '../const';
+import {UserAction, UpdateType} from "../const.js";
 
 const {EVENT: {VEHICLE: {NAMES: vehicleNames}, PLACE: {NAMES: placeNames}}, DESTINATIONS: cities} = Mock;
 const Mode = {
@@ -41,6 +42,11 @@ export default class Point {
 
     this._initReplaceComponent();
     this._initRemovePrev();
+  }
+
+  destroy() {
+    remove(this._pointComponent);
+    remove(this._pointEditComponent);
   }
 
   _initSavePrev() {
@@ -106,12 +112,14 @@ export default class Point {
   }
 
   _handleFormSubmit(point) {
-    this._changeData(point);
+    this._changeData(UserAction.UPDATE_POINT, UpdateType.MINOR, point);
     this._replaceFormToView();
   }
 
   _handleFavoriteClick() {
     this._changeData(
+        UserAction.UPDATE_POINT,
+        UpdateType.PATCH,
         Object.assign(
             {},
             this._point,
