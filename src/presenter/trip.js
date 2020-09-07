@@ -5,14 +5,15 @@ import DayInfoView from '../view/day-info';
 import TripEventsListView from '../view/trip-events-list';
 import NoRouteView from '../view/no-route';
 import PointPresenter from './point';
-import {SortType} from '../const';
+import {SortType, UpdateType} from '../const';
 import {render} from '../utils/render';
 import {setOrdinalDaysRoute, getDaysRoute, sortPrice, sortTime, sortDays} from '../utils/route';
 
 export default class Trip {
-  constructor(tripConatainer, pointsModel) {
+  constructor(tripContainer, models) {
+    const {pointsModel, offersModel, citiesModel} = models;
     this._pointsModel = pointsModel;
-    this._tripContainer = tripConatainer;
+    this._tripContainer = tripContainer;
     this._currentSortType = SortType.DEFAULT;
     this._pointPresenter = {};
 
@@ -145,7 +146,7 @@ export default class Trip {
   }
 
   _handleTripChange(updatedPoint) {
-    this._points = this._pointsModel.update(`!`, updatedPoint).points;
+    this._points = this._pointsModel.update(UpdateType.MAJOR, updatedPoint).points;
     this._pointPresenter[updatedPoint.id].init(updatedPoint);
   }
 

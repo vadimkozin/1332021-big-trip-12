@@ -33,8 +33,9 @@ export const Duration = {
 };
 
 export const OFFERS_MAX = 3; // показывать максимально предложений в отчёте
-
 export const ESCAPE_CODE = 27;
+export const SEPARATOR = `--`;
+export const INFO_ROUTE_CITIES_MAX = 3; // максимально городов в информации о маршруте
 
 export const SortType = {
   DEFAULT: `sort-event`,
@@ -42,6 +43,26 @@ export const SortType = {
   PRICE: `sort-price`,
 };
 
-export const SEPARATOR = `--`;
+export const UserAction = {
+  UPDATE_POINT: `UPDATE_POINT`,
+  ADD_POINT: `ADD_POINT`,
+  DELETE_POINT: `DELETE_POINT`
+};
 
-export const INFO_ROUTE_CITIES_MAX = 3; // максимально городов в информации о маршруте
+export const UpdateType = {
+  PATCH: `PATCH`,
+  MINOR: `MINOR`,
+  MAJOR: `MAJOR`
+};
+
+export const FilterType = {
+  EVERYTHING: `Everything`,
+  FUTURE: `Future`,
+  PAST: `Past`,
+};
+
+// export const MenuItem = {
+//   ADD_NEW_EVENT: `ADD_NEW_EVENT`,
+//   TABLE: `Table`,
+//   STATISTICS: `Stats`
+// };
