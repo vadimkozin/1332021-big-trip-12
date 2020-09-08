@@ -53,6 +53,8 @@ export default class Trip {
     };
 
     this._handlers.viewAction = (actionType, updateType, update) => {
+      console.log(`viewAction:`, actionType, updateType);
+
       switch (actionType) {
         case UserAction.UPDATE_POINT:
           this._pointsModel.update(updateType, update);
@@ -64,15 +66,16 @@ export default class Trip {
           this._pointsModel.delete(updateType, update);
           break;
       }
-      this._points = this._pointsModel.points;
-      this._pointPresenter[update.id].init(update);
     };
 
     this._handlers.modelEvent = (updateType, data) => {
-      console.log(updateType);
+      console.log(`modelEvent:`, updateType, data.isFavorite);
+
+      this._points = this._pointsModel.points;
+
       switch (updateType) {
         case UpdateType.PATCH:
-          this._pointPresenter[data.id].init(data);
+          this._pointPresenter[data.id].init(data, false);
           break;
         case UpdateType.MINOR:
           this._clear();

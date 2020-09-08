@@ -25,8 +25,12 @@ export default class Point {
     this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
   }
 
-  init(point) {
+  init(point, isRedraw = true) {
     this._point = point;
+
+    if (!isRedraw) {
+      return;
+    }
 
     this._initSavePrev();
 

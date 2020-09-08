@@ -4,6 +4,7 @@ import {formatDate as format} from '../utils/common';
 import StoreItems from '../utils/common';
 import {getEventType} from '../utils/route';
 import {getOffersByType, getDestinationByName} from '../mock/route';
+import {bindHandlers} from "../utils/common.js";
 
 import '../../node_modules/flatpickr/dist/flatpickr.min.css';
 import '../../node_modules/flatpickr/dist/themes/material_blue.css';
@@ -18,6 +19,7 @@ const Smart = {
   OFFERS: `_offers`,
   DESCRIPTION: `_description`,
   PHOTOS: `_photos`,
+  IS_FAVORITE: `_isFavorite`,
 };
 
 const configDatepicker = {
@@ -46,19 +48,27 @@ const createEventList = (events, typeEvent) =>
 const createCityList = (cities) =>
   cities.map((city) => `<option value="${city}"></option>`).join(``);
 
-const getPlaceholder = (point) => point._type ? getEventType(point._type) : getEventType(point.type);
+const getPlaceholder = (point) => point[Smart.EVENT_TYPE] ? getEventType(point[Smart.EVENT_TYPE]) : getEventType(point.type);
 
-const getDestination = (point) => point._destination ? point._destination : point.destination;
+const getDestination = (point) => point[Smart.DESTINATION] ? point[Smart.DESTINATION] : point.destination;
 
-const getPrice = (point) => point._price ? point._price : point.price;
+const getPrice = (point) => point[Smart.PRICE] ? point[Smart.PRICE] : point.price;
 
-const getStartDate = (point) => point._startDate ? point._startDate : point.startDate;
+const getStartDate = (point) => point[Smart.START_DATE] ? point[Smart.START_DATE] : point.startDate;
 
-const getEndDate = (point) => point._endDate ? point._endDate : point.endDate;
+const getEndDate = (point) => point[Smart.END_DATE] ? point[Smart.END_DATE] : point.endDate;
 
 const getStartDateFormat = (point) => format.dmy(getStartDate(point));
 
 const getEndDateFormat = (point) => format.dmy(getEndDate(point));
+
+const getIsFavorite = (point) => {
+  if (point[Smart.IS_FAVORITE] !== null) {
+    return point[Smart.IS_FAVORITE];
+  } else {
+    return point.isFavorite;
+  }
+};
 
 const createSectionOffers = (point) => {
 
@@ -130,13 +140,7 @@ const createSectionDestination = (point) => {
 
 
 const createTripEditTemplate = (point, cities, eventsTransfer, eventsActivity) => {
-  console.log(`trip-edit:`, point);
-  console.log(`price:`, getPrice(point));
-  console.log(`startDate:`, getStartDateFormat(point));
-  console.log(`endDate:`, getEndDateFormat(point));
-  console.log(`destination:`, getDestination(point));
-
-  const favoriteChecked = point.isFavorite ? `checked` : ``;
+  const favoriteChecked = getIsFavorite(point) ? `checked` : ``;
 
   return `<form class="event  event--edit" action="#" method="post">
   <header class="event__header">
@@ -290,6 +294,7 @@ export default class TripEdit extends SmartView {
 
     this._handlers.favorite = (evt) => {
       evt.preventDefault();
+      this.updateData({[Smart.IS_FAVORITE]: evt.target.checked});
       this._callback.favoriteClick();
     };
 
@@ -370,14 +375,7 @@ export default class TripEdit extends SmartView {
       }
     };
 
-    this._handlers.formSubmit = this._handlers.formSubmit.bind(this);
-    this._handlers.favorite = this._handlers.favorite.bind(this);
-    this._handlers.type = this._handlers.type.bind(this);
-    this._handlers.destination = this._handlers.destination.bind(this);
-    this._handlers.price = this._handlers.price.bind(this);
-    this._handlers.startDate = this._handlers.startDate.bind(this);
-    this._handlers.endDate = this._handlers.endDate.bind(this);
-    this._handlers.offer = this._handlers.offer.bind(this);
+    bindHandlers(this._handlers, this);
   }
 
   _setInnerHandlers() {
@@ -423,12 +421,13 @@ export default class TripEdit extends SmartView {
 
     Object
       .values(Smart)
-      .filter((property) => data[property])
+      .filter((property) => data[property] !== null)
       .forEach((property) => {
         const prop = property.slice(1);
         data[prop] = data[property];
-        delete data[property];
       });
+
+    Object.values(Smart).forEach((property) => delete data[property]);
 
     return data;
   }
