@@ -18,7 +18,7 @@ export default class Trip {
     this._currentSortType = SortType.DEFAULT;
     this._pointPresenter = {};
 
-    this._sortComponent = new SortView();
+    this._sortComponent = null;
     this._tripDaysComponent = new TripDaysView();
     this._tripDaysItemComponent = new TripDaysItemView();
     this._tripEventsListComponent = new TripEventsListView();
@@ -32,18 +32,14 @@ export default class Trip {
     this._handlers = {};
 
     this._handlers.sortTypeChange = (sortType) => {
+      console.log(sortType);
       if (this._currentSortType === sortType) {
         return;
       }
 
-      this._sortTrip(sortType);
-      this._clearTripList();
-      this._renderTripList(sortType);
-    };
-
-    this._handlers.tripChange = (updatedPoint) => {
-      this._points = this._pointsModel.update(UpdateType.MAJOR, updatedPoint).points;
-      this._pointPresenter[updatedPoint.id].init(updatedPoint);
+      this._currentSortType = sortType;
+      this._clear();
+      this._renderTrip();
     };
 
     this._handlers.modeChange = () => {
@@ -71,8 +67,6 @@ export default class Trip {
     this._handlers.modelEvent = (updateType, data) => {
       console.log(`modelEvent:`, updateType, data.isFavorite);
 
-      this._points = this._pointsModel.points;
-
       switch (updateType) {
         case UpdateType.PATCH:
           this._pointPresenter[data.id].init(data, false);
@@ -92,11 +86,7 @@ export default class Trip {
   }
 
   init() {
-    this._points = this._pointsModel.points;
-
     this._pointsModel.addObserver(this._handlers.modelEvent);
-
-    this._setHandlerSort();
     this._renderTrip();
   }
 
@@ -109,15 +99,16 @@ export default class Trip {
   }
 
   _renderTrip() {
+    this._points = this._getPoints();
+
     if (!this._points.length) {
       this._renderNoTrip();
       return;
     }
 
-    setOrdinalDaysRoute(this._points); // мутирую
+    this._renderSort();
 
-    render(this._tripContainer, this._sortComponent);
-    this._renderTripList(SortType.DEFAULT);
+    this._renderTripList(this._currentSortType);
   }
 
   _renderTripList(typeSort) {
@@ -125,6 +116,9 @@ export default class Trip {
       this._renderTripByDays();
       return;
     }
+
+    // элементы маршрута
+    render(this._tripContainer, this._tripDaysComponent);
 
     // день
     render(this._tripDaysComponent, this._tripDaysItemComponent);
@@ -140,6 +134,8 @@ export default class Trip {
   }
 
   _renderTripByDays() {
+    setOrdinalDaysRoute(this._points); // мутирую
+
     const days = getDaysRoute(this._points);
 
     // элементы маршрута
@@ -183,8 +179,13 @@ export default class Trip {
     render(this._tripContainer, this._noTripComponent);
   }
 
-  _sortTrip(sortType) {
-    switch (sortType) {
+  _getPoints() {
+    return this._sortTrip();
+  }
+
+  _sortTrip() {
+    this._points = this._pointsModel.points;
+    switch (this._currentSortType) {
       case SortType.TIME:
         this._points.sort(sortTime);
         break;
@@ -195,12 +196,13 @@ export default class Trip {
         this._points.sort(sortDays);
         break;
     }
-
-    this._currentSortType = sortType;
+    return this._points;
   }
 
-  _setHandlerSort() {
+  _renderSort() { // 12345
+    this._sortComponent = new SortView(this._currentSortType);
     this._sortComponent.setSortTypeChangeHandler(this._handlers.sortTypeChange);
+    render(this._tripContainer, this._sortComponent);
   }
 
   _clearTripList() {
@@ -215,7 +217,7 @@ export default class Trip {
       .forEach((presenter) => presenter.destroy());
     this._pointPresenter = {};
 
-    // remove(this._sortComponent);
+    remove(this._sortComponent);
     // remove(this._noTripComponent);
     remove(this._tripDaysComponent);
 
