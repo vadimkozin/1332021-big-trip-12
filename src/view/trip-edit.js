@@ -241,6 +241,11 @@ export default class TripEdit extends SmartView {
     this._setDatepicker();
   }
 
+  removeElement() {
+    super.removeElement();
+    this._destroyDatepicker();
+  }
+
   reset(point) {
     this.updateData(TripEdit.parsePointToData(point));
   }
@@ -258,14 +263,17 @@ export default class TripEdit extends SmartView {
   }
 
   _setDatepicker() {
+    this._destroyDatepicker();
+    this._initializeDatePicker();
+  }
+
+  _destroyDatepicker() {
     Object.values(this._datepicker).forEach((datepicker) => {
       if (datepicker) {
         datepicker.destroy();
         datepicker = null;
       }
     });
-
-    this._initializeDatePicker();
   }
 
   _initializeDatePicker() {
