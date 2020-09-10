@@ -27,4 +27,8 @@ export default class TripInfo extends AbstractView {
   getTemplate() {
     return createTripInfoTemplate(this._info);
   }
+
+  set totalSumma(total) {
+    document.querySelector(`.trip-info__cost-value`).textContent = total;
+  }
 }

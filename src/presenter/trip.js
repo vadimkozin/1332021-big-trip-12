@@ -4,6 +4,7 @@ import TripDaysItemView from '../view/trip-days-item';
 import DayInfoView from '../view/day-info';
 import TripEventsListView from '../view/trip-events-list';
 import NoRouteView from '../view/no-route';
+import TripInfoView from "../view/trip-info";
 import PointPresenter from './point';
 import {SortType, UpdateType, UserAction} from '../const';
 import {render, remove} from '../utils/render';
@@ -27,6 +28,8 @@ export default class Trip {
     this._tripEventsListComponent = new TripEventsListView();
     this._noTripComponent = new NoRouteView();
     this._dayWithoutInfoComponent = new DayInfoView({isDayWithoutInfo: true});
+
+    this._tripInfoComponent = new TripInfoView();
 
     this._setHandlers();
   }
@@ -104,6 +107,10 @@ export default class Trip {
 
   _renderTrip() {
     this._points = this._getPoints();
+
+    // обновление стоимости маршрута
+    const routeInfo = getRouteInfo(this._points);
+    this._tripInfoComponent.totalSumma = routeInfo.total;
 
     if (!this._points.length) {
       this._renderNoTrip();
