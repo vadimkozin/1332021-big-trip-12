@@ -1,5 +1,6 @@
 import SiteMenuView from './view/site-menu';
 import TripInfoView from './view/trip-info';
+import NewEventView from './view/new-event';
 import {generateRoute, offers} from './mock/route';
 import {render, RenderPosition} from './utils/render';
 import {getRouteInfo} from './utils/route';
@@ -30,6 +31,8 @@ const siteFilterElement = siteTripMainElement.querySelector(`.trip-main__trip-co
 const siteTripEventsElement = document.querySelector(`.trip-events`);
 
 render(siteTripMainElement, new TripInfoView(routeInfo), RenderPosition.AFTER_BEGIN);
+
+render(siteTripMainElement, new NewEventView());
 
 render(siteMenuElement, new SiteMenuView(), RenderPosition.AFTER_END);
 
