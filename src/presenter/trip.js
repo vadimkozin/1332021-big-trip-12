@@ -71,7 +71,7 @@ export default class Trip {
     };
 
     this._handlers.modelEvent = (updateType, data) => {
-      console.log(`modelEvent:`, updateType, data.isFavorite);
+      console.log(`modelEvent:`, updateType, data);
 
       switch (updateType) {
         case UpdateType.PATCH:
@@ -109,8 +109,7 @@ export default class Trip {
     this._points = this._getPoints();
 
     // обновление стоимости маршрута
-    const routeInfo = getRouteInfo(this._points);
-    this._tripInfoComponent.totalSumma = routeInfo.total;
+    this._tripInfoComponent.totalSumma = getRouteInfo(this._points).total;
 
     if (!this._points.length) {
       this._renderNoTrip();
@@ -179,7 +178,6 @@ export default class Trip {
   }
 
   _renderPoint(container, point) {
-    // const pointPresenter = new PointPresenter(container, this._handlers.tripChange, this._handlers.modeChange);
     const pointPresenter = new PointPresenter(container, this._handlers.viewAction, this._handlers.modeChange);
 
     pointPresenter.init(point);

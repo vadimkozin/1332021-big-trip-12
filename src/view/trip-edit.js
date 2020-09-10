@@ -300,6 +300,11 @@ export default class TripEdit extends SmartView {
       this._callback.formSubmit(TripEdit.parseDataToPoint(this._data));
     };
 
+    this._handlers.formDelete = (evt) => {
+      evt.preventDefault();
+      this._callback.formDelete(this._data);
+    };
+
     this._handlers.favorite = (evt) => {
       evt.preventDefault();
       this.updateData({[Smart.IS_FAVORITE]: evt.target.checked});
@@ -404,6 +409,11 @@ export default class TripEdit extends SmartView {
   setFormSubmitHandler(callback) {
     this._callback.formSubmit = callback;
     this.getElement().addEventListener(`submit`, this._handlers.formSubmit);
+  }
+
+  setFormDeleteHandler(callback) {
+    this._callback.formDelete = callback;
+    this.getElement().addEventListener(`reset`, this._handlers.formDelete);
   }
 
   setFavoriteClickHander(callback) {
