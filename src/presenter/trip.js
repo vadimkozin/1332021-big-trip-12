@@ -9,11 +9,14 @@ import {SortType, UpdateType, UserAction} from '../const';
 import {render, remove} from '../utils/render';
 import {setOrdinalDaysRoute, getDaysRoute, sortPrice, sortTime, sortDays} from '../utils/route';
 import {bindHandlers} from "../utils/common.js";
+import {filter} from "../utils/filter";
+import {getRouteInfo} from "../utils/route";
 
 export default class Trip {
   constructor(tripContainer, models) {
-    const {pointsModel, offersModel, citiesModel} = models;
+    const {pointsModel, filterModel, offersModel, citiesModel} = models;
     this._pointsModel = pointsModel;
+    this._filterModel = filterModel;
     this._tripContainer = tripContainer;
     this._currentSortType = SortType.DEFAULT;
     this._pointPresenter = {};
@@ -87,6 +90,7 @@ export default class Trip {
 
   init() {
     this._pointsModel.addObserver(this._handlers.modelEvent);
+    this._filterModel .addObserver(this._handlers.modelEvent);
     this._renderTrip();
   }
 
@@ -180,26 +184,26 @@ export default class Trip {
   }
 
   _getPoints() {
-    return this._sortTrip();
-  }
+    const filterType = this._filterModel.getFilter();
+    const points = this._pointsModel.points;
+    const filtredPoints = filter[filterType](points);
 
-  _sortTrip() {
-    this._points = this._pointsModel.points;
     switch (this._currentSortType) {
       case SortType.TIME:
-        this._points.sort(sortTime);
+        filtredPoints.sort(sortTime);
         break;
       case SortType.PRICE:
-        this._points.sort(sortPrice);
+        filtredPoints.sort(sortPrice);
         break;
       default:
-        this._points.sort(sortDays);
+        filtredPoints.sort(sortDays);
         break;
     }
-    return this._points;
+
+    return filtredPoints;
   }
 
-  _renderSort() { // 12345
+  _renderSort() {
     this._sortComponent = new SortView(this._currentSortType);
     this._sortComponent.setSortTypeChangeHandler(this._handlers.sortTypeChange);
     render(this._tripContainer, this._sortComponent);
@@ -218,7 +222,7 @@ export default class Trip {
     this._pointPresenter = {};
 
     remove(this._sortComponent);
-    // remove(this._noTripComponent);
+    remove(this._noTripComponent);
     remove(this._tripDaysComponent);
 
     if (resetSortType) {
