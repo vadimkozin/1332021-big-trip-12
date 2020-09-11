@@ -139,10 +139,13 @@ const createSectionDestination = (point) => {
 };
 
 
-const createTripEditTemplate = (point, cities, eventsTransfer, eventsActivity) => {
+const createTripEditTemplate = (point, cities, eventsTransfer, eventsActivity, isNewPoint) => {
   const favoriteChecked = getIsFavorite(point) ? `checked` : ``;
+  const isNewEvent = isNewPoint ? `trip-events__item` : ``;
+  const isHidden = isNewPoint ? `style="display: none"` : ``;
+  const btnName = isNewPoint ? `Cancel` : `Delete`;
 
-  return `<form class="event  event--edit" action="#" method="post">
+  return `<form class="${isNewEvent} event  event--edit" action="#" method="post">
   <header class="event__header">
     <div class="event__type-wrapper">
       <label class="event__type  event__type-btn" for="event-type-toggle-1">
@@ -197,17 +200,17 @@ const createTripEditTemplate = (point, cities, eventsTransfer, eventsActivity) =
     </div>
 
     <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-    <button class="event__reset-btn" type="reset">Delete</button>
+    <button class="event__reset-btn" type="reset">${btnName}</button>
 
     <input id="event-favorite-1" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" ${favoriteChecked}>
-    <label class="event__favorite-btn" for="event-favorite-1">
+    <label class="event__favorite-btn" for="event-favorite-1" ${isHidden}>
       <span class="visually-hidden">Add to favorite</span>
       <svg class="event__favorite-icon" width="28" height="28" viewBox="0 0 28 28">
         <path d="M14 21l-8.22899 4.3262 1.57159-9.1631L.685209 9.67376 9.8855 8.33688 14 0l4.1145 8.33688 9.2003 1.33688-6.6574 6.48934 1.5716 9.1631L14 21z"/>
       </svg>
     </label>
 
-    <button class="event__rollup-btn" type="button">
+    <button class="event__rollup-btn" type="button" ${isHidden}>
       <span class="visually-hidden">Open event</span>
     </button>
   </header>
@@ -221,9 +224,9 @@ const createTripEditTemplate = (point, cities, eventsTransfer, eventsActivity) =
 
 
 export default class TripEdit extends SmartView {
-  constructor(point, cities, eventsTransfer, eventsActivity) {
+  constructor({point, cities, eventsTransfer, eventsActivity, isNewPoint = false} = {}) {
     super();
-
+    this._isNewPoint = isNewPoint;
     this._data = TripEdit.parsePointToData(point);
     this._cities = cities;
     this._eventsTransfer = eventsTransfer;
@@ -252,7 +255,7 @@ export default class TripEdit extends SmartView {
 
   getTemplate() {
     return createTripEditTemplate(
-        this._data, this._cities, this._eventsTransfer, this._eventsActivity);
+        this._data, this._cities, this._eventsTransfer, this._eventsActivity, this._isNewPoint);
   }
 
   restoreHandlers() {
@@ -292,12 +295,25 @@ export default class TripEdit extends SmartView {
     this._datepicker.end.set(`minDate`, this._data.startDate);
   }
 
+  _validation() {
+    const destinationElement = this.getElement().querySelector(`input[name="event-destination"]`);
+    const cityInput = destinationElement.value;
+
+    const isCityValid = this._cities.find((city) => city === cityInput);
+    if (!isCityValid) {
+      destinationElement.focus();
+    }
+    return isCityValid;
+  }
+
   _setHandlers() {
     this._handlers = {};
 
     this._handlers.formSubmit = (evt) => {
       evt.preventDefault();
-      this._callback.formSubmit(TripEdit.parseDataToPoint(this._data));
+      if (this._validation()) {
+        this._callback.formSubmit(TripEdit.parseDataToPoint(this._data));
+      }
     };
 
     this._handlers.formDelete = (evt) => {

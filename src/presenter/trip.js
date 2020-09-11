@@ -6,6 +6,7 @@ import TripEventsListView from '../view/trip-events-list';
 import NoRouteView from '../view/no-route';
 import TripInfoView from "../view/trip-info";
 import PointPresenter from './point';
+import PointNewPresenter from './point-new';
 import {SortType, UpdateType, UserAction} from '../const';
 import {render, remove} from '../utils/render';
 import {setOrdinalDaysRoute, getDaysRoute, sortPrice, sortTime, sortDays} from '../utils/route';
@@ -18,6 +19,8 @@ export default class Trip {
     const {pointsModel, filterModel, offersModel, citiesModel} = models;
     this._pointsModel = pointsModel;
     this._filterModel = filterModel;
+    this._offersModel = offersModel;
+    this._citiesModel = citiesModel;
     this._tripContainer = tripContainer;
     this._currentSortType = SortType.DEFAULT;
     this._pointPresenter = {};
@@ -32,13 +35,15 @@ export default class Trip {
     this._tripInfoComponent = new TripInfoView();
 
     this._setHandlers();
+
+    this._tripEventsElement = document.querySelector(`.trip-events`);
+    this._pointNewPresenter = new PointNewPresenter(this._tripEventsElement, this._handlers.viewAction);
   }
 
   _setHandlers() {
     this._handlers = {};
 
     this._handlers.sortTypeChange = (sortType) => {
-      console.log(sortType);
       if (this._currentSortType === sortType) {
         return;
       }
@@ -55,8 +60,6 @@ export default class Trip {
     };
 
     this._handlers.viewAction = (actionType, updateType, update) => {
-      console.log(`viewAction:`, actionType, updateType);
-
       switch (actionType) {
         case UserAction.UPDATE_POINT:
           this._pointsModel.update(updateType, update);
@@ -71,8 +74,6 @@ export default class Trip {
     };
 
     this._handlers.modelEvent = (updateType, data) => {
-      console.log(`modelEvent:`, updateType, data);
-
       switch (updateType) {
         case UpdateType.PATCH:
           this._pointPresenter[data.id].init(data, false);
@@ -103,6 +104,10 @@ export default class Trip {
     remove(this._tripEventsListComponent);
 
     this._pointsModel.removeObserver(this._handlers.modelEvent);
+  }
+
+  createPoint(callback) {
+    this._pointNewPresenter.init(callback);
   }
 
   _renderTrip() {

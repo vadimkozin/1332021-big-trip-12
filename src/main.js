@@ -40,22 +40,30 @@ const tripPresenter = new TripPresenter(siteTripEventsElement, models);
 
 const menuAddItem = {
   selector: `.trip-main__event-add-btn`,
-  disable: () => {
-    siteTripMainElement.querySelector(menuAddItem.selector).disabled = true;
-    siteMenuComponent.setMenuItem(MenuItem.TABLE);
+  getElement() {
+    return siteTripMainElement.querySelector(this.selector);
   },
-  enable: () => {
-    siteTripMainElement.querySelector(menuAddItem.selector).disabled = false;
+  disable() {
+    this.getElement().disabled = true;
+  },
+  enable() {
+    this.getElement().disabled = false;
   },
 };
 
+const handlePointNewFormClose = () => {
+  menuAddItem.enable();
+  models.filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
+};
+
 const handleSiteMenuClick = (menuItem) => {
-  console.log(menuItem);
   switch (menuItem) {
     case MenuItem.ADD_NEW_EVENT:
       menuAddItem.disable();
+      siteMenuComponent.setMenuItem(MenuItem.TABLE);
       tripPresenter.destroy();
       models.filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
+      tripPresenter.createPoint(handlePointNewFormClose);
       break;
     case MenuItem.TABLE:
       siteMenuComponent.setMenuItem(menuItem);
@@ -73,5 +81,5 @@ const btnNewEvent = siteTripMainElement.querySelector(`.trip-main__event-add-btn
 siteMenuComponent.setMenuClickHandler(handleSiteMenuClick);
 siteMenuComponent.addMenuClickHandler(handleSiteMenuClick, btnNewEvent, MenuItem.ADD_NEW_EVENT);
 
-filterPresenter.init()
+filterPresenter.init();
 tripPresenter.init();

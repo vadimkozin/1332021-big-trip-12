@@ -2,6 +2,18 @@ import uniqueId from 'lodash.uniqueid';
 import {Mock} from '../const';
 import {getRandomInteger, getRandomSentences, getRandomPhotos, getNextRandomDate} from "../utils/common";
 
+export const POINT_BLANK = {
+  type: null,
+  startDate: new Date(),
+  endDate: new Date(),
+  destination: null,
+  description: null,
+  photos: [],
+  price: 0,
+  offers: [],
+  isFavorite: false,
+};
+
 const generatePointType = () => {
   const {EVENT: event} = Mock;
 

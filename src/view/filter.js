@@ -37,7 +37,6 @@ export default class Filter extends AbstractView {
 
   _filterTypeChangeHandler(evt) {
     evt.preventDefault();
-    console.log(evt.target.value + ` .`);
 
     if (evt.target.type !== `radio`) {
       return;

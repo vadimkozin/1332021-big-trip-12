@@ -7,7 +7,7 @@ import {UserAction, UpdateType} from "../const.js";
 const {EVENT: {VEHICLE: {NAMES: vehicleNames}, PLACE: {NAMES: placeNames}}, DESTINATIONS: cities} = Mock;
 const Mode = {
   DEFAULT: `DEFAULT`,
-  EDITTING: `EDITTING`
+  EDITTING: `EDITTING`,
 };
 
 export default class Point {
@@ -37,7 +37,7 @@ export default class Point {
     this._initSavePrev();
 
     this._pointComponent = new TripEventsItemView(point);
-    this._pointEditComponent = new TripEditView(point, cities, vehicleNames, placeNames);
+    this._pointEditComponent = new TripEditView({point, cities, eventsTransfer: vehicleNames, eventsActivity: placeNames});
 
     this._initSetHandlers();
 
