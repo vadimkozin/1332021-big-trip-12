@@ -4,6 +4,7 @@ import {formatDate as format} from '../utils/common';
 import StoreItems from '../utils/common';
 import {getEventType} from '../utils/route';
 import {getOffersByType, getDestinationByName} from '../mock/route';
+import {bindHandlers, getNumber} from "../utils/common.js";
 
 import '../../node_modules/flatpickr/dist/flatpickr.min.css';
 import '../../node_modules/flatpickr/dist/themes/material_blue.css';
@@ -18,6 +19,7 @@ const Smart = {
   OFFERS: `_offers`,
   DESCRIPTION: `_description`,
   PHOTOS: `_photos`,
+  IS_FAVORITE: `_isFavorite`,
 };
 
 const configDatepicker = {
@@ -46,12 +48,27 @@ const createEventList = (events, typeEvent) =>
 const createCityList = (cities) =>
   cities.map((city) => `<option value="${city}"></option>`).join(``);
 
-const getPlaceholder = (point) => point._type ? getEventType(point._type) : getEventType(point.type);
+const getPlaceholder = (point) => point[Smart.EVENT_TYPE] ? getEventType(point[Smart.EVENT_TYPE]) : getEventType(point.type);
 
-const getDestination = (point) => point._destination ? point._destination : point.destination;
+const getDestination = (point) => point[Smart.DESTINATION] ? point[Smart.DESTINATION] : point.destination;
 
-const getPrice = (point) => point._price ? point._price : point.price;
+const getPrice = (point) => point[Smart.PRICE] ? point[Smart.PRICE] : point.price;
 
+const getStartDate = (point) => point[Smart.START_DATE] ? point[Smart.START_DATE] : point.startDate;
+
+const getEndDate = (point) => point[Smart.END_DATE] ? point[Smart.END_DATE] : point.endDate;
+
+const getStartDateFormat = (point) => format.dmy(getStartDate(point));
+
+const getEndDateFormat = (point) => format.dmy(getEndDate(point));
+
+const getIsFavorite = (point) => {
+  if (point[Smart.IS_FAVORITE] !== null) {
+    return point[Smart.IS_FAVORITE];
+  } else {
+    return point.isFavorite;
+  }
+};
 
 const createSectionOffers = (point) => {
 
@@ -122,10 +139,13 @@ const createSectionDestination = (point) => {
 };
 
 
-const createTripEditTemplate = (point, cities, eventsTransfer, eventsActivity) => {
-  const favoriteChecked = point.isFavorite ? `checked` : ``;
+const createTripEditTemplate = (point, cities, eventsTransfer, eventsActivity, isNewPoint) => {
+  const favoriteChecked = getIsFavorite(point) ? `checked` : ``;
+  const isNewEvent = isNewPoint ? `trip-events__item` : ``;
+  const isHidden = isNewPoint ? `style="display: none"` : ``;
+  const btnName = isNewPoint ? `Cancel` : `Delete`;
 
-  return `<form class="event  event--edit" action="#" method="post">
+  return `<form class="${isNewEvent} event  event--edit" action="#" method="post">
   <header class="event__header">
     <div class="event__type-wrapper">
       <label class="event__type  event__type-btn" for="event-type-toggle-1">
@@ -161,13 +181,13 @@ const createTripEditTemplate = (point, cities, eventsTransfer, eventsActivity) =
       <label class="visually-hidden" for="event-start-time-1">
         From
       </label>
-      <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${format.dmy(point.startDate)}">
+      <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${getStartDateFormat(point)}">
 
       &mdash;
       <label class="visually-hidden" for="event-end-time-1">
         To
       </label>
-      <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${format.dmy(point.endDate)}">
+      <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${getEndDateFormat(point)}">
 
     </div>
 
@@ -176,21 +196,21 @@ const createTripEditTemplate = (point, cities, eventsTransfer, eventsActivity) =
         <span class="visually-hidden">Price</span>
         &euro;
       </label>
-      <input class="event__input  event__input--price" id="event-price-1" type="number" name="event-price" value="${getPrice(point)}">
+      <input class="event__input  event__input--price" id="event-price-1" type="number" min="0" name="event-price" value="${getPrice(point)}">
     </div>
 
     <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-    <button class="event__reset-btn" type="reset">Delete</button>
+    <button class="event__reset-btn" type="reset">${btnName}</button>
 
     <input id="event-favorite-1" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" ${favoriteChecked}>
-    <label class="event__favorite-btn" for="event-favorite-1">
+    <label class="event__favorite-btn" for="event-favorite-1" ${isHidden}>
       <span class="visually-hidden">Add to favorite</span>
       <svg class="event__favorite-icon" width="28" height="28" viewBox="0 0 28 28">
         <path d="M14 21l-8.22899 4.3262 1.57159-9.1631L.685209 9.67376 9.8855 8.33688 14 0l4.1145 8.33688 9.2003 1.33688-6.6574 6.48934 1.5716 9.1631L14 21z"/>
       </svg>
     </label>
 
-    <button class="event__rollup-btn" type="button">
+    <button class="event__rollup-btn" type="button" ${isHidden}>
       <span class="visually-hidden">Open event</span>
     </button>
   </header>
@@ -204,9 +224,9 @@ const createTripEditTemplate = (point, cities, eventsTransfer, eventsActivity) =
 
 
 export default class TripEdit extends SmartView {
-  constructor(point, cities, eventsTransfer, eventsActivity) {
+  constructor({point, cities, eventsTransfer, eventsActivity, isNewPoint = false} = {}) {
     super();
-
+    this._isNewPoint = isNewPoint;
     this._data = TripEdit.parsePointToData(point);
     this._cities = cities;
     this._eventsTransfer = eventsTransfer;
@@ -224,13 +244,18 @@ export default class TripEdit extends SmartView {
     this._setDatepicker();
   }
 
+  removeElement() {
+    super.removeElement();
+    this._destroyDatepicker();
+  }
+
   reset(point) {
     this.updateData(TripEdit.parsePointToData(point));
   }
 
   getTemplate() {
     return createTripEditTemplate(
-        this._data, this._cities, this._eventsTransfer, this._eventsActivity);
+        this._data, this._cities, this._eventsTransfer, this._eventsActivity, this._isNewPoint);
   }
 
   restoreHandlers() {
@@ -241,30 +266,44 @@ export default class TripEdit extends SmartView {
   }
 
   _setDatepicker() {
+    this._destroyDatepicker();
+    this._initializeDatePicker();
+  }
+
+  _destroyDatepicker() {
     Object.values(this._datepicker).forEach((datepicker) => {
       if (datepicker) {
         datepicker.destroy();
         datepicker = null;
       }
     });
-
-    this._initializeDatePicker();
   }
 
   _initializeDatePicker() {
     this._datepicker.start = getDatepicker({
       element: this.getElement().querySelector(`input[name="event-start-time"]`),
-      defaultDate: this._data.startDate,
+      defaultDate: getStartDate(this._data),
       onChange: this._handlers.startDate,
     });
 
     this._datepicker.end = getDatepicker({
       element: this.getElement().querySelector(`input[name="event-end-time"]`),
-      defaultDate: this._data.endDate,
+      defaultDate: getEndDate(this._data),
       onChange: this._handlers.endDate,
     });
 
     this._datepicker.end.set(`minDate`, this._data.startDate);
+  }
+
+  _validation() {
+    const destinationElement = this.getElement().querySelector(`input[name="event-destination"]`);
+    const cityInput = destinationElement.value;
+
+    const isCityValid = this._cities.find((city) => city === cityInput);
+    if (!isCityValid) {
+      destinationElement.focus();
+    }
+    return isCityValid;
   }
 
   _setHandlers() {
@@ -272,11 +311,19 @@ export default class TripEdit extends SmartView {
 
     this._handlers.formSubmit = (evt) => {
       evt.preventDefault();
-      this._callback.formSubmit(TripEdit.parseDataToPoint(this._data));
+      if (this._validation()) {
+        this._callback.formSubmit(TripEdit.parseDataToPoint(this._data));
+      }
+    };
+
+    this._handlers.formDelete = (evt) => {
+      evt.preventDefault();
+      this._callback.formDelete(this._data);
     };
 
     this._handlers.favorite = (evt) => {
       evt.preventDefault();
+      this.updateData({[Smart.IS_FAVORITE]: evt.target.checked});
       this._callback.favoriteClick();
     };
 
@@ -288,8 +335,11 @@ export default class TripEdit extends SmartView {
       }
 
       this._storeOffers.destroy();
-      this.updateData({[Smart.OFFERS]: {}});
-      this.updateData({[Smart.EVENT_TYPE]: evt.target.textContent});
+
+      this.updateData({
+        [Smart.OFFERS]: [],
+        [Smart.EVENT_TYPE]: evt.target.textContent,
+      });
     };
 
     this._handlers.destination = (evt) => {
@@ -300,16 +350,17 @@ export default class TripEdit extends SmartView {
       }
 
       const destination = evt.target.value;
-      const description = getDestinationByName(destination).description;
-      const photos = getDestinationByName(destination).photos;
-      this.updateData({[Smart.DESCRIPTION]: description});
-      this.updateData({[Smart.PHOTOS]: photos});
-      this.updateData({[Smart.DESTINATION]: destination});
+
+      this.updateData({
+        [Smart.DESCRIPTION]: getDestinationByName(destination).description,
+        [Smart.PHOTOS]: getDestinationByName(destination).photos,
+        [Smart.DESTINATION]: destination
+      });
     };
 
     this._handlers.price = (evt) => {
       evt.preventDefault();
-      this.updateData({[Smart.PRICE]: parseInt(evt.target.value, 10)}, true);
+      this.updateData({[Smart.PRICE]: getNumber(evt.target.value)}, true);
     };
 
     this._handlers.startDate = (selectedDates) => {
@@ -325,7 +376,6 @@ export default class TripEdit extends SmartView {
       }
 
       this._datepicker.end.set(`minDate`, startDate);
-
     };
 
     this._handlers.endDate = (selectedDates) => {
@@ -354,14 +404,7 @@ export default class TripEdit extends SmartView {
       }
     };
 
-    this._handlers.formSubmit = this._handlers.formSubmit.bind(this);
-    this._handlers.favorite = this._handlers.favorite.bind(this);
-    this._handlers.type = this._handlers.type.bind(this);
-    this._handlers.destination = this._handlers.destination.bind(this);
-    this._handlers.price = this._handlers.price.bind(this);
-    this._handlers.startDate = this._handlers.startDate.bind(this);
-    this._handlers.endDate = this._handlers.endDate.bind(this);
-    this._handlers.offer = this._handlers.offer.bind(this);
+    bindHandlers(this._handlers, this);
   }
 
   _setInnerHandlers() {
@@ -382,6 +425,11 @@ export default class TripEdit extends SmartView {
   setFormSubmitHandler(callback) {
     this._callback.formSubmit = callback;
     this.getElement().addEventListener(`submit`, this._handlers.formSubmit);
+  }
+
+  setFormDeleteHandler(callback) {
+    this._callback.formDelete = callback;
+    this.getElement().addEventListener(`reset`, this._handlers.formDelete);
   }
 
   setFavoriteClickHander(callback) {
@@ -407,12 +455,13 @@ export default class TripEdit extends SmartView {
 
     Object
       .values(Smart)
-      .filter((property) => data[property])
+      .filter((property) => data[property] !== null)
       .forEach((property) => {
         const prop = property.slice(1);
         data[prop] = data[property];
-        delete data[property];
       });
+
+    Object.values(Smart).forEach((property) => delete data[property]);
 
     return data;
   }

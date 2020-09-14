@@ -2,11 +2,12 @@ import TripEventsItemView from '../view/trip-events-item';
 import TripEditView from '../view/trip-edit';
 import {render, replace, remove} from '../utils/render';
 import {Mock, ESCAPE_CODE} from '../const';
+import {UserAction, UpdateType} from "../const.js";
 
 const {EVENT: {VEHICLE: {NAMES: vehicleNames}, PLACE: {NAMES: placeNames}}, DESTINATIONS: cities} = Mock;
 const Mode = {
   DEFAULT: `DEFAULT`,
-  EDITTING: `EDITTING`
+  EDITTING: `EDITTING`,
 };
 
 export default class Point {
@@ -22,15 +23,21 @@ export default class Point {
     this._handleFavoriteClick = this._handleFavoriteClick.bind(this);
     this._handleFormSubmit = this._handleFormSubmit.bind(this);
     this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
+    this._handleFormDelete = this._handleFormDelete.bind(this);
+
   }
 
-  init(point) {
+  init(point, isRedraw = true) {
     this._point = point;
+
+    if (!isRedraw) {
+      return;
+    }
 
     this._initSavePrev();
 
     this._pointComponent = new TripEventsItemView(point);
-    this._pointEditComponent = new TripEditView(point, cities, vehicleNames, placeNames);
+    this._pointEditComponent = new TripEditView({point, cities, eventsTransfer: vehicleNames, eventsActivity: placeNames});
 
     this._initSetHandlers();
 
@@ -41,6 +48,11 @@ export default class Point {
 
     this._initReplaceComponent();
     this._initRemovePrev();
+  }
+
+  destroy() {
+    remove(this._pointComponent);
+    remove(this._pointEditComponent);
   }
 
   _initSavePrev() {
@@ -54,6 +66,7 @@ export default class Point {
     this._pointComponent.setEditClickHandler(this._handleEditClick);
     this._pointEditComponent.setFormSubmitHandler(this._handleFormSubmit);
     this._pointEditComponent.setFavoriteClickHander(this._handleFavoriteClick);
+    this._pointEditComponent.setFormDeleteHandler(this._handleFormDelete);
   }
 
   _initIsFirstCall() {
@@ -106,12 +119,18 @@ export default class Point {
   }
 
   _handleFormSubmit(point) {
-    this._changeData(point);
+    this._changeData(UserAction.UPDATE_POINT, UpdateType.MINOR, point);
     this._replaceFormToView();
+  }
+
+  _handleFormDelete(point) {
+    this._changeData(UserAction.DELETE_POINT, UpdateType.MINOR, point);
   }
 
   _handleFavoriteClick() {
     this._changeData(
+        UserAction.UPDATE_POINT,
+        UpdateType.PATCH,
         Object.assign(
             {},
             this._point,

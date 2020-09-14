@@ -147,3 +147,11 @@ export default class StoreItems {
       .map(([key, value]) => ({[this._keyName]: key, [this._valueName]: value}));
   }
 }
+
+export const bindHandlers = (handlerMap, that) => {
+  Object.keys(handlerMap).forEach((handler) =>
+    (handlerMap[handler] = handlerMap[handler].bind(that))
+  );
+};
+
+export const getNumber = (value) => isNaN(Number(value)) ? 0 : Number(value);
