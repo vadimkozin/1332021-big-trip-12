@@ -360,9 +360,7 @@ export default class TripEdit extends SmartView {
 
     this._handlers.price = (evt) => {
       evt.preventDefault();
-      // this.updateData({[Smart.PRICE]: parseInt(evt.target.value, 10)}, true);
       this.updateData({[Smart.PRICE]: getNumber(evt.target.value)}, true);
-
     };
 
     this._handlers.startDate = (selectedDates) => {
