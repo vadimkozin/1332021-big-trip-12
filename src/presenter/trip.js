@@ -226,6 +226,8 @@ export default class Trip {
   }
 
   _clear({resetSortType = false} = {}) {
+    this._pointNewPresenter.destroy();
+
     Object
       .values(this._pointPresenter)
       .forEach((presenter) => presenter.destroy());

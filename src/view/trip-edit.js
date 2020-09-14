@@ -4,7 +4,7 @@ import {formatDate as format} from '../utils/common';
 import StoreItems from '../utils/common';
 import {getEventType} from '../utils/route';
 import {getOffersByType, getDestinationByName} from '../mock/route';
-import {bindHandlers} from "../utils/common.js";
+import {bindHandlers, getNumber} from "../utils/common.js";
 
 import '../../node_modules/flatpickr/dist/flatpickr.min.css';
 import '../../node_modules/flatpickr/dist/themes/material_blue.css';
@@ -196,7 +196,7 @@ const createTripEditTemplate = (point, cities, eventsTransfer, eventsActivity, i
         <span class="visually-hidden">Price</span>
         &euro;
       </label>
-      <input class="event__input  event__input--price" id="event-price-1" type="number" name="event-price" value="${getPrice(point)}">
+      <input class="event__input  event__input--price" id="event-price-1" type="number" min="0" name="event-price" value="${getPrice(point)}">
     </div>
 
     <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
@@ -360,7 +360,9 @@ export default class TripEdit extends SmartView {
 
     this._handlers.price = (evt) => {
       evt.preventDefault();
-      this.updateData({[Smart.PRICE]: parseInt(evt.target.value, 10)}, true);
+      // this.updateData({[Smart.PRICE]: parseInt(evt.target.value, 10)}, true);
+      this.updateData({[Smart.PRICE]: getNumber(evt.target.value)}, true);
+
     };
 
     this._handlers.startDate = (selectedDates) => {
