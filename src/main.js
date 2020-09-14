@@ -11,7 +11,7 @@ import OffersModel from './model/offers';
 import CitiesModel from './model/cities';
 import {Mock, MenuItem, UpdateType, FilterType} from './const';
 
-const ROUTE_POINT_COUNT = 9;
+const ROUTE_POINT_COUNT = 7;
 
 const points = Array(ROUTE_POINT_COUNT).fill().map(generateRoute);
 const routeInfo = getRouteInfo(points);
