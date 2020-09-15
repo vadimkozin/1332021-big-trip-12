@@ -12,7 +12,7 @@ import OffersModel from './model/offers';
 import CitiesModel from './model/cities';
 import {Mock, MenuItem, UpdateType, FilterType} from './const';
 
-const ROUTE_POINT_COUNT = 2;
+const ROUTE_POINT_COUNT = 9;
 
 const points = Array(ROUTE_POINT_COUNT).fill().map(generateRoute);
 const routeInfo = getRouteInfo(points);
@@ -62,10 +62,16 @@ const menuAddItem = new MenuAddItem(siteTripMainElement);
 
 let statComponent = null;
 
+const removeAny = (component) => {
+  if (component) {
+    remove(component);
+  }
+};
+
 const handleSiteMenuClick = (menuItem) => {
   switch (menuItem) {
     case MenuItem.ADD_NEW_EVENT:
-      remove(statComponent);
+      removeAny(statComponent);
       menuAddItem.disable();
       siteMenuComponent.setMenuItem(MenuItem.TABLE);
       tripPresenter.destroy();
@@ -74,9 +80,9 @@ const handleSiteMenuClick = (menuItem) => {
       tripPresenter.createPoint(menuAddItem.enable);
       break;
     case MenuItem.TABLE:
+      removeAny(statComponent);
       tripPresenter.destroy();
       tripPresenter.init();
-      remove(statComponent);
       siteMenuComponent.setMenuItem(menuItem);
       menuAddItem.enable();
       break;
@@ -84,7 +90,7 @@ const handleSiteMenuClick = (menuItem) => {
       siteMenuComponent.setMenuItem(menuItem);
       menuAddItem.enable();
       tripPresenter.destroy();
-      statComponent = new StatView();
+      statComponent = new StatView(models.pointsModel.points);
       render(siteTripEventsElement, statComponent);
       break;
   }
