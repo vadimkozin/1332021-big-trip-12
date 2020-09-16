@@ -1,14 +1,18 @@
 import uniqueId from 'lodash.uniqueid';
 import {Mock} from '../const';
-import {getRandomInteger, getRandomSentences, getRandomPhotos, getNextRandomDate} from "../utils/common";
+import {getRandomInteger, getRandomSentences, getRandomPictures, getNextRandomDate} from "../utils/common";
+
+export const DESTINATION_BLANK = {
+  name: Mock.DESTINATIONS[0],
+  pictures: [{src: `#`, description: ``}],
+  description: ``,
+};
 
 export const POINT_BLANK = {
-  type: null,
+  type: Mock.EVENT.VEHICLE.NAMES[0],
   startDate: new Date(),
   endDate: new Date(),
-  destination: null,
-  description: null,
-  photos: [],
+  destination: DESTINATION_BLANK,
   price: 0,
   offers: [],
   isFavorite: false,
@@ -24,25 +28,24 @@ const generatePointType = () => {
   return events[index];
 };
 
-const generateDestination = (destinations) => {
-  const index = getRandomInteger(0, destinations.length - 1);
-
-  return destinations[index];
-};
-
 const destinations = Mock.DESTINATIONS.map((destination) =>
   ({
     name: destination,
-    photos: getRandomPhotos(Mock.URL_PHOTO),
+    pictures: getRandomPictures(Mock.URL_PHOTO, destination),
     description: getRandomSentences(Mock.TEXT),
   })
 );
 
+const getRandomDestination = () => {
+  const index = getRandomInteger(0, destinations.length - 1);
+  return destinations[index];
+};
+
 export const getDestinationByName = (name) => destinations.find((dest) => dest.name === name);
 
-export const offers = Mock.OFFERS_NAME.map((name) =>
+export const offers = Mock.OFFERS_NAME.map((title) =>
   ({
-    name,
+    title,
     type: generatePointType(),
     price: getRandomInteger(10, 100),
   })
@@ -50,8 +53,8 @@ export const offers = Mock.OFFERS_NAME.map((name) =>
 
 const generateOffers = (type, from = 0, to = 5) => {
   const array = offers
-    .filter((it) => it.type === type)
-    .map((it) => ({name: it.name, price: it.price}));
+    .filter((offer) => offer.type === type)
+    .map((offer) => ({title: offer.title, price: offer.price}));
 
   const count = getRandomInteger(from, Math.min(to, array.length - 1));
 
@@ -68,7 +71,7 @@ export const generateRoute = () => {
   const startDate = getNextRandomDate(currentDate, `hours`);
   const index = getRandomInteger(0, times.length - 1);
   const endDate = getNextRandomDate(startDate, times[index]);
-  const destination = generateDestination(Mock.DESTINATIONS);
+  const destination = getRandomDestination();
 
   currentDate = endDate;
 
@@ -78,8 +81,6 @@ export const generateRoute = () => {
     startDate,
     endDate,
     destination,
-    description: getDestinationByName(destination).description,
-    photos: getDestinationByName(destination).photos,
     price: getRandomInteger(50, 400),
     offers: generateOffers(type),
     isFavorite: Boolean(getRandomInteger(0, 1)),

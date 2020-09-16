@@ -30,7 +30,7 @@ export default class PointNew {
     }
 
     this._pointEditComponent = new TripEditView(
-        {point: Object.assign({}, POINT_BLANK, {type: vehicleNames[0], destination: cities[0]}),
+        {point: Object.assign({}, POINT_BLANK),
           cities, eventsTransfer: vehicleNames, eventsActivity: placeNames, isNewPoint: true});
 
     this._pointEditComponent.setFormSubmitHandler(this._handleFormSubmit);

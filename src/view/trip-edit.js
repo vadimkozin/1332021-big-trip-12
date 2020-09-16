@@ -52,7 +52,7 @@ const getType = (point) => point[Smart.EVENT_TYPE] ? point[Smart.EVENT_TYPE] : p
 
 const getPlaceholder = (point) => point[Smart.EVENT_TYPE] ? getEventType(point[Smart.EVENT_TYPE]) : getEventType(point.type);
 
-const getDestination = (point) => point[Smart.DESTINATION] ? point[Smart.DESTINATION] : point.destination;
+const getDestinationName = (point) => point[Smart.DESTINATION] ? point[Smart.DESTINATION].name : point.destination.name;
 
 const getPrice = (point) => point[Smart.PRICE] ? point[Smart.PRICE] : point.price;
 
@@ -83,14 +83,14 @@ const createSectionOffers = (point) => {
     : pointOffers;
 
   const offerList = allOffersByType.map((offer) => {
-    const nameLower = offer.name.toLowerCase();
-    const checked = offers.find((offerChecked) => offerChecked.name === offer.name) ? `checked` : ``;
+    const nameLower = offer.title.toLowerCase();
+    const checked = offers.find((offerChecked) => offerChecked.title === offer.title) ? `checked` : ``;
 
     return `
       <div class="event__offer-selector">
         <input class="event__offer-checkbox  visually-hidden" id="event-offer-${nameLower}-1" type="checkbox" name="event-offer-${nameLower}" ${checked}>
         <label class="event__offer-label" for="event-offer-${nameLower}-1">
-          <span class="event__offer-title">${offer.name}</span>
+          <span class="event__offer-title">${offer.title}</span>
           &plus;
           &euro;&nbsp;<span class="event__offer-price">${offer.price}</span>
         </label>
@@ -110,8 +110,8 @@ const createSectionOffers = (point) => {
 
 
 const createSectionDestination = (point) => {
-  const description = point._description ? point._description : point.description;
-  const photos = point._photos ? point._photos : point.photos;
+  const description = point[Smart.DESTINATION] ? point[Smart.DESTINATION].description : point.destination.description;
+  const photos = point[Smart.DESTINATION] ? point[Smart.DESTINATION].pictures : point.destination.pictures;
   const isPhotos = Boolean(photos.length);
 
   if (!(description && isPhotos)) {
@@ -122,7 +122,7 @@ const createSectionDestination = (point) => {
 
   if (isPhotos) {
     const photoList = photos.map((photo) =>
-      `<img class="event__photo" src="${photo}" alt="Event photo"></img>`).join(``);
+      `<img class="event__photo" src="${photo.src}" alt="${photo.description}"></img>`).join(``);
 
     photosContainer =
       `<div class="event__photos-container">
@@ -173,7 +173,7 @@ const createTripEditTemplate = (point, cities, eventsTransfer, eventsActivity, i
       <label class="event__label  event__type-output" for="event-destination-1">
         ${getPlaceholder(point)}
       </label>
-      <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${getDestination(point)}" list="destination-list-1">
+      <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${getDestinationName(point)}" list="destination-list-1">
       <datalist id="destination-list-1">
         ${createCityList(cities)}
       </datalist>
@@ -234,7 +234,7 @@ export default class TripEdit extends SmartView {
     this._eventsTransfer = eventsTransfer;
     this._eventsActivity = eventsActivity;
 
-    this._storeOffers = new StoreItems(`name`, `price`).init(point.offers);
+    this._storeOffers = new StoreItems(`title`, `price`).init(point.offers);
 
     this._datepicker = {
       start: null,
@@ -351,12 +351,8 @@ export default class TripEdit extends SmartView {
         return;
       }
 
-      const destination = evt.target.value;
-
       this.updateData({
-        [Smart.DESCRIPTION]: getDestinationByName(destination).description,
-        [Smart.PHOTOS]: getDestinationByName(destination).photos,
-        [Smart.DESTINATION]: destination
+        [Smart.DESTINATION]: getDestinationByName(evt.target.value)
       });
     };
 

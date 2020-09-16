@@ -13,7 +13,7 @@ const createTripEventsItemTemplate = (point) =>
 
         </div>
       <!-- <h3 class="event__title">Taxi to Amsterdam</h3> -->
-      <h3 class="event__title">${getEventTitle(point.type, point.destination)}</h3>
+      <h3 class="event__title">${getEventTitle(point.type, point.destination.name)}</h3>
 
 
       <div class="event__schedule">
