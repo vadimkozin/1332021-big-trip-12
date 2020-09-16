@@ -11,11 +11,19 @@ import PointsModel from './model/points';
 import OffersModel from './model/offers';
 import CitiesModel from './model/cities';
 import {Mock, MenuItem, UpdateType, FilterType} from './const';
+import Api from './api';
 
 const ROUTE_POINT_COUNT = 9;
+const AUTHORIZATION = `Basic qbdt45Urf&knPwsR5`;
+const END_POINT = `https://12.ecmascript.pages.academy/big-trip`;
 
 const points = Array(ROUTE_POINT_COUNT).fill().map(generateRoute);
 const routeInfo = getRouteInfo(points);
+
+const api = new Api(END_POINT, AUTHORIZATION);
+api.getPoints().then((points) => {
+  console.log(points);
+});
 
 
 const models = {

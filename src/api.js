@@ -18,13 +18,13 @@ export default class Api {
     this._authorization = authorization;
   }
 
-  getTasks() {
+  getPoints() {
     return this._load({url: `points`})
       .then(Api.toJSON)
       .then((points) => points.map(PointsModel.adaptToClient));
   }
 
-  updateTask(point) {
+  updatePoint(point) {
     return this._load({
       url: `points/${point.id}`,
       method: Method.PUT,
@@ -35,7 +35,7 @@ export default class Api {
       .then(PointsModel.adaptToClient);
   }
 
-  addTask(point) {
+  addPoint(point) {
     return this._load({
       url: `tasks`,
       method: Method.POST,
@@ -46,7 +46,7 @@ export default class Api {
       .then(PointsModel.adaptToClient);
   }
 
-  deleteTask(point) {
+  deletePoint(point) {
     return this._load({
       url: `points/${point.id}`,
       method: Method.DELETE
