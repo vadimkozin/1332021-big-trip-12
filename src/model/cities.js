@@ -1,6 +1,6 @@
 export default class Cities {
   constructor(cities) {
-    this._cities = cities.slice();
+    this._cities = cities ? cities.slice() : null;
   }
 
   set cities(cities) {

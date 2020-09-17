@@ -165,3 +165,7 @@ export const bindHandlers = (handlerMap, that) => {
 };
 
 export const getNumber = (value) => isNaN(Number(value)) ? 0 : Number(value);
+
+const transfers = [`taxi`, `bus`, `train`, `flight`, `ship`, `transport`, `drive`];
+
+export const isTransfer = (item) => transfers.find((transfer) => transfer === item.toLowerCase());

@@ -1,6 +1,6 @@
 export default class Offers {
   constructor(offers) {
-    this._offers = offers.slice();
+    this._offers = offers ? offers.slice() : null;
   }
 
   set offers(offers) {

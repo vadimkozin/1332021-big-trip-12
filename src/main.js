@@ -13,7 +13,7 @@ import CitiesModel from './model/cities';
 import {Mock, MenuItem, UpdateType, FilterType} from './const';
 import Api from './api';
 
-const ROUTE_POINT_COUNT = 9;
+const ROUTE_POINT_COUNT = 3;
 const AUTHORIZATION = `Basic qbdt45Urf&knPwsR5`;
 const END_POINT = `https://12.ecmascript.pages.academy/big-trip`;
 
@@ -21,17 +21,17 @@ const points = Array(ROUTE_POINT_COUNT).fill().map(generateRoute);
 const routeInfo = getRouteInfo(points);
 
 const api = new Api(END_POINT, AUTHORIZATION);
-api.getPoints().then((points) => {
-  console.log(points);
-});
-
 
 const models = {
-  pointsModel: new PointsModel(points),
-  offersModel: new OffersModel(offers),
-  citiesModel: new CitiesModel(Mock.DESTINATIONS),
+  pointsModel: new PointsModel(),
+  offersModel: new OffersModel(),
+  citiesModel: new CitiesModel(),
   filterModel: new FilterModel(),
 };
+models.pointsModel.points = points;
+models.offersModel.offers = offers;
+models.citiesModel.cities = Mock.DESTINATIONS;
+
 
 const siteTripMainElement = document.querySelector(`.trip-main`);
 const siteMenuElement = siteTripMainElement.querySelector(`.trip-main__trip-controls h2:first-child`);
@@ -111,3 +111,12 @@ siteMenuComponent.addMenuClickHandler(handleSiteMenuClick, btnNewEvent, MenuItem
 
 filterPresenter.init();
 tripPresenter.init();
+
+api.getPoints().then((points1) => {
+  console.log(points1);
+  models.pointsModel.points = points1;
+});
+
+api.getOffers().then((offers1) => console.log(offers1));
+
+api.getDestinations().then((destinations) => console.log(destinations));

@@ -3,7 +3,8 @@ import Observer from "../utils/observer.js";
 export default class Points extends Observer {
   constructor(points) {
     super();
-    this._points = points.slice();
+
+    this._points = points ? points.slice() : null;
   }
 
   set points(points) {
