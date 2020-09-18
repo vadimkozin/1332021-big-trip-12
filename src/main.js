@@ -35,7 +35,7 @@ const siteMenuComponent = new SiteMenuView();
 const tripInfoComponent = new TripInfoView();
 
 const filterPresenter = new FilterPresenter(siteFilterElement, models.filterModel);
-const tripPresenter = new TripPresenter(siteTripEventsElement, models);
+const tripPresenter = new TripPresenter(siteTripEventsElement, models, api);
 
 class MenuAddItem {
   constructor(menuElement) {

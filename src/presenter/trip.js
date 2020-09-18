@@ -15,9 +15,10 @@ import {filter} from "../utils/filter";
 import {getRouteInfo} from "../utils/route";
 
 export default class Trip {
-  constructor(tripContainer, models) {
+  constructor(tripContainer, models, api) {
     this._tripContainer = tripContainer;
     this._models = models;
+    this._api = api;
     this._pointsModel = models.pointsModel;
     this._filterModel = models.filterModel;
     this._currentSortType = SortType.DEFAULT;
@@ -60,7 +61,9 @@ export default class Trip {
     this._handlers.viewAction = (actionType, updateType, update) => {
       switch (actionType) {
         case UserAction.UPDATE_POINT:
-          this._pointsModel.update(updateType, update);
+          this._api.updatePoint(update).then((response) => {
+            this._pointsModel.update(updateType, response);
+          });
           break;
         case UserAction.ADD_POINT:
           this._pointsModel.add(updateType, update);
