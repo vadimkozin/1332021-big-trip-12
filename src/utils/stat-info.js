@@ -1,6 +1,5 @@
 import moment from 'moment';
-import {Mock} from '../const';
-const {EVENT: {VEHICLE: {NAMES: vehicleNames}}} = Mock;
+import {Offer} from '../const';
 
 
 const makeItemsUniq = (items) => [...new Set(items)];
@@ -75,7 +74,7 @@ export default class StatInfo {
 
   _calcTransport() {
     const vehicles = this._points
-      .filter((point) => vehicleNames.includes(point.type))
+      .filter((point) => Offer.TRANSFERS.includes(point.type))
       .map((point) => point.type);
 
     this._transport = vehicles.reduce((acc, vehicle) => {

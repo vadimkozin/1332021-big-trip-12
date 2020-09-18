@@ -1,3 +1,6 @@
 .event__input.event__input--time.flatpickr-input {
   font-size: 90%;
 }
+.event__type-label, .event__title, .event__label {
+  text-transform: capitalize;
+}

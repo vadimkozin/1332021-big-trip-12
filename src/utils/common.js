@@ -94,7 +94,7 @@ export const getNextRandomDate = (lastDate = Date.now(), timeShift = `hours`) =>
   }
 };
 
-// возвращает значения из массива объектов по ключуы
+// возвращает значения из массива объектов по ключу
 export const getValuesByKey = ({key, arrayObj} = {}) => {
   return arrayObj.reduce((array, it) => {
     array.push(it[key]);
@@ -165,7 +165,3 @@ export const bindHandlers = (handlerMap, that) => {
 };
 
 export const getNumber = (value) => isNaN(Number(value)) ? 0 : Number(value);
-
-const transfers = [`taxi`, `bus`, `train`, `flight`, `ship`, `transport`, `drive`];
-
-export const isTransfer = (item) => transfers.find((transfer) => transfer === item.toLowerCase());

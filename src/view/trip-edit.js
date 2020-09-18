@@ -3,8 +3,7 @@ import SmartView from './smart';
 import {formatDate as format} from '../utils/common';
 import StoreItems from '../utils/common';
 import {getEventType} from '../utils/route';
-import {getOffersByType, getDestinationByName} from '../mock/route';
-import {bindHandlers, getNumber} from "../utils/common.js";
+import {bindHandlers, getNumber} from '../utils/common';
 
 import '../../node_modules/flatpickr/dist/flatpickr.min.css';
 import '../../node_modules/flatpickr/dist/themes/material_blue.css';
@@ -72,9 +71,9 @@ const getIsFavorite = (point) => {
   }
 };
 
-const createSectionOffers = (point) => {
+const createSectionOffers = (point, offersModel) => {
 
-  const allOffersByType = point._type ? getOffersByType(point._type) : getOffersByType(point.type);
+  const allOffersByType = point._type ? offersModel.getByType(point._type) : offersModel.getByType(point.type);
 
   const pointOffers = Array.isArray(point.offers) ? point.offers.slice() : [];
 
@@ -141,7 +140,7 @@ const createSectionDestination = (point) => {
 };
 
 
-const createTripEditTemplate = (point, cities, eventsTransfer, eventsActivity, isNewPoint) => {
+const createTripEditTemplate = (point, eventsTransfer, eventsActivity, isNewPoint, models) => {
   const favoriteChecked = getIsFavorite(point) ? `checked` : ``;
   const isNewEvent = isNewPoint ? `trip-events__item` : ``;
   const isHidden = isNewPoint ? `style="display: none"` : ``;
@@ -175,7 +174,7 @@ const createTripEditTemplate = (point, cities, eventsTransfer, eventsActivity, i
       </label>
       <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${getDestinationName(point)}" list="destination-list-1">
       <datalist id="destination-list-1">
-        ${createCityList(cities)}
+        ${createCityList(models.destinationsModel.names)}
       </datalist>
     </div>
 
@@ -218,7 +217,7 @@ const createTripEditTemplate = (point, cities, eventsTransfer, eventsActivity, i
   </header>
 
   <section class="event__details">
-    ${createSectionOffers(point)}
+    ${createSectionOffers(point, models.offersModel)}
     ${createSectionDestination(point)}
   </section>
 </form>`;
@@ -226,11 +225,11 @@ const createTripEditTemplate = (point, cities, eventsTransfer, eventsActivity, i
 
 
 export default class TripEdit extends SmartView {
-  constructor({point, cities, eventsTransfer, eventsActivity, isNewPoint = false} = {}) {
+  constructor({point, eventsTransfer, eventsActivity, isNewPoint = false, models} = {}) {
     super();
+    this._models = models;
     this._isNewPoint = isNewPoint;
     this._data = TripEdit.parsePointToData(point);
-    this._cities = cities;
     this._eventsTransfer = eventsTransfer;
     this._eventsActivity = eventsActivity;
 
@@ -257,12 +256,13 @@ export default class TripEdit extends SmartView {
 
   getTemplate() {
     return createTripEditTemplate(
-        this._data, this._cities, this._eventsTransfer, this._eventsActivity, this._isNewPoint);
+        this._data, this._eventsTransfer, this._eventsActivity, this._isNewPoint, this._models);
   }
 
   restoreHandlers() {
     this._setInnerHandlers();
     this.setFormSubmitHandler(this._callback.formSubmit);
+    this.setFormDeleteHandler(this._callback.formDelete);
     this.setFavoriteClickHander(this._callback.favoriteClick);
     this._setDatepicker();
   }
@@ -301,7 +301,8 @@ export default class TripEdit extends SmartView {
     const destinationElement = this.getElement().querySelector(`input[name="event-destination"]`);
     const cityInput = destinationElement.value;
 
-    const isCityValid = this._cities.find((city) => city === cityInput);
+    const isCityValid = Boolean(this._models.destinationsModel.names.find((city) => city === cityInput));
+
     if (!isCityValid) {
       destinationElement.focus();
     }
@@ -351,9 +352,11 @@ export default class TripEdit extends SmartView {
         return;
       }
 
-      this.updateData({
-        [Smart.DESTINATION]: getDestinationByName(evt.target.value)
-      });
+      if (this._validation()) {
+        this.updateData({
+          [Smart.DESTINATION]: this._models.destinationsModel.getByName(evt.target.value)
+        });
+      }
     };
 
     this._handlers.price = (evt) => {

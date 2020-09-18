@@ -1,20 +1,20 @@
 import TripEventsItemView from '../view/trip-events-item';
 import TripEditView from '../view/trip-edit';
 import {render, replace, remove} from '../utils/render';
-import {Mock, ESCAPE_CODE} from '../const';
+import {ESCAPE_CODE, Offer} from '../const';
 import {UserAction, UpdateType} from "../const.js";
 
-const {EVENT: {VEHICLE: {NAMES: vehicleNames}, PLACE: {NAMES: placeNames}}, DESTINATIONS: cities} = Mock;
 const Mode = {
   DEFAULT: `DEFAULT`,
   EDITTING: `EDITTING`,
 };
 
 export default class Point {
-  constructor(pointContainer, changeData, changeMode) {
+  constructor(pointContainer, changeData, changeMode, models) {
     this._pointContainer = pointContainer;
     this._changeData = changeData;
     this._changeMode = changeMode;
+    this._models = models;
     this._pointComponent = null;
     this._pointEditComponent = null;
     this._mode = Mode.DEFAULT;
@@ -24,7 +24,6 @@ export default class Point {
     this._handleFormSubmit = this._handleFormSubmit.bind(this);
     this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
     this._handleFormDelete = this._handleFormDelete.bind(this);
-
   }
 
   init(point, isRedraw = true) {
@@ -37,7 +36,7 @@ export default class Point {
     this._initSavePrev();
 
     this._pointComponent = new TripEventsItemView(point);
-    this._pointEditComponent = new TripEditView({point, cities, eventsTransfer: vehicleNames, eventsActivity: placeNames});
+    this._pointEditComponent = new TripEditView({point, eventsTransfer: Offer.TRANSFERS, eventsActivity: Offer.ACTIVITIES, isNewPoint: false, models: this._models});
 
     this._initSetHandlers();
 

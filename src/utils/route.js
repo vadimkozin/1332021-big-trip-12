@@ -1,6 +1,22 @@
 import moment from 'moment';
-import {MONTHS, Mock, Duration, SEPARATOR, INFO_ROUTE_CITIES_MAX} from '../const';
+import {MONTHS, Duration, SEPARATOR, INFO_ROUTE_CITIES_MAX, Offer} from '../const';
 import {addZeros, formatDate, getValuesByKey} from './common';
+
+export const DESTINATION_BLANK = {
+  name: `?`,
+  pictures: [{src: `#`, description: ``}],
+  description: ``,
+};
+
+export const POINT_BLANK = {
+  type: Offer.TRANSFERS[0],
+  startDate: new Date(),
+  endDate: new Date(),
+  destination: DESTINATION_BLANK,
+  price: 0,
+  offers: [],
+  isFavorite: false,
+};
 
 const ROUTE_INFO_BLANK = {
   nameRoute: ``,
@@ -78,7 +94,9 @@ export const getRouteInfo = (routePoints) => {
   const duration = getDuration(points[0].startDate, points[points.length - 1].endDate).toUpperCase();
 
   // список городов(пунктов назначения) в хронологическом порядке
-  const cities = getValuesByKey({key: `destination`, arrayObj: points});
+  // const cities = getValuesByKey({key: `destination`, arrayObj: points});
+  const cities = points.map((point) => point.destination.name);
+
 
   const total = points.reduce((sum, it) =>
     sum + it.price + it.offers.reduce((sumOffer, offer) => sumOffer + offer.price, 0)
@@ -128,10 +146,12 @@ export const setOrdinalDaysRoute = (points) => {
   }, 1);
 };
 
-const getMap = (event) =>
-  event.NAMES.reduce((acc, name) => Object.assign(acc, {[name]: event.ACTION}), {});
+const getMap = (array, value) =>
+  array.reduce((acc, name) => Object.assign(acc, {[name]: value}), {});
 
-const namesToActionMap = Object.assign({}, getMap(Mock.EVENT.PLACE), getMap(Mock.EVENT.VEHICLE));
+const namesToActionMap = Object.assign({},
+    getMap(Offer.TRANSFERS, Offer.ACTION.TRANSFER),
+    getMap(Offer.ACTIVITIES, Offer.ACTION.ACTIVITY));
 
 // возвращает название события в виде: 'Taxi to Amsterdam' || 'Restaurant in Geneva'
 export const getEventTitle = (type, destination) => getEventInfo(type, destination);
@@ -140,7 +160,7 @@ export const getEventTitle = (type, destination) => getEventInfo(type, destinati
 export const getEventType = (type) => getEventInfo(type);
 
 const getEventInfo = (type, destination) => {
-  const action = namesToActionMap[type];
+  const action = namesToActionMap[type.toLowerCase()];
   return destination
     ? `${type} ${action} ${destination}`
     : `${type} ${action}`;

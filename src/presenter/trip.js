@@ -16,12 +16,10 @@ import {getRouteInfo} from "../utils/route";
 
 export default class Trip {
   constructor(tripContainer, models) {
-    const {pointsModel, filterModel, offersModel, citiesModel} = models;
-    this._pointsModel = pointsModel;
-    this._filterModel = filterModel;
-    this._offersModel = offersModel;
-    this._citiesModel = citiesModel;
     this._tripContainer = tripContainer;
+    this._models = models;
+    this._pointsModel = models.pointsModel;
+    this._filterModel = models.filterModel;
     this._currentSortType = SortType.DEFAULT;
     this._pointPresenter = {};
 
@@ -37,7 +35,7 @@ export default class Trip {
     this._setHandlers();
 
     this._tripEventsElement = document.querySelector(`.trip-events`);
-    this._pointNewPresenter = new PointNewPresenter(this._tripEventsElement, this._handlers.viewAction);
+    this._pointNewPresenter = new PointNewPresenter(this._tripEventsElement, this._handlers.viewAction, this._models);
   }
 
   _setHandlers() {
@@ -94,7 +92,7 @@ export default class Trip {
 
   init() {
     this._pointsModel.addObserver(this._handlers.modelEvent);
-    this._filterModel .addObserver(this._handlers.modelEvent);
+    this._filterModel.addObserver(this._handlers.modelEvent);
     this._renderTrip();
   }
 
@@ -183,7 +181,7 @@ export default class Trip {
   }
 
   _renderPoint(container, point) {
-    const pointPresenter = new PointPresenter(container, this._handlers.viewAction, this._handlers.modeChange);
+    const pointPresenter = new PointPresenter(container, this._handlers.viewAction, this._handlers.modeChange, this._models);
 
     pointPresenter.init(point);
     this._pointPresenter[point.id] = pointPresenter;
