@@ -2,6 +2,7 @@ import SiteMenuView from './view/site-menu';
 import TripInfoView from './view/trip-info';
 import StatView from './view/stat';
 import LoadingView from './view/loading';
+import ErrorView from './view/error';
 import {render, RenderPosition, remove} from './utils/render';
 import {getRouteInfo} from './utils/route';
 import TripPresenter from './presenter/trip';
@@ -127,11 +128,12 @@ Promise.all([api.getPoints(), api.getOffers(), api.getDestinations()]).then((res
   models.offersModel.offers = offers;
   models.destinationsModel.destinations = destinations;
 
-  console.log(points);
-
   render(siteTripMainElement, tripInfoComponent, RenderPosition.AFTER_BEGIN);
   render(siteMenuElement, siteMenuComponent, RenderPosition.AFTER_END);
 
   tripPresenter.init();
 
-}).catch(alert);
+}).catch(() => {
+  remove(loadingComponent);
+  render(siteTripEventsElement, new ErrorView());
+});
