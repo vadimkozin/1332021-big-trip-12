@@ -127,6 +127,8 @@ Promise.all([api.getPoints(), api.getOffers(), api.getDestinations()]).then((res
   models.offersModel.offers = offers;
   models.destinationsModel.destinations = destinations;
 
+  console.log(points);
+
   render(siteTripMainElement, tripInfoComponent, RenderPosition.AFTER_BEGIN);
   render(siteMenuElement, siteMenuComponent, RenderPosition.AFTER_END);
 
