@@ -58,3 +58,9 @@ export const MenuItem = {
   TABLE: `Table`,
   STATS: `Stats`,
 };
+
+export const Flags = {
+  isDisabled: false,
+  isSaving: false,
+  isDeleting: false,
+};

@@ -4,6 +4,7 @@ import {formatDate as format} from '../utils/common';
 import StoreItems from '../utils/common';
 import {getEventType} from '../utils/route';
 import {bindHandlers, getNumber} from '../utils/common';
+import {Flags} from '../const';
 
 import '../../node_modules/flatpickr/dist/flatpickr.min.css';
 import '../../node_modules/flatpickr/dist/themes/material_blue.css';
@@ -19,12 +20,6 @@ const Smart = {
   DESCRIPTION: `_description`,
   PHOTOS: `_photos`,
   IS_FAVORITE: `_isFavorite`,
-};
-
-const Flags = {
-  isDisabled: false,
-  isSaving: false,
-  isDeleting: false,
 };
 
 const configDatepicker = {
