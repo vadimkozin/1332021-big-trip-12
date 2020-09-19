@@ -5,7 +5,7 @@ import DayInfoView from '../view/day-info';
 import TripEventsListView from '../view/trip-events-list';
 import NoRouteView from '../view/no-route';
 import TripInfoView from "../view/trip-info";
-import PointPresenter from './point';
+import PointPresenter, {State as PointPresenterViewState} from './point';
 import PointNewPresenter from './point-new';
 import {SortType, UpdateType, UserAction} from '../const';
 import {render, remove} from '../utils/render';
@@ -61,16 +61,19 @@ export default class Trip {
     this._handlers.viewAction = (actionType, updateType, update) => {
       switch (actionType) {
         case UserAction.UPDATE_POINT:
+          this._pointPresenter[update.id].setViewState(PointPresenterViewState.SAVING);
           this._api.updatePoint(update).then((response) => {
             this._pointsModel.update(updateType, response);
           });
           break;
         case UserAction.ADD_POINT:
+          this._pointNewPresenter.setSaving();
           this._api.addPoint(update).then((response) => {
             this._pointsModel.add(updateType, response);
           });
           break;
         case UserAction.DELETE_POINT:
+          this._pointPresenter[update.id].setViewState(PointPresenterViewState.DELETING);
           this._api.deletePoint(update).then(() => {
             this._pointsModel.delete(updateType, update);
           });
