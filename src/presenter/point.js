@@ -31,6 +31,7 @@ export default class Point {
     this._handleFormSubmit = this._handleFormSubmit.bind(this);
     this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
     this._handleFormDelete = this._handleFormDelete.bind(this);
+    this._handleFormClose = this._handleFormClose.bind(this);
   }
 
   init(point, isRedraw = true) {
@@ -73,6 +74,8 @@ export default class Point {
     this._pointEditComponent.setFormSubmitHandler(this._handleFormSubmit);
     this._pointEditComponent.setFavoriteClickHander(this._handleFavoriteClick);
     this._pointEditComponent.setFormDeleteHandler(this._handleFormDelete);
+    this._pointEditComponent.setFormCloseHandler(this._handleFormClose);
+
   }
 
   _initIsFirstCall() {
@@ -167,6 +170,11 @@ export default class Point {
       this._pointEditComponent.reset(this._point);
       this._replaceFormToView();
     }
+  }
+
+  _handleFormClose(point) {
+    this._pointEditComponent.reset(point);
+    this._replaceFormToView();
   }
 
   _handleFormSubmit(point) {
