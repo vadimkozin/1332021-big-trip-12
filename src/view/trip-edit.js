@@ -21,6 +21,12 @@ const Smart = {
   IS_FAVORITE: `_isFavorite`,
 };
 
+const Flags = {
+  isDisabled: false,
+  isSaving: false,
+  isDeleting: false,
+};
+
 const configDatepicker = {
   "dateFormat": `d/m/Y H:i`,
   "time_24hr": true,
@@ -144,7 +150,11 @@ const createTripEditTemplate = (point, eventsTransfer, eventsActivity, isNewPoin
   const favoriteChecked = getIsFavorite(point) ? `checked` : ``;
   const isNewEvent = isNewPoint ? `trip-events__item` : ``;
   const isHidden = isNewPoint ? `style="display: none"` : ``;
-  const btnName = isNewPoint ? `Cancel` : `Delete`;
+
+  let btnResetName = point.flags.isDeleting ? `Deleting...` : `Delete`;
+  if (isNewPoint) {
+    btnResetName = `Cancel`;
+  }
 
   return `<form class="${isNewEvent} event  event--edit" action="#" method="post">
   <header class="event__header">
@@ -200,8 +210,10 @@ const createTripEditTemplate = (point, eventsTransfer, eventsActivity, isNewPoin
       <input class="event__input  event__input--price" id="event-price-1" type="number" min="0" name="event-price" value="${getPrice(point)}">
     </div>
 
-    <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-    <button class="event__reset-btn" type="reset">${btnName}</button>
+    <!-- <button class="event__save-btn  btn  btn--blue" type="submit">Save</button> -->
+    <button class="event__save-btn  btn  btn--blue" type="submit">${point.flags.isSaving ? `Saving...` : `Save`}</button>
+
+    <button class="event__reset-btn" type="reset">${btnResetName}</button>
 
     <input id="event-favorite-1" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" ${favoriteChecked}>
     <label class="event__favorite-btn" for="event-favorite-1" ${isHidden}>
@@ -447,7 +459,8 @@ export default class TripEdit extends SmartView {
     return Object.assign(
         {},
         point,
-        getBlankSmartProperty()
+        getBlankSmartProperty(),
+        {flags: Flags}
     );
   }
 
@@ -463,6 +476,7 @@ export default class TripEdit extends SmartView {
       });
 
     Object.values(Smart).forEach((property) => delete data[property]);
+    delete data.flags;
 
     return data;
   }
