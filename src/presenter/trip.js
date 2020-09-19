@@ -61,23 +61,35 @@ export default class Trip {
     this._handlers.viewAction = (actionType, updateType, update) => {
       switch (actionType) {
         case UserAction.UPDATE_POINT:
+          // debugger
           this._pointPresenter[update.id].setViewState(PointPresenterViewState.SAVING);
-          this._api.updatePoint(update).then((response) => {
-            this._pointsModel.update(updateType, response);
-            this._pointPresenter[update.id].setViewState(PointPresenterViewState.DEFAULT);
-          });
+          this._api.updatePoint(update)
+            .then((response) => {
+              this._pointsModel.update(updateType, response);
+              this._pointPresenter[update.id].setViewState(PointPresenterViewState.DEFAULT);
+            }).catch(() =>{
+              this._pointPresenter[update.id].setViewState(PointPresenterViewState.ABORTING);
+            });
           break;
         case UserAction.ADD_POINT:
           this._pointNewPresenter.setSaving();
-          this._api.addPoint(update).then((response) => {
-            this._pointsModel.add(updateType, response);
-          });
+          this._api.addPoint(update)
+            .then((response) => {
+              this._pointsModel.add(updateType, response);
+            })
+            .catch(() => {
+              this._pointNewPresenter.setAborting();
+            });
           break;
         case UserAction.DELETE_POINT:
           this._pointPresenter[update.id].setViewState(PointPresenterViewState.DELETING);
-          this._api.deletePoint(update).then(() => {
-            this._pointsModel.delete(updateType, update);
-          });
+          this._api.deletePoint(update)
+            .then(() => {
+              this._pointsModel.delete(updateType, update);
+            })
+            .catch(() => {
+              this._pointPresenter[update.id].setViewState(PointPresenterViewState.ABORTING);
+            });
           break;
       }
     };

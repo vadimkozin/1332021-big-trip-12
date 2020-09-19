@@ -12,6 +12,7 @@ const Mode = {
 export const State = {
   SAVING: `SAVING`,
   DELETING: `DELETING`,
+  ABORTING: `ABORTING`,
   DEFAULT: `DEFAULT`
 };
 
@@ -84,7 +85,6 @@ export default class Point {
     }
 
     if (this._mode === Mode.EDITTING) {
-      // replace(this._pointEditComponent, this._prev.pointEditComponent);
       replace(this._pointComponent, this._prev.pointEditComponent);
       this._mode = Mode.DEFAULT;
     }
@@ -105,6 +105,16 @@ export default class Point {
   }
 
   setViewState(state) {
+    const resetFormState = () => {
+      this._pointEditComponent.updateData({
+        flags: {
+          isDisabled: false,
+          isSaving: false,
+          isDeleting: false
+        }
+      });
+    };
+
     switch (state) {
       case State.SAVING:
         this._pointEditComponent.updateData({
@@ -130,6 +140,10 @@ export default class Point {
             isSaving: false
           }
         });
+        break;
+      case State.ABORTING:
+        this._pointComponent.shake(resetFormState);
+        this._pointEditComponent.shake(resetFormState);
         break;
     }
   }
@@ -157,7 +171,7 @@ export default class Point {
 
   _handleFormSubmit(point) {
     this._changeData(UserAction.UPDATE_POINT, UpdateType.MINOR, point);
-    this._replaceFormToView();
+    // this._replaceFormToView();
   }
 
   _handleFormDelete(point) {
