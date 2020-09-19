@@ -1,6 +1,6 @@
 import TripEditView from '../view/trip-edit';
 import {remove, render, RenderPosition} from "../utils/render.js";
-import {UserAction, UpdateType, Flags} from "../const.js";
+import {UserAction, UpdateType} from "../const.js";
 import {ESCAPE_CODE} from "../const";
 import {Offer} from "../const";
 import {POINT_BLANK} from "../utils/route";
@@ -57,8 +57,8 @@ export default class PointNew {
   setSaving() {
     this._pointEditComponent.updateData({
       flags: {
-        [Flags.isDisabled]: true,
-        [Flags.isSaving]: true
+        isDisabled: true,
+        isSaving: true
       }
     });
   }

@@ -205,10 +205,8 @@ const createTripEditTemplate = (point, eventsTransfer, eventsActivity, isNewPoin
       <input class="event__input  event__input--price" id="event-price-1" type="number" min="0" name="event-price" value="${getPrice(point)}">
     </div>
 
-    <!-- <button class="event__save-btn  btn  btn--blue" type="submit">Save</button> -->
-    <button class="event__save-btn  btn  btn--blue" type="submit">${point.flags.isSaving ? `Saving...` : `Save`}</button>
-
-    <button class="event__reset-btn" type="reset">${btnResetName}</button>
+    <button class="event__save-btn  btn  btn--blue" type="submit" ${point.flags.isDisabled ? `disabled` : ``}>${point.flags.isSaving ? `Saving...` : `Save `}</button>
+    <button class="event__reset-btn" type="reset" ${point.flags.isDisabled ? `disabled` : ``}>${btnResetName}</button>
 
     <input id="event-favorite-1" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" ${favoriteChecked}>
     <label class="event__favorite-btn" for="event-favorite-1" ${isHidden}>

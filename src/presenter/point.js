@@ -2,7 +2,7 @@ import TripEventsItemView from '../view/trip-events-item';
 import TripEditView from '../view/trip-edit';
 import {render, replace, remove} from '../utils/render';
 import {ESCAPE_CODE, Offer} from '../const';
-import {UserAction, UpdateType, Flags} from "../const.js";
+import {UserAction, UpdateType} from "../const.js";
 
 const Mode = {
   DEFAULT: `DEFAULT`,
@@ -11,7 +11,8 @@ const Mode = {
 
 export const State = {
   SAVING: `SAVING`,
-  DELETING: `DELETING`
+  DELETING: `DELETING`,
+  DEFAULT: `DEFAULT`
 };
 
 export default class Point {
@@ -108,16 +109,25 @@ export default class Point {
       case State.SAVING:
         this._pointEditComponent.updateData({
           flags: {
-            [Flags.isDisabled]: true,
-            [Flags.isSaving]: true
+            isDisabled: true,
+            isSaving: true
           }
         });
         break;
       case State.DELETING:
         this._pointEditComponent.updateData({
           flags: {
-            [Flags.isDisabled]: true,
-            [Flags.isDeleting]: true
+            isDisabled: true,
+            isDeleting: true
+          }
+        });
+        break;
+      case State.DEFAULT:
+        this._pointEditComponent.updateData({
+          flags: {
+            isDisabled: false,
+            isDeleting: false,
+            isSaving: false
           }
         });
         break;

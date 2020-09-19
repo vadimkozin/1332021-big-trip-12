@@ -64,6 +64,7 @@ export default class Trip {
           this._pointPresenter[update.id].setViewState(PointPresenterViewState.SAVING);
           this._api.updatePoint(update).then((response) => {
             this._pointsModel.update(updateType, response);
+            this._pointPresenter[update.id].setViewState(PointPresenterViewState.DEFAULT);
           });
           break;
         case UserAction.ADD_POINT:
