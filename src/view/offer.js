@@ -6,7 +6,7 @@ const getHtmlOffers = (offers, max) =>
     .slice(0, Math.min(offers.length, max))
     .map((offer) => {
       return `<li class="event__offer">
-        <span class="event__offer-title">${offer.name}</span>
+        <span class="event__offer-title">${offer.title}</span>
         &plus;
         &euro;&nbsp;<span class="event__offer-price">${offer.price}</span>
       </li>`;
@@ -18,7 +18,7 @@ export const createOfferTemplate = (offers) =>
     ${getHtmlOffers(offers, OFFERS_MAX)}
   </ul>`;
 
-export default class SiteMenu extends AbstractView {
+export default class Offer extends AbstractView {
   constructor(offers) {
     super();
     this._offers = offers;

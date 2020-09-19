@@ -3,8 +3,7 @@ import SmartView from './smart';
 import {formatDate as format} from '../utils/common';
 import StoreItems from '../utils/common';
 import {getEventType} from '../utils/route';
-import {getOffersByType, getDestinationByName} from '../mock/route';
-import {bindHandlers, getNumber} from "../utils/common.js";
+import {bindHandlers, getNumber} from '../utils/common';
 
 import '../../node_modules/flatpickr/dist/flatpickr.min.css';
 import '../../node_modules/flatpickr/dist/themes/material_blue.css';
@@ -52,7 +51,7 @@ const getType = (point) => point[Smart.EVENT_TYPE] ? point[Smart.EVENT_TYPE] : p
 
 const getPlaceholder = (point) => point[Smart.EVENT_TYPE] ? getEventType(point[Smart.EVENT_TYPE]) : getEventType(point.type);
 
-const getDestination = (point) => point[Smart.DESTINATION] ? point[Smart.DESTINATION] : point.destination;
+const getDestinationName = (point) => point[Smart.DESTINATION] ? point[Smart.DESTINATION].name : point.destination.name;
 
 const getPrice = (point) => point[Smart.PRICE] ? point[Smart.PRICE] : point.price;
 
@@ -72,9 +71,9 @@ const getIsFavorite = (point) => {
   }
 };
 
-const createSectionOffers = (point) => {
+const createSectionOffers = (point, offersModel) => {
 
-  const allOffersByType = point._type ? getOffersByType(point._type) : getOffersByType(point.type);
+  const allOffersByType = point._type ? offersModel.getByType(point._type) : offersModel.getByType(point.type);
 
   const pointOffers = Array.isArray(point.offers) ? point.offers.slice() : [];
 
@@ -83,14 +82,14 @@ const createSectionOffers = (point) => {
     : pointOffers;
 
   const offerList = allOffersByType.map((offer) => {
-    const nameLower = offer.name.toLowerCase();
-    const checked = offers.find((offerChecked) => offerChecked.name === offer.name) ? `checked` : ``;
+    const nameLower = offer.title.toLowerCase();
+    const checked = offers.find((offerChecked) => offerChecked.title === offer.title) ? `checked` : ``;
 
     return `
       <div class="event__offer-selector">
         <input class="event__offer-checkbox  visually-hidden" id="event-offer-${nameLower}-1" type="checkbox" name="event-offer-${nameLower}" ${checked}>
         <label class="event__offer-label" for="event-offer-${nameLower}-1">
-          <span class="event__offer-title">${offer.name}</span>
+          <span class="event__offer-title">${offer.title}</span>
           &plus;
           &euro;&nbsp;<span class="event__offer-price">${offer.price}</span>
         </label>
@@ -110,8 +109,8 @@ const createSectionOffers = (point) => {
 
 
 const createSectionDestination = (point) => {
-  const description = point._description ? point._description : point.description;
-  const photos = point._photos ? point._photos : point.photos;
+  const description = point[Smart.DESTINATION] ? point[Smart.DESTINATION].description : point.destination.description;
+  const photos = point[Smart.DESTINATION] ? point[Smart.DESTINATION].pictures : point.destination.pictures;
   const isPhotos = Boolean(photos.length);
 
   if (!(description && isPhotos)) {
@@ -122,7 +121,7 @@ const createSectionDestination = (point) => {
 
   if (isPhotos) {
     const photoList = photos.map((photo) =>
-      `<img class="event__photo" src="${photo}" alt="Event photo"></img>`).join(``);
+      `<img class="event__photo" src="${photo.src}" alt="${photo.description}"></img>`).join(``);
 
     photosContainer =
       `<div class="event__photos-container">
@@ -141,7 +140,7 @@ const createSectionDestination = (point) => {
 };
 
 
-const createTripEditTemplate = (point, cities, eventsTransfer, eventsActivity, isNewPoint) => {
+const createTripEditTemplate = (point, eventsTransfer, eventsActivity, isNewPoint, models) => {
   const favoriteChecked = getIsFavorite(point) ? `checked` : ``;
   const isNewEvent = isNewPoint ? `trip-events__item` : ``;
   const isHidden = isNewPoint ? `style="display: none"` : ``;
@@ -173,9 +172,9 @@ const createTripEditTemplate = (point, cities, eventsTransfer, eventsActivity, i
       <label class="event__label  event__type-output" for="event-destination-1">
         ${getPlaceholder(point)}
       </label>
-      <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${getDestination(point)}" list="destination-list-1">
+      <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${getDestinationName(point)}" list="destination-list-1">
       <datalist id="destination-list-1">
-        ${createCityList(cities)}
+        ${createCityList(models.destinationsModel.names)}
       </datalist>
     </div>
 
@@ -218,7 +217,7 @@ const createTripEditTemplate = (point, cities, eventsTransfer, eventsActivity, i
   </header>
 
   <section class="event__details">
-    ${createSectionOffers(point)}
+    ${createSectionOffers(point, models.offersModel)}
     ${createSectionDestination(point)}
   </section>
 </form>`;
@@ -226,15 +225,15 @@ const createTripEditTemplate = (point, cities, eventsTransfer, eventsActivity, i
 
 
 export default class TripEdit extends SmartView {
-  constructor({point, cities, eventsTransfer, eventsActivity, isNewPoint = false} = {}) {
+  constructor({point, eventsTransfer, eventsActivity, isNewPoint = false, models} = {}) {
     super();
+    this._models = models;
     this._isNewPoint = isNewPoint;
     this._data = TripEdit.parsePointToData(point);
-    this._cities = cities;
     this._eventsTransfer = eventsTransfer;
     this._eventsActivity = eventsActivity;
 
-    this._storeOffers = new StoreItems(`name`, `price`).init(point.offers);
+    this._storeOffers = new StoreItems(`title`, `price`).init(point.offers);
 
     this._datepicker = {
       start: null,
@@ -257,12 +256,13 @@ export default class TripEdit extends SmartView {
 
   getTemplate() {
     return createTripEditTemplate(
-        this._data, this._cities, this._eventsTransfer, this._eventsActivity, this._isNewPoint);
+        this._data, this._eventsTransfer, this._eventsActivity, this._isNewPoint, this._models);
   }
 
   restoreHandlers() {
     this._setInnerHandlers();
     this.setFormSubmitHandler(this._callback.formSubmit);
+    this.setFormDeleteHandler(this._callback.formDelete);
     this.setFavoriteClickHander(this._callback.favoriteClick);
     this._setDatepicker();
   }
@@ -301,7 +301,8 @@ export default class TripEdit extends SmartView {
     const destinationElement = this.getElement().querySelector(`input[name="event-destination"]`);
     const cityInput = destinationElement.value;
 
-    const isCityValid = this._cities.find((city) => city === cityInput);
+    const isCityValid = Boolean(this._models.destinationsModel.names.find((city) => city === cityInput));
+
     if (!isCityValid) {
       destinationElement.focus();
     }
@@ -351,13 +352,11 @@ export default class TripEdit extends SmartView {
         return;
       }
 
-      const destination = evt.target.value;
-
-      this.updateData({
-        [Smart.DESCRIPTION]: getDestinationByName(destination).description,
-        [Smart.PHOTOS]: getDestinationByName(destination).photos,
-        [Smart.DESTINATION]: destination
-      });
+      if (this._validation()) {
+        this.updateData({
+          [Smart.DESTINATION]: this._models.destinationsModel.getByName(evt.target.value)
+        });
+      }
     };
 
     this._handlers.price = (evt) => {

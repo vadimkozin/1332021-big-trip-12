@@ -1,24 +1,22 @@
-import uniqueId from 'lodash.uniqueid';
 import TripEditView from '../view/trip-edit';
 import {remove, render, RenderPosition} from "../utils/render.js";
 import {UserAction, UpdateType} from "../const.js";
 import {ESCAPE_CODE} from "../const";
-import {Mock} from "../const";
-import {POINT_BLANK} from "../mock/route";
+import {Offer} from "../const";
+import {POINT_BLANK} from "../utils/route";
 
-
-const {EVENT: {VEHICLE: {NAMES: vehicleNames}, PLACE: {NAMES: placeNames}}, DESTINATIONS: cities} = Mock;
 
 export default class PointNew {
-  constructor(contaiter, changeData) {
+  constructor(contaiter, changeData, models) {
     this._contaiter = contaiter;
     this._changeData = changeData;
+    this._models = models;
 
     this._pointEditComponent = null;
     this._destroyCallback = null;
 
     this._handleFormSubmit = this._handleFormSubmit.bind(this);
-    this._handleDeleteClick = this._handleDeleteClick.bind(this);
+    this._handleFormDelete = this._handleFormDelete.bind(this);
     this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
   }
 
@@ -30,11 +28,11 @@ export default class PointNew {
     }
 
     this._pointEditComponent = new TripEditView(
-        {point: Object.assign({}, POINT_BLANK, {type: vehicleNames[0], destination: cities[0]}),
-          cities, eventsTransfer: vehicleNames, eventsActivity: placeNames, isNewPoint: true});
+        {point: POINT_BLANK,
+          eventsTransfer: Offer.TRANSFERS, eventsActivity: Offer.ACTIVITIES, isNewPoint: true, models: this._models});
 
     this._pointEditComponent.setFormSubmitHandler(this._handleFormSubmit);
-    this._pointEditComponent.setFormDeleteHandler(this._handleDeleteClick);
+    this._pointEditComponent.setFormDeleteHandler(this._handleFormDelete);
 
     render(this._contaiter, this._pointEditComponent, RenderPosition.AFTER_BEGIN);
 
@@ -59,13 +57,13 @@ export default class PointNew {
   _handleFormSubmit(point) {
     this._changeData(
         UserAction.ADD_POINT,
-        UpdateType.MAJOR,
-        Object.assign({id: uniqueId()}, point)
+        UpdateType.MINOR,
+        point
     );
-    this.destroy();
+    // this.destroy();
   }
 
-  _handleDeleteClick() {
+  _handleFormDelete() {
     this.destroy();
   }
 

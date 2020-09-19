@@ -1,3 +1,4 @@
+import he from 'he';
 import AbstractView from './abstract';
 import {replaceStr as replace} from '../utils/common';
 
@@ -21,6 +22,10 @@ const createTripInfoTemplate = (info) =>
 export default class TripInfo extends AbstractView {
   constructor(info) {
     super();
+    this._info = info ? info : null;
+  }
+
+  set info(info) {
     this._info = info;
   }
 
@@ -30,5 +35,13 @@ export default class TripInfo extends AbstractView {
 
   set totalSumma(total) {
     document.querySelector(`.trip-info__cost-value`).textContent = total;
+  }
+
+  init(info) {
+    this._info = info;
+    this.totalSumma = info.total;
+
+    document.querySelector(`.trip-info__title`).textContent = he.decode(replace(info.nameRoute));
+    document.querySelector(`.trip-info__dates`).textContent = he.decode(replace(info.duration));
   }
 }

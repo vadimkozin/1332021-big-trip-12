@@ -63,6 +63,16 @@ export const getRandomPhotos = (url, from = 1, to = 5) => {
   return Array(count).fill().map(() => `${url}${Math.random()}`);
 };
 
+export const getRandomPictures = (url, name, from = 1, to = 5) => {
+  const count = getRandomInteger(from, to);
+
+  return Array(count).fill().map((v, i) => ({
+    src: `${url}${Math.random()}`,
+    description: `The ${name} is very beautiful, photo ${i + 1}`,
+  }));
+};
+
+
 // возвращает случайную дату позднее чем lastDate,
 // добавляя timeShift, одно из: ['minutes', 'hours', 'days', 'hoursminutes']
 export const getNextRandomDate = (lastDate = Date.now(), timeShift = `hours`) => {
@@ -84,7 +94,7 @@ export const getNextRandomDate = (lastDate = Date.now(), timeShift = `hours`) =>
   }
 };
 
-// возвращает значения из массива объектов по ключуы
+// возвращает значения из массива объектов по ключу
 export const getValuesByKey = ({key, arrayObj} = {}) => {
   return arrayObj.reduce((array, it) => {
     array.push(it[key]);
