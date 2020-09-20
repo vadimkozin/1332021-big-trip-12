@@ -4,6 +4,7 @@ import {formatDate as format} from '../utils/common';
 import StoreItems from '../utils/common';
 import {getEventType} from '../utils/route';
 import {bindHandlers, getNumber} from '../utils/common';
+import {Flags} from '../const';
 
 import '../../node_modules/flatpickr/dist/flatpickr.min.css';
 import '../../node_modules/flatpickr/dist/themes/material_blue.css';
@@ -144,7 +145,11 @@ const createTripEditTemplate = (point, eventsTransfer, eventsActivity, isNewPoin
   const favoriteChecked = getIsFavorite(point) ? `checked` : ``;
   const isNewEvent = isNewPoint ? `trip-events__item` : ``;
   const isHidden = isNewPoint ? `style="display: none"` : ``;
-  const btnName = isNewPoint ? `Cancel` : `Delete`;
+
+  let btnResetName = point.flags.isDeleting ? `Deleting...` : `Delete`;
+  if (isNewPoint) {
+    btnResetName = `Cancel`;
+  }
 
   return `<form class="${isNewEvent} event  event--edit" action="#" method="post">
   <header class="event__header">
@@ -200,8 +205,8 @@ const createTripEditTemplate = (point, eventsTransfer, eventsActivity, isNewPoin
       <input class="event__input  event__input--price" id="event-price-1" type="number" min="0" name="event-price" value="${getPrice(point)}">
     </div>
 
-    <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-    <button class="event__reset-btn" type="reset">${btnName}</button>
+    <button class="event__save-btn  btn  btn--blue" type="submit" ${point.flags.isDisabled ? `disabled` : ``}>${point.flags.isSaving ? `Saving...` : `Save `}</button>
+    <button class="event__reset-btn" type="reset" ${point.flags.isDisabled ? `disabled` : ``}>${btnResetName}</button>
 
     <input id="event-favorite-1" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" ${favoriteChecked}>
     <label class="event__favorite-btn" for="event-favorite-1" ${isHidden}>
@@ -263,6 +268,7 @@ export default class TripEdit extends SmartView {
     this._setInnerHandlers();
     this.setFormSubmitHandler(this._callback.formSubmit);
     this.setFormDeleteHandler(this._callback.formDelete);
+    this.setFormCloseHandler(this._callback.formClose);
     this.setFavoriteClickHander(this._callback.favoriteClick);
     this._setDatepicker();
   }
@@ -322,6 +328,11 @@ export default class TripEdit extends SmartView {
     this._handlers.formDelete = (evt) => {
       evt.preventDefault();
       this._callback.formDelete(this._data);
+    };
+
+    this._handlers.formClose = (evt) => {
+      evt.preventDefault();
+      this._callback.formClose(this._data);
     };
 
     this._handlers.favorite = (evt) => {
@@ -440,6 +451,11 @@ export default class TripEdit extends SmartView {
       .addEventListener(`change`, this._handlers.favorite);
   }
 
+  setFormCloseHandler(callback) {
+    this._callback.formClose = callback;
+    this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, this._handlers.formClose);
+  }
+
   static parsePointToData(point) {
     const getBlankSmartProperty = () =>
       Object.values(Smart).reduce((acc, prop) => Object.assign(acc, {[prop]: null}), {});
@@ -447,7 +463,8 @@ export default class TripEdit extends SmartView {
     return Object.assign(
         {},
         point,
-        getBlankSmartProperty()
+        getBlankSmartProperty(),
+        {flags: Flags}
     );
   }
 
@@ -463,6 +480,7 @@ export default class TripEdit extends SmartView {
       });
 
     Object.values(Smart).forEach((property) => delete data[property]);
+    delete data.flags;
 
     return data;
   }
