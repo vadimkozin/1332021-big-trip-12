@@ -2,7 +2,7 @@
   font-size: 90%;
 }
 
-.event__type-label, .event__title, .event__label {
+.event__type-label, .event__title::first-letter, .event__label::first-letter {
   text-transform: capitalize;
 }
 
