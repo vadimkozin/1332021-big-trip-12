@@ -13,12 +13,25 @@ import OffersModel from './model/offers';
 import DestinationsModel from './model/destinations';
 import {MenuItem, UpdateType, FilterType} from './const';
 import Api from './api/index';
+import Store from "./api/store.js";
+import Provider from "./api/provider.js";
 
-const AUTHORIZATION = `Basic qbdt45Urf&knPwsR5`;
+const AUTHORIZATION = `Basic qbdt45Urf&knPwsR5-7`;
 const END_POINT = `https://12.ecmascript.pages.academy/big-trip`;
+const STORE_PREFIX = `bigtrip`;
+const STORE_VER = `v12`;
+const STORE_POINTS = `${STORE_PREFIX}-points-${STORE_VER}`;
+const STORE_OFFERS = `${STORE_PREFIX}-offers-${STORE_VER}`;
+const STORE_DESTINATIONS = `${STORE_PREFIX}-dest-${STORE_VER}`;
+
 let isLoading = true;
 
 const api = new Api(END_POINT, AUTHORIZATION);
+const storePoints = new Store(STORE_POINTS, window.localStorage);
+const storeOffers = new Store(STORE_OFFERS, window.localStorage);
+const storeDestinations = new Store(STORE_DESTINATIONS, window.localStorage);
+
+const apiWithProvider = new Provider(api, storePoints, storeOffers, storeDestinations);
 
 const models = {
   pointsModel: new PointsModel(),
@@ -36,7 +49,7 @@ const siteMenuComponent = new SiteMenuView();
 const tripInfoComponent = new TripInfoView();
 
 const filterPresenter = new FilterPresenter(siteFilterElement, models.filterModel);
-const tripPresenter = new TripPresenter(siteTripEventsElement, models, api);
+const tripPresenter = new TripPresenter(siteTripEventsElement, models, apiWithProvider);
 
 class MenuAddItem {
   constructor(menuElement) {
@@ -115,7 +128,8 @@ render(siteMenuElement, siteMenuComponent, RenderPosition.AFTER_END);
 
 filterPresenter.init();
 
-Promise.all([api.getPoints(), api.getOffers(), api.getDestinations()]).then((response) => {
+Promise.all([apiWithProvider.getPoints(), apiWithProvider.getOffers(), apiWithProvider.getDestinations()]).then((response) => {
+
   const [points, offers, destinations] = [...response];
 
   remove(loadingComponent);
@@ -138,13 +152,26 @@ Promise.all([api.getPoints(), api.getOffers(), api.getDestinations()]).then((res
   render(siteTripEventsElement, new ErrorView());
 });
 
+const showOfflineFlag = () => {
+  document.title += ` [offline]`;
+};
+
 window.addEventListener(`load`, () => {
+  if (!Provider.isOnline()) {
+    showOfflineFlag();
+  }
+
   navigator.serviceWorker.register(`/sw.js`)
     .then(() => {
-      // Действие, в случае успешной регистрации ServiceWorker
       console.log(`ServiceWorker available`); // eslint-disable-line
     }).catch(() => {
-      // Действие, в случае ошибки при регистрации ServiceWorker
       console.error(`ServiceWorker isn't available`); // eslint-disable-line
     });
 });
+
+window.addEventListener(`online`, () => {
+  document.title = document.title.replace(` [offline]`, ``);
+  apiWithProvider.sync();
+});
+
+window.addEventListener(`offline`, showOfflineFlag);

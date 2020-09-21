@@ -12,6 +12,7 @@ self.addEventListener(`install`, (evt) => {
           return cache.addAll([
             `/`,
             `/index.html`,
+            `/favicon.ico`,
             `/bundle.js`,
             `/css/style.css`,
             `/css/add.css`,

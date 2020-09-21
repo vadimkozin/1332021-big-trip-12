@@ -41,12 +41,12 @@ export default class Provider {
     if (Provider.isOnline()) {
       return this._api.getOffers()
         .then((offers) => {
-          this._storeOffers.setItem(`storedOffers`, JSON.stringify(offers));
+          this._storeOffers.setSimpleItem(JSON.stringify(offers));
           return offers;
         });
     }
 
-    const storeOffers = JSON.parse(this._storeOffers.getItem(`storedOffers`));
+    const storeOffers = JSON.parse(this._storeOffers.getSimpleItem());
 
     return Promise.resolve(storeOffers);
   }
@@ -55,12 +55,12 @@ export default class Provider {
     if (Provider.isOnline()) {
       return this._api.getDestinations()
         .then((destinations) => {
-          this._storeDestinations.setItem(`storedDestinations`, JSON.stringify(destinations));
+          this._storeDestinations.setSimpleItem(JSON.stringify(destinations));
           return destinations;
         });
     }
 
-    const storeDestinations = JSON.parse(this._storeDestinations.getItem(`storedDestinations`));
+    const storeDestinations = JSON.parse(this._storeDestinations.getSimpleItem());
 
     return Promise.resolve(storeDestinations);
   }
@@ -88,9 +88,8 @@ export default class Provider {
         });
     }
 
-    // На случай локального создания данных мы должны сами создать `id`.
-    // Иначе наша модель будет не полной, и это может привнести баги
-    const localNewPoint = Object.assign({}, point, {id: nanoid()});
+    const localNewPointId = nanoid();
+    const localNewPoint = Object.assign({}, point, {id: localNewPointId});
 
     this._store.setItem(localNewPoint.id, PointsModel.adaptToServer(localNewPoint));
 
@@ -119,7 +118,6 @@ export default class Provider {
           const updatedTasks = getSyncedPoints(response.updated);
 
           // Добавляем синхронизированные точки в хранилище.
-          // Хранилище должно быть актуальным в любой момент.
           const items = createStoreStructure([...createdTasks, ...updatedTasks]);
 
           this._store.setItems(items);
