@@ -148,7 +148,7 @@ Promise.all([apiWithProvider.getPoints(), apiWithProvider.getOffers(), apiWithPr
   remove(loadingComponent);
   render(siteTripEventsElement, new ErrorView());
 
-  console.log(error); // eslint-disable-line
+  throw new Error(error);
 });
 
 const showOfflineFlag = () => {
