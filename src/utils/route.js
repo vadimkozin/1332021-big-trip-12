@@ -88,15 +88,13 @@ export const getRouteInfo = (routePoints) => {
     return ROUTE_INFO_BLANK;
   }
 
-  const points = routePoints.slice().sort((a, b) => a.startDate > b.startDate);
+  const points = routePoints.slice().sort((a, b) => a.startDate - b.startDate);
   const begin = formatDate.dm(points[0].startDate).toUpperCase();
   const end = formatDate.dm(points[points.length - 1].endDate).toUpperCase();
   const duration = getDuration(points[0].startDate, points[points.length - 1].endDate).toUpperCase();
 
-  // список городов(пунктов назначения) в хронологическом порядке
-  // const cities = getValuesByKey({key: `destination`, arrayObj: points});
+  // список городов(пунктов назначения)
   const cities = points.map((point) => point.destination.name);
-
 
   const total = points.reduce((sum, it) =>
     sum + it.price + it.offers.reduce((sumOffer, offer) => sumOffer + offer.price, 0)

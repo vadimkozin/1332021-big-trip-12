@@ -12,11 +12,11 @@ import PointsModel from './model/points';
 import OffersModel from './model/offers';
 import DestinationsModel from './model/destinations';
 import {MenuItem, UpdateType, FilterType} from './const';
-import Api from './api/index';
+import Api from './api/api';
 import Store from "./api/store.js";
 import Provider from "./api/provider.js";
 
-const AUTHORIZATION = `Basic qbdt45Urf&knPwsR5-7`;
+const AUTHORIZATION = `Basic qbdt45Urf&knPwsR5-9`;
 const END_POINT = `https://12.ecmascript.pages.academy/big-trip`;
 const STORE_PREFIX = `bigtrip`;
 const STORE_VER = `v12`;
@@ -48,7 +48,7 @@ const siteTripEventsElement = document.querySelector(`.trip-events`);
 const siteMenuComponent = new SiteMenuView();
 const tripInfoComponent = new TripInfoView();
 
-const filterPresenter = new FilterPresenter(siteFilterElement, models.filterModel);
+const filterPresenter = new FilterPresenter(siteFilterElement, models.filterModel, models.pointsModel);
 const tripPresenter = new TripPresenter(siteTripEventsElement, models, apiWithProvider);
 
 class MenuAddItem {
@@ -126,30 +126,29 @@ render(siteTripEventsElement, loadingComponent);
 
 render(siteMenuElement, siteMenuComponent, RenderPosition.AFTER_END);
 
-filterPresenter.init();
-
 Promise.all([apiWithProvider.getPoints(), apiWithProvider.getOffers(), apiWithProvider.getDestinations()]).then((response) => {
 
-  const [points, offers, destinations] = [...response];
+  [models.pointsModel.points,
+    models.offersModel.offers,
+    models.destinationsModel.destinations] = [...response];
 
   remove(loadingComponent);
   menuAddItem.enable();
   isLoading = false;
 
-  tripInfoComponent.init(getRouteInfo(points));
-
-  models.pointsModel.points = points;
-  models.offersModel.offers = offers;
-  models.destinationsModel.destinations = destinations;
+  filterPresenter.init();
+  tripInfoComponent.init(getRouteInfo(models.pointsModel.points));
 
   render(siteTripMainElement, tripInfoComponent, RenderPosition.AFTER_BEGIN);
   render(siteMenuElement, siteMenuComponent, RenderPosition.AFTER_END);
 
   tripPresenter.init();
 
-}).catch(() => {
+}).catch((error) => {
   remove(loadingComponent);
   render(siteTripEventsElement, new ErrorView());
+
+  console.log(error); // eslint-disable-line
 });
 
 const showOfflineFlag = () => {

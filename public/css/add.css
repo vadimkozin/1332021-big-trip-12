@@ -6,6 +6,14 @@
   text-transform: capitalize;
 }
 
+input[type="radio"]:disabled + label {
+  opacity: 0.6;
+}
+input[type="radio"]:disabled + label:hover {
+  cursor: default;
+}
+
+
 @keyframes shake {
   0%,
   100% {

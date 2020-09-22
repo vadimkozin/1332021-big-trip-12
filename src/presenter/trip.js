@@ -61,12 +61,12 @@ export default class Trip {
     this._handlers.viewAction = (actionType, updateType, update) => {
       switch (actionType) {
         case UserAction.UPDATE_POINT:
-          // debugger
           this._pointPresenter[update.id].setViewState(PointPresenterViewState.SAVING);
           this._api.updatePoint(update)
             .then((response) => {
               this._pointsModel.update(updateType, response);
               this._pointPresenter[update.id].setViewState(PointPresenterViewState.DEFAULT);
+              this._updateInfoRoute();
             }).catch(() =>{
               this._pointPresenter[update.id].setViewState(PointPresenterViewState.ABORTING);
             });
@@ -76,6 +76,7 @@ export default class Trip {
           this._api.addPoint(update)
             .then((response) => {
               this._pointsModel.add(updateType, response);
+              this._updateInfoRoute();
             })
             .catch(() => {
               this._pointNewPresenter.setAborting();
@@ -86,6 +87,7 @@ export default class Trip {
           this._api.deletePoint(update)
             .then(() => {
               this._pointsModel.delete(updateType, update);
+              this._updateInfoRoute();
             })
             .catch(() => {
               this._pointPresenter[update.id].setViewState(PointPresenterViewState.ABORTING);
@@ -129,6 +131,10 @@ export default class Trip {
 
   createPoint(callback) {
     this._pointNewPresenter.init(callback);
+  }
+
+  _updateInfoRoute() {
+    this._tripInfoComponent.init(getRouteInfo(this._pointsModel.points));
   }
 
   _renderTrip() {
