@@ -3,13 +3,13 @@ import {MONTHS, Duration, SEPARATOR, INFO_ROUTE_CITIES_MAX, Offer} from '../cons
 import {addZeros, formatDate, getValuesByKey} from './common';
 
 export const DESTINATION_BLANK = {
-  name: `?`,
+  name: ``,
   pictures: [{src: `#`, description: ``}],
   description: ``,
 };
 
 export const POINT_BLANK = {
-  type: Offer.TRANSFERS[0],
+  type: Offer.TRANSFERS[1],
   startDate: new Date(),
   endDate: new Date(),
   destination: DESTINATION_BLANK,

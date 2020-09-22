@@ -254,9 +254,17 @@ export default class Trip {
       .forEach((presenter) => presenter.destroy());
     this._pointPresenter = {};
 
-    remove(this._sortComponent);
-    remove(this._noTripComponent);
-    remove(this._tripDaysComponent);
+    if (this._sortComponent) {
+      remove(this._sortComponent);
+    }
+
+    if (this._noTripComponent) {
+      remove(this._noTripComponent);
+    }
+
+    if (this._tripDaysComponent) {
+      remove(this._tripDaysComponent);
+    }
 
     if (resetSortType) {
       this._currentSortType = SortType.DEFAULT;
