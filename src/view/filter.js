@@ -16,10 +16,10 @@ const createFilterItemTemplate = (filter, currentFilter) => {
 };
 
 const createFilterTemplate = (currentFilter, filters) => {
-  const itemsFilter = filters.map((filter) => createFilterItemTemplate(filter, currentFilter)).join(``);
+  const itemsFilterTemplate = filters.map((filter) => createFilterItemTemplate(filter, currentFilter)).join(``);
 
   return `<form class="trip-filters" action="#" method="get">
-            ${itemsFilter}
+            ${itemsFilterTemplate}
             <button class="visually-hidden" type="submit">Accept filter</button>
           </form>`;
 };
@@ -36,16 +36,6 @@ export default class Filter extends AbstractView {
     return createFilterTemplate(this._currentFilter, this._filters);
   }
 
-  _filterTypeChangeHandler(evt) {
-    evt.preventDefault();
-
-    if (evt.target.type !== `radio`) {
-      return;
-    }
-
-    this._callback.filterTypeChange(evt.target.value);
-  }
-
   setFilterTypeChangeHandler(callback) {
     this._callback.filterTypeChange = callback;
     this.getElement().addEventListener(`change`, this._filterTypeChangeHandler);
@@ -55,6 +45,16 @@ export default class Filter extends AbstractView {
     const element = this.getElement().querySelector(`#filter-${filterName}`);
     element.setAttribute(`disabled`, `disabled`);
     element.removeAttribute(`checked`);
+  }
+
+  _filterTypeChangeHandler(evt) {
+    evt.preventDefault();
+
+    if (evt.target.type !== `radio`) {
+      return;
+    }
+
+    this._callback.filterTypeChange(evt.target.value);
   }
 
 }

@@ -1,7 +1,7 @@
-import FilterView from "../view/filter";
+import FilterView from '../view/filter';
 import {render, replace, remove, RenderPosition} from '../utils/render';
-import {FilterType, UpdateType} from "../const.js";
-import {filter} from "../utils/filter";
+import {FilterType, UpdateType} from '../const';
+import {filter} from '../utils/filter';
 
 
 export default class Filter {
@@ -11,7 +11,6 @@ export default class Filter {
     this._pointsModel = pointsModel;
 
     this._currentFilter = null;
-
     this._component = null;
 
     this._handleModelEvent = this._handleModelEvent.bind(this);

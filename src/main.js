@@ -18,11 +18,15 @@ import Provider from "./api/provider.js";
 
 const AUTHORIZATION = `Basic qbdt45Urf&knPwsR5-9`;
 const END_POINT = `https://12.ecmascript.pages.academy/big-trip`;
+
 const STORE_PREFIX = `bigtrip`;
 const STORE_VER = `v12`;
-const STORE_POINTS = `${STORE_PREFIX}-points-${STORE_VER}`;
-const STORE_OFFERS = `${STORE_PREFIX}-offers-${STORE_VER}`;
-const STORE_DESTINATIONS = `${STORE_PREFIX}-dest-${STORE_VER}`;
+
+const getStore = (item, prefix = STORE_PREFIX, ver = STORE_VER) => `${prefix}-${item}-${ver}`;
+
+const STORE_POINTS = getStore(`points`);
+const STORE_OFFERS = getStore(`offers`);
+const STORE_DESTINATIONS = getStore(`dest`);
 
 let isLoading = true;
 
@@ -148,7 +152,11 @@ Promise.all([apiWithProvider.getPoints(), apiWithProvider.getOffers(), apiWithPr
   remove(loadingComponent);
   render(siteTripEventsElement, new ErrorView());
 
-  throw new Error(error);
+  if (error.stack) {
+    throw new Error(error.stack);
+  } else {
+    throw new Error(error);
+  }
 });
 
 const showOfflineFlag = () => {

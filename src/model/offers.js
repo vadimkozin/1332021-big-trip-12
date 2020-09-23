@@ -1,5 +1,6 @@
 import {Offer} from '../const';
 
+
 export default class Offers {
   constructor(offers) {
     this._offers = offers ? Offers.setTypePoint(offers.slice()) : null;

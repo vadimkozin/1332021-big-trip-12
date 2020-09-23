@@ -18,11 +18,11 @@ const getSortItem = (sort, currentSort) => {
 };
 
 const createSortTemplate = (currentSort) => {
-  const itemsSort = Object.values(SortType).map((sort) => getSortItem(sort, currentSort)).join(``);
+  const itemsSortTemplate = Object.values(SortType).map((sort) => getSortItem(sort, currentSort)).join(``);
 
   return `<form class="trip-events__trip-sort  trip-sort" action="#" method="get">\n
       <span class="trip-sort__item  trip-sort__item--day">Day</span>\n
-      ${itemsSort}
+      ${itemsSortTemplate}
       <span class="trip-sort__item  trip-sort__item--offers">Offers</span>\n
     </form>`;
 };
@@ -39,6 +39,11 @@ export default class Sort extends AbstractView {
     return createSortTemplate(this._currentSort);
   }
 
+  setSortTypeChangeHandler(callback) {
+    this._callback.sortTypeChange = callback;
+    this.getElement().addEventListener(`change`, this._sortTypeChangeHandler);
+  }
+
   _sortTypeChangeHandler(evt) {
     if (evt.target.type !== `radio`) {
       return;
@@ -46,10 +51,5 @@ export default class Sort extends AbstractView {
 
     evt.preventDefault();
     this._callback.sortTypeChange(evt.target.value);
-  }
-
-  setSortTypeChangeHandler(callback) {
-    this._callback.sortTypeChange = callback;
-    this.getElement().addEventListener(`change`, this._sortTypeChangeHandler);
   }
 }

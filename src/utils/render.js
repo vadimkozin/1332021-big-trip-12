@@ -1,4 +1,4 @@
-import Abstract from "../view/abstract.js";
+import Abstract from '../view/abstract';
 
 export const RenderPosition = {
   BEFORE_BEGIN: `beforebegin`,

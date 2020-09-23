@@ -115,15 +115,6 @@ export const sortPrice = (a, b) => b.price - a.price;
 export const sortTime = (a, b) => (b.endDate - b.startDate) - (a.endDate - a.startDate);
 export const sortDays = (a, b) => a.startDate - b.startDate;
 
-// фильтры: всё, запланированно, пройдено
-// Это не перечисления, это то, что автор называет: объектами-неймспейсами (критерий Б16)
-// https://up.htmlacademy.ru/ecmascript/12/criteries#b16
-export const filterRoute = {
-  everything: (points) => points,
-  future: (points) => points.filter((it) => it.startDate.getTime() > Date.now()),
-  past: (points) => points.filter((it) => it.endDate.getTime() < Date.now()),
-};
-
 // установка порядкового номера дня для каждой точки маршрута (мутация)
 export const setOrdinalDaysRoute = (points) => {
   points.sort((a, b) => a.startDate - b.startDate);

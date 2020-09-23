@@ -19,7 +19,6 @@ export default class DayInfo extends AbstractView {
   }
 
   getTemplate() {
-    // return createDayInfoTemplate(this._dayInOrder, this._date);
     return this.isDayWithoutInfo
       ? createDayWithoutInfoTemplate()
       : createDayInfoTemplate(this._dayInOrder, this._date);

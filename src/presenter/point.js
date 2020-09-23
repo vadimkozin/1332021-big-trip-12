@@ -1,8 +1,9 @@
 import TripEventsItemView from '../view/trip-events-item';
 import TripEditView from '../view/trip-edit';
 import {render, replace, remove} from '../utils/render';
-import {ESCAPE_CODE, Offer} from '../const';
-import {UserAction, UpdateType} from "../const.js";
+import {ESCAPE_CODE, Offer, UserAction, UpdateType} from '../const';
+import {bindHandlers} from "../utils/common";
+
 
 const Mode = {
   DEFAULT: `DEFAULT`,
@@ -26,12 +27,7 @@ export default class Point {
     this._pointEditComponent = null;
     this._mode = Mode.DEFAULT;
 
-    this._handleEditClick = this._handleEditClick.bind(this);
-    this._handleFavoriteClick = this._handleFavoriteClick.bind(this);
-    this._handleFormSubmit = this._handleFormSubmit.bind(this);
-    this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
-    this._handleFormDelete = this._handleFormDelete.bind(this);
-    this._handleFormClose = this._handleFormClose.bind(this);
+    this._setHandlers();
   }
 
   init(point, isRedraw = true) {
@@ -60,44 +56,6 @@ export default class Point {
   destroy() {
     remove(this._pointComponent);
     remove(this._pointEditComponent);
-  }
-
-  _initSavePrev() {
-    this._prev = {
-      pointComponent: this._pointComponent,
-      pointEditComponent: this._pointEditComponent,
-    };
-  }
-
-  _initSetHandlers() {
-    this._pointComponent.setEditClickHandler(this._handleEditClick);
-    this._pointEditComponent.setFormSubmitHandler(this._handleFormSubmit);
-    this._pointEditComponent.setFavoriteClickHander(this._handleFavoriteClick);
-    this._pointEditComponent.setFormDeleteHandler(this._handleFormDelete);
-    this._pointEditComponent.setFormCloseHandler(this._handleFormClose);
-
-  }
-
-  _initIsFirstCall() {
-    return !Object.values(this._prev).every(Boolean);
-  }
-
-  _initReplaceComponent() {
-    if (this._mode === Mode.DEFAULT) {
-      replace(this._pointComponent, this._prev.pointComponent);
-    }
-
-    if (this._mode === Mode.EDITTING) {
-      replace(this._pointComponent, this._prev.pointEditComponent);
-      this._mode = Mode.DEFAULT;
-    }
-  }
-
-  _initRemovePrev() {
-    Object.keys(this._prev).forEach((component) => {
-      remove(this._prev[component]);
-      this._prev[component] = null;
-    });
   }
 
   resetView() {
@@ -151,58 +109,99 @@ export default class Point {
     }
   }
 
+  _initSavePrev() {
+    this._prev = {
+      pointComponent: this._pointComponent,
+      pointEditComponent: this._pointEditComponent,
+    };
+  }
+
+  _initSetHandlers() {
+    this._pointComponent.setEditClickHandler(this._handlers.editClick);
+    this._pointEditComponent.setFormSubmitHandler(this._handlers.formSubmit);
+    this._pointEditComponent.setFavoriteClickHander(this._handlers.favoriteClick);
+    this._pointEditComponent.setFormDeleteHandler(this._handlers.formDelete);
+    this._pointEditComponent.setFormCloseHandler(this._handlers.formClose);
+  }
+
+  _initIsFirstCall() {
+    return !Object.values(this._prev).every(Boolean);
+  }
+
+  _initReplaceComponent() {
+    if (this._mode === Mode.DEFAULT) {
+      replace(this._pointComponent, this._prev.pointComponent);
+    }
+
+    if (this._mode === Mode.EDITTING) {
+      replace(this._pointComponent, this._prev.pointEditComponent);
+      this._mode = Mode.DEFAULT;
+    }
+  }
+
+  _initRemovePrev() {
+    Object.keys(this._prev).forEach((component) => {
+      remove(this._prev[component]);
+      this._prev[component] = null;
+    });
+  }
+
   _replaceViewToForm() {
     replace(this._pointEditComponent, this._pointComponent);
-    document.addEventListener(`keydown`, this._escKeyDownHandler);
+    document.addEventListener(`keydown`, this._handlers.escKeyDown);
     this._changeMode();
     this._mode = Mode.EDITTING;
   }
 
   _replaceFormToView() {
     replace(this._pointComponent, this._pointEditComponent);
-    document.removeEventListener(`keydown`, this._escKeyDownHandler);
+    document.removeEventListener(`keydown`, this._handlers.escKeyDown);
     this._mode = Mode.DEFAULT;
   }
 
-  _escKeyDownHandler(evt) {
-    if (evt.keyCode === ESCAPE_CODE) {
-      evt.preventDefault();
-      this._pointEditComponent.reset(this._point);
+  _setHandlers() {
+    this._handlers = {};
+
+    this._handlers.editClick = () => {
+      this._replaceViewToForm();
+    };
+
+    this._handlers.favoriteClick = () => {
+      this._changeData(
+          UserAction.UPDATE_POINT,
+          UpdateType.PATCH,
+          Object.assign(
+              {},
+              this._point,
+              {
+                isFavorite: !this._point.isFavorite
+              }
+          )
+      );
+    };
+
+    this._handlers.formSubmit = (point) => {
+      this._changeData(UserAction.UPDATE_POINT, UpdateType.MINOR, point);
+    };
+
+    this._handlers.escKeyDown = (evt) => {
+      if (evt.keyCode === ESCAPE_CODE) {
+        evt.preventDefault();
+        this._pointEditComponent.reset(this._point);
+        this._replaceFormToView();
+      }
+    };
+
+    this._handlers.formDelete = (point) => {
+      this._changeData(UserAction.DELETE_POINT, UpdateType.MINOR, point);
+    };
+
+    this._handlers.formClose = (point) => {
+      this._pointEditComponent.reset(point);
       this._replaceFormToView();
-    }
-  }
+    };
 
-  _handleFormClose(point) {
-    this._pointEditComponent.reset(point);
-    this._replaceFormToView();
-  }
-
-  _handleFormSubmit(point) {
-    this._changeData(UserAction.UPDATE_POINT, UpdateType.MINOR, point);
-    // this._replaceFormToView();
-  }
-
-  _handleFormDelete(point) {
-    this._changeData(UserAction.DELETE_POINT, UpdateType.MINOR, point);
-  }
-
-  _handleFavoriteClick() {
-    this._changeData(
-        UserAction.UPDATE_POINT,
-        UpdateType.PATCH,
-        Object.assign(
-            {},
-            this._point,
-            {
-              isFavorite: !this._point.isFavorite
-            }
-        )
-    );
-  }
-
-  _handleEditClick() {
-    this._replaceViewToForm();
+    bindHandlers(this._handlers, this);
   }
 
 }
-

@@ -1,7 +1,6 @@
 import moment from 'moment';
 import {Offer} from '../const';
 
-
 const makeItemsUniq = (items) => [...new Set(items)];
 
 const calcTotalSumma = (points) => points.reduce((sum, it) => sum + it.price, 0);
@@ -46,19 +45,6 @@ export default class StatInfo {
     this._calcTimeSpend();
   }
 
-  _calcMoney() {
-    const types = makeItemsUniq(this._points.map((point) => point.type));
-
-    this._money = types.reduce((acc, type) => {
-      const pointsByType = this._points.filter((point) => point.type === type);
-
-      const cost = calcTotalSumma(pointsByType);
-      this._totalCost += cost;
-
-      return Object.assign(acc, {[type]: cost});
-    }, {});
-  }
-
   getMoney() {
     const sortedTypesByValue = sortObjectByValues(this._money);
     const types = sortedTypesByValue.map((type) => Object.keys(type)[0]);
@@ -70,17 +56,6 @@ export default class StatInfo {
       count: types.length,
       total: this._totalCost,
     };
-  }
-
-  _calcTransport() {
-    const vehicles = this._points
-      .filter((point) => Offer.TRANSFERS.includes(point.type))
-      .map((point) => point.type);
-
-    this._transport = vehicles.reduce((acc, vehicle) => {
-      const countType = this._points.reduce((count, point) => point.type === vehicle ? count + 1 : count, 0);
-      return Object.assign(acc, {[vehicle]: countType});
-    }, {});
   }
 
   getTransport() {
@@ -95,19 +70,6 @@ export default class StatInfo {
     };
   }
 
-  _calcTimeSpend() {
-    const types = makeItemsUniq(this._points.map((point) => point.type));
-
-    this._timeSpend = types.reduce((acc, type) => {
-      const pointsByType = this._points.filter((point) => point.type === type);
-
-      const duration = calcTotalDuration(pointsByType);
-      this._totalDuration += duration;
-
-      return Object.assign(acc, {[type]: duration});
-    }, {});
-  }
-
   getTimeSpend() {
     const sortedTypesByValue = sortObjectByValues(this._timeSpend);
     const types = sortedTypesByValue.map((type) => Object.keys(type)[0]);
@@ -120,6 +82,43 @@ export default class StatInfo {
       durationsInHours,
       count: types.length,
     };
+  }
+
+  _calcMoney() {
+    const types = makeItemsUniq(this._points.map((point) => point.type));
+
+    this._money = types.reduce((acc, type) => {
+      const pointsByType = this._points.filter((point) => point.type === type);
+
+      const cost = calcTotalSumma(pointsByType);
+      this._totalCost += cost;
+
+      return Object.assign(acc, {[type]: cost});
+    }, {});
+  }
+
+  _calcTransport() {
+    const vehicles = this._points
+      .filter((point) => Offer.TRANSFERS.includes(point.type))
+      .map((point) => point.type);
+
+    this._transport = vehicles.reduce((acc, vehicle) => {
+      const countType = this._points.reduce((count, point) => point.type === vehicle ? count + 1 : count, 0);
+      return Object.assign(acc, {[vehicle]: countType});
+    }, {});
+  }
+
+  _calcTimeSpend() {
+    const types = makeItemsUniq(this._points.map((point) => point.type));
+
+    this._timeSpend = types.reduce((acc, type) => {
+      const pointsByType = this._points.filter((point) => point.type === type);
+
+      const duration = calcTotalDuration(pointsByType);
+      this._totalDuration += duration;
+
+      return Object.assign(acc, {[type]: duration});
+    }, {});
   }
 }
 

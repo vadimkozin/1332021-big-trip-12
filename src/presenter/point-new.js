@@ -1,9 +1,7 @@
 import TripEditView from '../view/trip-edit';
-import {remove, render, RenderPosition} from "../utils/render.js";
-import {UserAction, UpdateType} from "../const.js";
-import {ESCAPE_CODE} from "../const";
-import {Offer} from "../const";
-import {POINT_BLANK} from "../utils/route";
+import {remove, render, RenderPosition} from '../utils/render';
+import {UserAction, UpdateType, ESCAPE_CODE, Offer} from '../const';
+import {POINT_BLANK} from '../utils/route';
 
 
 export default class PointNew {

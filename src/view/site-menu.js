@@ -1,5 +1,5 @@
 import AbstractView from './abstract';
-import {MenuItem} from "../const";
+import {MenuItem} from '../const';
 
 const createSiteMenuTemplate = () =>
   `<nav class="trip-controls__trip-tabs  trip-tabs">
@@ -25,19 +25,9 @@ export default class SiteMenu extends AbstractView {
     return createSiteMenuTemplate();
   }
 
-  _menuClickHandler(evt) {
-    evt.preventDefault();
-    this._callback.menuClick(evt.target.name);
-  }
-
   setMenuClickHandler(callback) {
     this._callback.menuClick = callback;
     this.getElement().addEventListener(`click`, this._menuClickHandler);
-  }
-
-  _addMenuClickHandler(evt) {
-    evt.preventDefault();
-    this._callback.addMenuClick(this._nameAddMenuItem);
   }
 
   addMenuClickHandler(callback, element, nameAddMenuItem) {
@@ -55,5 +45,15 @@ export default class SiteMenu extends AbstractView {
     if (item !== null) {
       item.classList.add(this._active);
     }
+  }
+
+  _menuClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.menuClick(evt.target.name);
+  }
+
+  _addMenuClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.addMenuClick(this._nameAddMenuItem);
   }
 }

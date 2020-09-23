@@ -108,7 +108,6 @@ const createSectionOffers = (point, offersModel) => {
     </section>`;
 };
 
-
 const createSectionDestination = (point) => {
   const description = point[Smart.DESTINATION] ? point[Smart.DESTINATION].description : point.destination.description;
   const photos = point[Smart.DESTINATION] ? point[Smart.DESTINATION].pictures : point.destination.pictures;
@@ -118,16 +117,16 @@ const createSectionDestination = (point) => {
     return ``;
   }
 
-  let photosContainer = ``;
+  let photosTemplate = ``;
 
   if (isPhotos) {
-    const photoList = photos.map((photo) =>
+    const photoListTemplate = photos.map((photo) =>
       `<img class="event__photo" src="${photo.src}" alt="${photo.description}"></img>`).join(``);
 
-    photosContainer =
+    photosTemplate =
       `<div class="event__photos-container">
         <div class="event__photos-tape">
-        ${photoList}
+        ${photoListTemplate}
         </div>
       </div>`;
   }
@@ -136,10 +135,9 @@ const createSectionDestination = (point) => {
     <section class="event__section  event__section--destination">
       <h3 class="event__section-title  event__section-title--destination">Destination</h3>
       <p class="event__destination-description">${description}</p>
-      ${photosContainer}
+      ${photosTemplate}
     </section>`;
 };
-
 
 const createTripEditTemplate = (point, eventsTransfer, eventsActivity, isNewPoint, models) => {
   const favoriteChecked = getIsFavorite(point) ? `checked` : ``;
@@ -228,7 +226,6 @@ const createTripEditTemplate = (point, eventsTransfer, eventsActivity, isNewPoin
 </form>`;
 };
 
-
 export default class TripEdit extends SmartView {
   constructor({point, eventsTransfer, eventsActivity, isNewPoint = false, models} = {}) {
     super();
@@ -271,6 +268,28 @@ export default class TripEdit extends SmartView {
     this.setFormCloseHandler(this._callback.formClose);
     this.setFavoriteClickHander(this._callback.favoriteClick);
     this._setDatepicker();
+  }
+
+  setFormSubmitHandler(callback) {
+    this._callback.formSubmit = callback;
+    this.getElement().addEventListener(`submit`, this._handlers.formSubmit);
+  }
+
+  setFormDeleteHandler(callback) {
+    this._callback.formDelete = callback;
+    this.getElement().addEventListener(`reset`, this._handlers.formDelete);
+  }
+
+  setFavoriteClickHander(callback) {
+    this._callback.favoriteClick = callback;
+    this.getElement()
+      .querySelector(`.event__favorite-checkbox`)
+      .addEventListener(`change`, this._handlers.favorite);
+  }
+
+  setFormCloseHandler(callback) {
+    this._callback.formClose = callback;
+    this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, this._handlers.formClose);
   }
 
   _setDatepicker() {
@@ -432,28 +451,6 @@ export default class TripEdit extends SmartView {
     this.getElement().querySelector(`.event__available-offers`)
         .addEventListener(`click`, this._handlers.offer);
 
-  }
-
-  setFormSubmitHandler(callback) {
-    this._callback.formSubmit = callback;
-    this.getElement().addEventListener(`submit`, this._handlers.formSubmit);
-  }
-
-  setFormDeleteHandler(callback) {
-    this._callback.formDelete = callback;
-    this.getElement().addEventListener(`reset`, this._handlers.formDelete);
-  }
-
-  setFavoriteClickHander(callback) {
-    this._callback.favoriteClick = callback;
-    this.getElement()
-      .querySelector(`.event__favorite-checkbox`)
-      .addEventListener(`change`, this._handlers.favorite);
-  }
-
-  setFormCloseHandler(callback) {
-    this._callback.formClose = callback;
-    this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, this._handlers.formClose);
   }
 
   static parsePointToData(point) {
