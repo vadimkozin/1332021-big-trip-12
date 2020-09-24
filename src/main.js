@@ -152,11 +152,8 @@ Promise.all([apiWithProvider.getPoints(), apiWithProvider.getOffers(), apiWithPr
   remove(loadingComponent);
   render(siteTripEventsElement, new ErrorView());
 
-  if (error.stack) {
-    throw new Error(error.stack);
-  } else {
-    throw new Error(error);
-  }
+  const errorMessage = error.stack || error;
+  throw new Error(errorMessage);
 });
 
 const showOfflineFlag = () => {
@@ -169,10 +166,8 @@ window.addEventListener(`load`, () => {
   }
 
   navigator.serviceWorker.register(`/sw.js`)
-    .then(() => {
-      console.log(`ServiceWorker available`); // eslint-disable-line
-    }).catch(() => {
-      console.error(`ServiceWorker isn't available`); // eslint-disable-line
+    .catch(() => {
+      throw new Error(`ServiceWorker isn't available`);
     });
 });
 

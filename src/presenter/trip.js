@@ -13,7 +13,6 @@ import {setOrdinalDaysRoute, getDaysRoute, sortPrice, sortTime, sortDays, getRou
 import {bindHandlers} from '../utils/common';
 import {filter} from '../utils/filter';
 
-
 export default class Trip {
   constructor(tripContainer, models, api) {
     this._tripContainer = tripContainer;
@@ -64,7 +63,6 @@ export default class Trip {
   _renderTrip() {
     this._points = this._getPoints();
 
-    // обновление стоимости маршрута
     this._tripInfoComponent.totalSumma = getRouteInfo(this._points).total;
 
     if (!this._points.length) {
@@ -83,50 +81,37 @@ export default class Trip {
       return;
     }
 
-    // элементы маршрута
     render(this._tripContainer, this._tripDaysComponent);
-
-    // день
     render(this._tripDaysComponent, this._tripDaysItemComponent);
     render(this._tripDaysItemComponent, this._dayWithoutInfoComponent);
-
-    // контейнер для точек маршрута
     render(this._tripDaysItemComponent, this._tripEventsListComponent);
 
-    // точки маршрута
     this._points.forEach((point) => {
       this._renderPoint(this._tripEventsListComponent, point);
     });
   }
 
   _renderTripByDays() {
-    setOrdinalDaysRoute(this._points); // мутирую
+    setOrdinalDaysRoute(this._points);
 
     const days = getDaysRoute(this._points);
-
-    // элементы маршрута
     const tripDaysElement = this._tripDaysComponent.getElement();
 
     render(this._tripContainer, this._tripDaysComponent);
 
     days.forEach((day) => {
-      // точки за день
       const pointsOfDay = this._points.filter((point) => point.order === day);
 
-      // день
       render(tripDaysElement, new TripDaysItemView());
 
       const tripDaysItemElement = tripDaysElement.querySelector(`.trip-days__item:nth-child(${day})`);
 
-      // инфо по дню
       render(tripDaysItemElement, new DayInfoView({date: pointsOfDay[0].startDate, dayInOrder: day}));
 
-      // контейнер для точек маршрута за текущий день
       const tripListElement = new TripEventsListView();
 
       render(tripDaysItemElement, tripListElement);
 
-      // точки маршрута за день
       pointsOfDay.forEach((point) => {
         this._renderPoint(tripListElement, point);
       });
@@ -167,12 +152,6 @@ export default class Trip {
     this._sortComponent = new SortView(this._currentSortType);
     this._sortComponent.setSortTypeChangeHandler(this._handlers.sortTypeChange);
     render(this._tripContainer, this._sortComponent);
-  }
-
-  _clearTripList() {
-    this._tripDaysComponent.getElement().innerHTML = ``;
-    this._tripDaysItemComponent.getElement().innerHTML = ``;
-    this._tripEventsListComponent.getElement().innerHTML = ``;
   }
 
   _clear({resetSortType = false} = {}) {

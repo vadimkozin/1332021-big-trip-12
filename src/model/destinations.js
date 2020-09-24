@@ -19,8 +19,4 @@ export default class Destinations {
     return this._destinations.find((destination) => destination.name === name);
   }
 
-  getPicturesByName(name) {
-    return this._destinations.find((destination) => destination.name === name).pictures;
-  }
-
 }

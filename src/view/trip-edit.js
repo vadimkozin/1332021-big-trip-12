@@ -64,13 +64,7 @@ const getStartDateFormat = (point) => format.dmy(getStartDate(point));
 
 const getEndDateFormat = (point) => format.dmy(getEndDate(point));
 
-const getIsFavorite = (point) => {
-  if (point[Smart.IS_FAVORITE] !== null) {
-    return point[Smart.IS_FAVORITE];
-  } else {
-    return point.isFavorite;
-  }
-};
+const getIsFavorite = (point) => point[Smart.IS_FAVORITE] !== null ? point[Smart.IS_FAVORITE] : point.isFavorite;
 
 const createSectionOffers = (point, offersModel) => {
 

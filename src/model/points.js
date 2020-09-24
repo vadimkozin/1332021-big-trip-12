@@ -1,6 +1,5 @@
 import Observer from '../utils/observer';
 
-
 export default class Points extends Observer {
   constructor(points) {
     super();

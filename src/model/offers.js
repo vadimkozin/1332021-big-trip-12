@@ -1,6 +1,5 @@
 import {Offer} from '../const';
 
-
 export default class Offers {
   constructor(offers) {
     this._offers = offers ? Offers.setTypePoint(offers.slice()) : null;
@@ -16,18 +15,6 @@ export default class Offers {
 
   getByType(type) {
     return this._offers.find((offer) => offer.type === type.toLowerCase()).offers;
-  }
-
-  getTypes() {
-    return this._offers.map((offer) => offer.type);
-  }
-
-  getTransferTypes() {
-    return this._offers.filter((offer) => offer.isTransfer).map((offer) => offer.type);
-  }
-
-  getNoTransferTypes() {
-    return this._offers.filter((offer) => !offer.isTransfer).map((offer) => offer.type);
   }
 
   static setTypePoint(offers) {

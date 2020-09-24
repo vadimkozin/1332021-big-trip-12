@@ -4,10 +4,9 @@ import {render, replace, remove} from '../utils/render';
 import {ESCAPE_CODE, Offer, UserAction, UpdateType} from '../const';
 import {bindHandlers} from "../utils/common";
 
-
 const Mode = {
   DEFAULT: `DEFAULT`,
-  EDITTING: `EDITTING`,
+  EDITING: `EDITING`,
 };
 
 export const State = {
@@ -133,7 +132,7 @@ export default class Point {
       replace(this._pointComponent, this._prev.pointComponent);
     }
 
-    if (this._mode === Mode.EDITTING) {
+    if (this._mode === Mode.EDITING) {
       replace(this._pointComponent, this._prev.pointEditComponent);
       this._mode = Mode.DEFAULT;
     }
@@ -150,7 +149,7 @@ export default class Point {
     replace(this._pointEditComponent, this._pointComponent);
     document.addEventListener(`keydown`, this._handlers.escKeyDown);
     this._changeMode();
-    this._mode = Mode.EDITTING;
+    this._mode = Mode.EDITING;
   }
 
   _replaceFormToView() {

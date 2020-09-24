@@ -11,10 +11,8 @@ const calcTotalDuration = (points) => {
   , 0);
 };
 
-// {k1:v1, k2:v2, k3:v3} --> [{k1:v1}, {k2:v2}, {k3:v3}]
 const objectToArray = (object) => Object.entries(object).map(([key, value]) => ({[key]: value}));
 
-// [{a: 2}, {b: 15}, {c: 10}] -> [{b: 15}, {c: 10}, {a: 2}]
 const sortObjectByValues = (object, sortDescending = true) => {
   const array = objectToArray(object);
 
@@ -32,9 +30,6 @@ export default class StatInfo {
   constructor(points) {
     this._points = points;
     this._totalCost = 0;
-    this._totalCost2 = 0;
-
-    this._totalDuration = 0;
 
     this._money = {};
     this._transport = {};
@@ -115,7 +110,6 @@ export default class StatInfo {
       const pointsByType = this._points.filter((point) => point.type === type);
 
       const duration = calcTotalDuration(pointsByType);
-      this._totalDuration += duration;
 
       return Object.assign(acc, {[type]: duration});
     }, {});

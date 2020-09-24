@@ -3,10 +3,9 @@ import {remove, render, RenderPosition} from '../utils/render';
 import {UserAction, UpdateType, ESCAPE_CODE, Offer} from '../const';
 import {POINT_BLANK} from '../utils/route';
 
-
 export default class PointNew {
-  constructor(contaiter, changeData, models) {
-    this._contaiter = contaiter;
+  constructor(container, changeData, models) {
+    this._container = container;
     this._changeData = changeData;
     this._models = models;
 
@@ -32,7 +31,7 @@ export default class PointNew {
     this._pointEditComponent.setFormSubmitHandler(this._handleFormSubmit);
     this._pointEditComponent.setFormDeleteHandler(this._handleFormDelete);
 
-    render(this._contaiter, this._pointEditComponent, RenderPosition.AFTER_BEGIN);
+    render(this._container, this._pointEditComponent, RenderPosition.AFTER_BEGIN);
 
     document.addEventListener(`keydown`, this._escKeyDownHandler);
   }

@@ -26,11 +26,9 @@ const ROUTE_INFO_BLANK = {
   total: 0
 };
 
-// возвращает уникальные дни маршрута: [1,2,..]
 export const getDaysRoute = (points) =>
   [...new Set(getValuesByKey({key: `order`, arrayObj: points}))];
 
-// возвращает продолжительность маршрута в формате: "23M" or "02H 44M" or "01D 02H 30M"
 export const getDurationRoute = (milliseconds) => {
   const duration = moment.duration(milliseconds);
 
@@ -47,7 +45,6 @@ export const getDurationRoute = (milliseconds) => {
   return `${days}D ${hours}H ${minutes}M`;
 };
 
-// возвращает время маршрута в формате: начало-окончание: '10:30 - 11:00'
 const getTimeRoute = (startDate, endDate) => {
   const start = new Date(startDate);
   const end = new Date(endDate);
@@ -58,8 +55,6 @@ const getTimeRoute = (startDate, endDate) => {
   return `${from} - ${to}`;
 };
 
-// возвращает разницу dateEnd-dateStart в виде объекта {time, duration}
-// например:  {time: '10:30-11:00', duration: '30М'}
 export const getTimeAndDuration = (dateStart = new Date(), dateEnd = new Date()) => (
   {
     duration: getDurationRoute(dateEnd - dateStart),
@@ -67,22 +62,20 @@ export const getTimeAndDuration = (dateStart = new Date(), dateEnd = new Date())
   }
 );
 
-// возвращает продолжительность маршрута в виде: "18 AUG--6 OCT" или "MAR 18--20"
 const getDuration = (startDate, endDate, separator = SEPARATOR) => {
   const isOneMonth = startDate.getMonth() === endDate.getMonth() && startDate.getFullYear() === endDate.getFullYear();
   const isOneDay = isOneMonth && startDate.getDate() === endDate.getDate();
 
-  if (isOneDay) { // 18 AUG
+  if (isOneDay) {
     return `${formatDate.dm(startDate)}`;
-  } else if (isOneMonth) { // AUG 18--20
+  } else if (isOneMonth) {
     return `${MONTHS[startDate.getMonth()]} ${startDate.getDate()}${separator}${endDate.getDate()}`;
-  } else { // 18 AUG--6 OCT
+  } else {
     return `${MONTHS[startDate.getMonth()]} ${startDate.getDate()}${separator}${endDate.getDate()} ${MONTHS[endDate.getMonth()]}`;
   }
 
 };
 
-// возвращает инфо по маршруту
 export const getRouteInfo = (routePoints) => {
   if (!routePoints.length) {
     return ROUTE_INFO_BLANK;
@@ -92,8 +85,6 @@ export const getRouteInfo = (routePoints) => {
   const begin = formatDate.dm(points[0].startDate).toUpperCase();
   const end = formatDate.dm(points[points.length - 1].endDate).toUpperCase();
   const duration = getDuration(points[0].startDate, points[points.length - 1].endDate).toUpperCase();
-
-  // список городов(пунктов назначения)
   const cities = points.map((point) => point.destination.name);
 
   const total = points.reduce((sum, it) =>
@@ -115,7 +106,6 @@ export const sortPrice = (a, b) => b.price - a.price;
 export const sortTime = (a, b) => (b.endDate - b.startDate) - (a.endDate - a.startDate);
 export const sortDays = (a, b) => a.startDate - b.startDate;
 
-// установка порядкового номера дня для каждой точки маршрута (мутация)
 export const setOrdinalDaysRoute = (points) => {
   points.sort((a, b) => a.startDate - b.startDate);
 
@@ -142,10 +132,8 @@ const namesToActionMap = Object.assign({},
     getMap(Offer.TRANSFERS, Offer.ACTION.TRANSFER),
     getMap(Offer.ACTIVITIES, Offer.ACTION.ACTIVITY));
 
-// возвращает название события в виде: 'Taxi to Amsterdam' || 'Restaurant in Geneva'
 export const getEventTitle = (type, destination) => getEventInfo(type, destination);
 
-// возвращает название события в виде: 'Taxi to' || 'Restaurant in'
 export const getEventType = (type) => getEventInfo(type);
 
 const getEventInfo = (type, destination) => {
@@ -154,4 +142,3 @@ const getEventInfo = (type, destination) => {
     ? `${type} ${action} ${destination}`
     : `${type} ${action}`;
 };
-

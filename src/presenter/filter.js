@@ -3,7 +3,6 @@ import {render, replace, remove, RenderPosition} from '../utils/render';
 import {FilterType, UpdateType} from '../const';
 import {filter} from '../utils/filter';
 
-
 export default class Filter {
   constructor(container, filterModel, pointsModel) {
     this._container = container;

@@ -9,25 +9,18 @@ export const Offer = {
   }
 };
 
-export const Time = {
-  ADD_MINUTES: `minutes`,
-  ADD_HOURS: `hours`,
-  ADD_DAYS: `days`,
-  ADD_HOURS_AND_MINUTES: `hoursminutes`,
-};
-
 export const Duration = {
-  MSEC_PER_MINUTE: 60 * 1000, // миллисекунд в минуте
-  MSEC_PER_HOUR: 60 * 60 * 1000, // миллисекунд в часе
-  MSEC_PER_DAY: 60 * 60 * 1000 * 24, // миллисекунд в сутках
-  MINUTES_PER_HOUR: 60, // минут в часе
-  HOURS_PER_DAY: 24, // часов в дне
+  MSEC_PER_MINUTE: 60 * 1000,
+  MSEC_PER_HOUR: 60 * 60 * 1000,
+  MSEC_PER_DAY: 60 * 60 * 1000 * 24,
+  MINUTES_PER_HOUR: 60,
+  HOURS_PER_DAY: 24,
 };
 
-export const OFFERS_MAX = 3; // показывать максимально предложений в отчёте
+export const OFFERS_MAX = 3;
 export const ESCAPE_CODE = 27;
 export const SEPARATOR = `--`;
-export const INFO_ROUTE_CITIES_MAX = 3; // максимально городов в информации о маршруте
+export const INFO_ROUTE_CITIES_MAX = 3;
 
 export const SortType = {
   DEFAULT: `sort-event`,

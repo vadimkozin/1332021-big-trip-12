@@ -1,6 +1,5 @@
 import {MONTHS} from '../const';
 
-// добавляет ведущие нули: ( '2' => '02')
 export const addZeros = (number, digitsInNumber = 2) => {
   let n = String(number);
   while (n.length < digitsInNumber) {
@@ -9,8 +8,6 @@ export const addZeros = (number, digitsInNumber = 2) => {
   return n;
 };
 
-// форматривание дат: dm:'AUG 25' md:'25 AUG' hm:'10:30' ymd:'2020-08-25'
-//                    ymdhm:'2019-03-18T10:30' dmy:18/03/19 00:00
 export const formatDate = {
   dm: (date) => `${date.getDate()} ${MONTHS[date.getMonth()]}`,
   md: (date) => `${MONTHS[date.getMonth()]} ${date.getDate()}`,
@@ -20,10 +17,8 @@ export const formatDate = {
   ymdhm: (date) => `${formatDate.ymd(date)}T${formatDate.hm(date)}`,
 };
 
-// замена в строке (по умолчанию меняет два тире на длинное тире в html)
 export const replaceStr = (str, search = `--`, replace = `&nbsp;&mdash;&nbsp;`) => str.split(search).join(replace);
 
-// возвращает значения из массива объектов по ключу
 export const getValuesByKey = ({key, arrayObj} = {}) => {
   return arrayObj.reduce((array, it) => {
     array.push(it[key]);
@@ -31,7 +26,6 @@ export const getValuesByKey = ({key, arrayObj} = {}) => {
   }, []);
 };
 
-// хранилище уникальных пар: key->value, !при повторном добавлении key удаляется из хранилища
 export default class StoreItems {
   constructor(keyName = `key`, valueName = `value`) {
     this._store = {};

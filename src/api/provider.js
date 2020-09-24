@@ -113,11 +113,9 @@ export default class Provider {
 
       return this._api.sync(storePoints)
         .then((response) => {
-          // Забираем из ответа синхронизированные точки
           const createdTasks = getSyncedPoints(response.created);
           const updatedTasks = getSyncedPoints(response.updated);
 
-          // Добавляем синхронизированные точки в хранилище.
           const items = createStoreStructure([...createdTasks, ...updatedTasks]);
 
           this._store.setItems(items);

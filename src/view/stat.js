@@ -49,7 +49,6 @@ const renderMoneyChart = (moneyCtx, money) => {
             display: false,
             drawBorder: false
           },
-          // barThickness: 44,
         }],
         xAxes: [{
           ticks: {
@@ -60,7 +59,6 @@ const renderMoneyChart = (moneyCtx, money) => {
             display: false,
             drawBorder: false
           },
-          // minBarLength: 50
         }],
       },
       legend: {
@@ -118,7 +116,6 @@ const renderTransportChart = (transportCtx, transport) => {
             display: false,
             drawBorder: false
           },
-          // barThickness: 44,
         }],
         xAxes: [{
           ticks: {
@@ -129,7 +126,6 @@ const renderTransportChart = (transportCtx, transport) => {
             display: false,
             drawBorder: false
           },
-          // minBarLength: 50
         }],
       },
       legend: {
@@ -187,7 +183,6 @@ const renderTimeSpendChart = (timeSpendCtx, timeSpend) => {
             display: false,
             drawBorder: false
           },
-          // barThickness: 44,
         }],
         xAxes: [{
           ticks: {
@@ -198,7 +193,6 @@ const renderTimeSpendChart = (timeSpendCtx, timeSpend) => {
             display: false,
             drawBorder: false
           },
-          // minBarLength: 50
         }],
       },
       legend: {

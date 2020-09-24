@@ -8,7 +8,7 @@ const getIcon = () => `
 
 const getSortItem = (sort, currentSort) => {
   const isChecked = sort === currentSort ? `checked` : ``;
-  const name = sort.split(`-`)[1]; // sort-price -> price
+  const name = sort.split(`-`)[1];
   const icon = sort === SortType.DEFAULT ? `` : getIcon();
 
   return `<div class="trip-sort__item  trip-sort__item--event">
