@@ -1,5 +1,6 @@
 import moment from 'moment';
 import {Offer} from '../const';
+import {ucFirst} from './common';
 
 const makeItemsUniq = (items) => [...new Set(items)];
 
@@ -46,7 +47,7 @@ export default class StatInfo {
     const costs = types.map((type) => this._money[type]);
 
     return {
-      types,
+      types: types.map((type) => ucFirst(type)),
       costs,
       count: types.length,
       total: this._totalCost,
@@ -59,7 +60,7 @@ export default class StatInfo {
     const numberTrips = vehicles.map((vehicle) => this._transport[vehicle]);
 
     return {
-      vehicles,
+      vehicles: vehicles.map((vehicle) => ucFirst(vehicle)),
       numberTrips,
       count: vehicles.length,
     };
@@ -72,7 +73,7 @@ export default class StatInfo {
     const durationsInHours = durations.map((it) => Math.round(moment.duration(it).asHours()));
 
     return {
-      types,
+      types: types.map((type) => ucFirst(type)),
       durations,
       durationsInHours,
       count: types.length,

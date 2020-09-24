@@ -1,5 +1,9 @@
 import {MONTHS} from '../const';
 
+export const ucFirst = (str) => {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+};
+
 export const addZeros = (number, digitsInNumber = 2) => {
   let n = String(number);
   while (n.length < digitsInNumber) {
